@@ -24,7 +24,7 @@
 #'
 #' @param use.label Logical. Default is TRUE. For \code{SMR.table} this option will replace the variables names by its lables in var.labels argument.
 #'
-#' @param var.labels A character vector with variables labels. The default is to replace the variable name by the label stored at attr(data, "var.labels "). But one may specify labels directly.
+#' @param var.labels A character vector with variables labels. The default is to replace the variable name by the label stored at attr(data, "var.labels"). But one may specify labels directly.
 #'
 #' @param reorder Default is "no". Possible values are: "no", "SMR","lower.Cl", and "upper.Cl". Will make the \code{SMR.table} to be ordered within each varibale by its original order, or by SMR order, or by lower.Cl order, or by upper.Cl.
 #'
@@ -36,11 +36,19 @@
 #'
 #' @param overall.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall label. Internally  and 'y' coordinate is replaced.
 #'
-#' @param NOE.args A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed eaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.
+#' @param NOE.overall.args A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed eaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.
 #'
 #' @param var.labels.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the variables labels. Internally  and 'y' coordinate is replaced.
 #'
 #' @param var.labels.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories labels. Internally  and 'y' coordinate is replaced.
+#'
+#' @param N.values.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of N (number of observations) of each subgroup. Internally the arguments 'label' and 'y' coordinate are replaced.
+#'
+#' @param O.values.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Observed deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.
+#'
+#' @param E.values.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Expected deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.
+#'
+#' @param NOE.head.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the labels of the columns N, E and O on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.
 #'
 #' @return
 #' If SMR, then:
@@ -56,7 +64,6 @@
 #' If SMR.table, then a data.frame with the the same information as above, and the additional information: "Variables" (variables names), "Levels" (variables levels).
 #'
 #'If forest.SMR, then a plot is returned.
-#' @references
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'
@@ -64,7 +71,11 @@
 #'
 #' @examples
 #'
-#' @import stats graphics
+#' @references
+#'
+#' DAVID W. HOSMER AND STANLEY LEMESHOW. CONFIDENCE INTERVAL ESTIMATES OF AN INDEX OF QUALITY PERFORMANCE BASED ON LOGISTIC REGRESSION MODELS. STATISTICS IN MEDICINE, VOL. 14, 2161-2172 (1995)
+#'
+#' @import stats
 #' @export
 SMR <- function(obs.var, pred.var, digits = 5, ci.method = c("Hosmer", "Byar"), ci.level = 0.95) {
   if (length(obs.var) != length(pred.var)){
@@ -192,6 +203,7 @@ SMR.table <- function(data, group.var, obs.var, pred.var, digits = 5, use.label 
 }
 
 #' @rdname SMR
+#' @import graphics
 #' @export
 ############## Essa fun??o cria um grafico em floresta a partir do SMR.table
 # x ? a saida da fun??o SMR.table
@@ -209,10 +221,17 @@ SMR.table <- function(data, group.var, obs.var, pred.var, digits = 5, use.label 
 forest.SMR <- function(x,
                        mar1 = c(5.1, 1, 4.1, 1),
                        mar.SMR = c(5.1, 7, 4.1, 1),
-                       overall.arg = list(x = .01, font = 2, las = 1, cex = 1, labels = var.labels[1], xpd = NA, adj = 0),
-                       NOE.args = list(x = c(.5, .675, .85), font = 2, las = 1, cex = 1, xpd = NA),
+                       overall.arg = list(x = .01, font = 2, las = 1, labels = var.labels[1], xpd = NA, adj = 0),
+                       NOE.overall.args = list(x = c(.5, .675, .85), font = 2, las = 1, xpd = NA),
                        var.labels.arg = list(x = .01, font = 2, las = 1, cex = 1, xpd = NA, adj = 0),
                        cat.labels.arg = list(x = .1, font = 3, las = 1, cex = .95,  col = "gray30", xpd = NA , adj = 0),
+                       N.values.arg = list(x = .5, col = "gray30", xpd = NA),
+                       O.values.arg = list(x = .675, col = "gray30", xpd = NA),
+                       E.values.arg = list(x = .85, col = "gray30", xpd = NA),
+                       NOE.head.arg= list(font = 2, labels = c("N","O","E"), xpd = NA),
+                       Overall.seg.arg = list(col = "blue", xpd = NA),
+                       Overall.p.arg = list(pch = 23, cex = 2, col = "black", bg = gray(.4), xpd = NA),
+                       Overall.est.arg = list(x = smr.xlim[1] - .06, las = 1, font = 2, xpd = NA, adj = 1),
                        smr.xlab = "Standardized Mortality Ratio",
                        seg.col="blue",
                        seg.lty = 1,
@@ -292,7 +311,7 @@ forest.SMR <- function(x,
 
   par(mfrow = c(1,2))
 
-  # Janela com textos com vari?veis e categorias
+  # Janela com textos com variáveis e categorias
   par(mar = mar1)
   plot(NA, NA, xlim = c(0,1), ylim = ylim , xlab = "", ylab = "",yaxt = "n", xaxt = "n", xaxs = "i", bty = "n", xpd = NA)
 
@@ -301,9 +320,9 @@ forest.SMR <- function(x,
   do.call(text, overall.arg)
 
   # N O E do overall
-  NOE.args$labels <- c(main.n, main.observed, main.expected)
-  NOE.args$y <- main.pos
-  do.call(text, NOE.args)
+  NOE.overall.args$labels <- c(main.n, main.observed, main.expected)
+  NOE.overall.args$y <- main.pos
+  do.call(text, NOE.overall.args)
 
   # Demais vari?veis
   var.labels.arg$labels <- var.labels[2:length(var.labels)]
@@ -316,26 +335,58 @@ forest.SMR <- function(x,
   do.call(text, cat.labels.arg)
 
   # Colunas com os valores de N O e E
-  # NOE.values.arg <-
-  text(x.n, cat.pos, las = 1, cex = cex.var,  col = cat.col, labels = N, xpd = NA)
-  text(x.observed, cat.pos, las = 1, cex = cex.var,  col = cat.col, labels = observed, xpd = NA)
-  text(x.expected, cat.pos, las = 1, cex = cex.var,  col = cat.col, labels = expected, xpd = NA)
+  N.values.arg$labels <- N
+  N.values.arg$y <- cat.pos
+  do.call(text, N.values.arg)
 
-  # Cabe?alho das colunas N O E
-  text(c(x.n,x.observed,x.expected), ylim[2] + 1, font = font.var, cex = cex.var,  col = var.col, labels = c("N","O","E"), xpd = NA)
+  O.values.arg$labels <- observed
+  O.values.arg$y <- cat.pos
+  do.call(text, O.values.arg)
+
+  E.values.arg$labels <- expected
+  E.values.arg$y <- cat.pos
+  do.call(text, E.values.arg)
+
+  # Cabecalho das colunas N O E
+  NOE.head.arg$y <- ylim[2] + 1
+  NOE.head.arg$x <- c(x.n,x.observed,x.expected)
+  do.call(text, NOE.head.arg)
 
   # SMR
   par(mar = mar.SMR)
-  plot(NA, NA, xlim = smr.xlim, ylim = ylim , xlab = smr.xlab, ylab = "",yaxt = "n", xaxt = "n", xaxs = "i", bty = "n", xpd = NA);axis(1)
-  if(grid == T) grid()
+  plot(NA, NA, xlim = smr.xlim, ylim = ylim , xlab = smr.xlab, ylab = "", yaxt = "n", xaxt = "n", xaxs = "i", bty = "n", xpd = NA); axis(1)
+  if(grid) grid()
 
-  # Efeito principal
-  segments(main.smr[2], main.pos, main.smr[3], main.pos,col = seg.col, lty = seg.lty, lwd = seg.lwd, xpd = NA)
-  points(main.smr[1], main.pos, type = "p", pch = pch.type ,cex = pch.cex, col = pch.col, xpd = NA)
-  text(smr.xlim[1] - smr.pos, main.pos, las = 1, cex = cex.var, font = font.var, col = cat.col, labels = sprintf("%.3f [%.3f ; %.3f]",main.smr[1],main.smr[2],main.smr[3]), xpd = NA, adj = adj.smr)
+  # Segmento do IC Efeito principal
+  Overall.seg.arg$x0 <- main.smr[2]
+  Overall.seg.arg$y0 <- main.pos
+  Overall.seg.arg$x1 <- main.smr[3]
+  Overall.seg.arg$y1 <- main.pos
+  do.call(segments, Overall.seg.arg)
+  # Ponto do Efeito principal
+  Overall.p.arg$x <- main.smr[1]
+  Overall.p.arg$y <- main.pos
+  Overall.p.arg$type <- "p"
+  do.call(points, Overall.p.arg)
+  # Estimativa do efeito principal
+  Overall.est.arg$y <- main.pos
+  Overall.est.arg$labels <- sprintf(paste0("%.",digits,"f [%.",digits,"f ; %.",digits,"f]"),main.smr[1],main.smr[2],main.smr[3])
+  do.call(text, Overall.est.arg)
 
   # Das demais vari?veis
+  cat.est.arg$x0 <- smr.ll
+  cat.est.arg$y0 <- cat.pos
+  cat.est.arg$x1 <- smr.ul
+  cat.est.arg$y1 <- cat.pos
+  cat.est.arg = list(lty = seg.lty, lwd = seg.lwd, xpd = NA)
   segments(smr.ll, cat.pos, smr.ul, cat.pos,col = seg.col, lty = seg.lty, lwd = seg.lwd, xpd = NA)
+
+
+  cat.p.arg
+  cat.seg.arg
+
+
+
   points(smr.estimates, cat.pos, type = "p", pch = pch.type ,cex= pch.cex, col = pch.col, xpd = NA)
   text(smr.xlim[1] - smr.pos, cat.pos, las = 1, cex = cex.var,  col = cat.col, labels = sprintf("%.3f [%.3f ; %.3f]",smr.estimates,smr.ll,smr.ul), xpd = NA, adj = adj.smr)
   text(smr.xlim[1] - smr.pos, ylim[2] + 1, font = font.var, cex = cex.var,  col = var.col, labels = "SMR [95% CI]", xpd = NA, adj = adj.smr)

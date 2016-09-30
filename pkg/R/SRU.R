@@ -24,7 +24,6 @@
 #' \item \code{Surv} Total of survivors.
 #' \item \code{Total.LOS} Total length of stay (days).
 #' \item \code{AvDays} Average days to produce a survivor.
-#'
 #' \item \code{N.Unit} Quantity if ICUs.
 #' \item \code{N.Pat} Quantity of patients.
 #' \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation) - see \code{\link{SMR}}.
@@ -39,8 +38,6 @@
 #' @references
 #' Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
 #' @export
-
-
 
 SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, type = 1, digits = 2, digits2 = 5, originals = FALSE){
   if(length(which(is.na(prob) == TRUE))){

@@ -15,12 +15,18 @@ SMR.table(data, group.var, obs.var, pred.var, digits = 5, use.label = TRUE,
   "SMR", "lower.Cl", "upper.Cl"), decreasing = FALSE)
 
 forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
-  overall.arg = list(x = 0.01, font = 2, las = 1, cex = 1, labels =
-  var.labels[1], xpd = NA, adj = 0), NOE.args = list(x = c(0.5, 0.675, 0.85),
-  font = 2, las = 1, cex = 1, xpd = NA), var.labels.arg = list(x = 0.01, font
-  = 2, las = 1, cex = 1, xpd = NA, adj = 0), cat.labels.arg = list(x = 0.1,
-  font = 3, las = 1, cex = 0.95, col = "gray30", xpd = NA, adj = 0),
-  smr.xlab = "Standardized Mortality Ratio", seg.col = "blue",
+  overall.arg = list(x = 0.01, font = 2, las = 1, labels = var.labels[1], xpd
+  = NA, adj = 0), NOE.overall.args = list(x = c(0.5, 0.675, 0.85), font = 2,
+  las = 1, xpd = NA), var.labels.arg = list(x = 0.01, font = 2, las = 1, cex =
+  1, xpd = NA, adj = 0), cat.labels.arg = list(x = 0.1, font = 3, las = 1, cex
+  = 0.95, col = "gray30", xpd = NA, adj = 0), N.values.arg = list(x = 0.5, col
+  = "gray30", xpd = NA), O.values.arg = list(x = 0.675, col = "gray30", xpd =
+  NA), E.values.arg = list(x = 0.85, col = "gray30", xpd = NA),
+  NOE.head.arg = list(font = 2, labels = c("N", "O", "E"), xpd = NA),
+  Overall.seg.arg = list(col = "blue", xpd = NA), Overall.p.arg = list(pch =
+  23, cex = 2, col = "black", bg = gray(0.4), xpd = NA),
+  Overall.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, font = 2, xpd = NA,
+  adj = 1), smr.xlab = "Standardized Mortality Ratio", seg.col = "blue",
   seg.lty = 1, seg.lwd = 1, pch.type = 18, pch.cex = 2, pch.col = 1,
   cex.var = 1, cex.cat = 0.95, cat.col = "gray30", var.col = "black",
   font.var = 2, font.cat = 3, x.var = 0.01, x.cat = 0.1, x.n = 0.5,
@@ -45,7 +51,7 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{use.label}{Logical. Default is TRUE. For \code{SMR.table} this option will replace the variables names by its lables in var.labels argument.}
 
-\item{var.labels}{A character vector with variables labels. The default is to replace the variable name by the label stored at attr(data, "var.labels "). But one may specify labels directly.}
+\item{var.labels}{A character vector with variables labels. The default is to replace the variable name by the label stored at attr(data, "var.labels"). But one may specify labels directly.}
 
 \item{reorder}{Default is "no". Possible values are: "no", "SMR","lower.Cl", and "upper.Cl". Will make the \code{SMR.table} to be ordered within each varibale by its original order, or by SMR order, or by lower.Cl order, or by upper.Cl.}
 
@@ -57,9 +63,17 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{overall.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall label. Internally  and 'y' coordinate is replaced.}
 
-\item{NOE.args}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed eaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.}
+\item{NOE.overall.args}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed eaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.}
 
 \item{var.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the variables labels. Internally  and 'y' coordinate is replaced.}
+
+\item{N.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of N (number of observations) of each subgroup. Internally the arguments 'label' and 'y' coordinate are replaced.}
+
+\item{O.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Observed deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.}
+
+\item{E.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Expected deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.}
+
+\item{NOE.head.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the labels of the columns N, E and O on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.}
 
 \item{var.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories labels. Internally  and 'y' coordinate is replaced.}
 }
@@ -92,7 +106,7 @@ Calculates the standardized mortality ratio and its confidence interval. SMR, fo
 Lunna Borges and Pedro Brasil
 }
 \references{
-
+DAVID W. HOSMER AND STANLEY LEMESHOW. CONFIDENCE INTERVAL ESTIMATES OF AN INDEX OF QUALITY PERFORMANCE BASED ON LOGISTIC REGRESSION MODELS. STATISTICS IN MEDICINE, VOL. 14, 2161-2172 (1995)
 }
 \seealso{
 \link{SRU}

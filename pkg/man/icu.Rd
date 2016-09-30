@@ -5,9 +5,6 @@
 \alias{icu}
 \title{Data from ICU admissions.}
 \format{A data frame with 11549 rows and 24 variables}
-\source{
-\url{http://www.diamondse.info/}
-}
 \usage{
 icu
 }

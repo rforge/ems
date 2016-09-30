@@ -51,7 +51,6 @@ Two tables: one with information about severity classes, and another with inform
 \item \code{Surv} Total of survivors.
 \item \code{Total.LOS} Total length of stay (days).
 \item \code{AvDays} Average days to produce a survivor.
-
 \item \code{N.Unit} Quantity if ICUs.
 \item \code{N.Pat} Quantity of patients.
 \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation) - see \code{\link{SMR}}.

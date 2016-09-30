@@ -30,6 +30,5 @@
 #' }
 #'
 #' @format A data frame with 11549 rows and 24 variables
-#' @source \url{http://www.diamondse.info/}
 "icu"
 #> [1] "icu"
