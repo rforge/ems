@@ -50,6 +50,32 @@
 #'
 #' @param NOE.head.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the labels of the columns N, E and O on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.
 #'
+#' @param Overall.seg.arg A list of arguments passed to \code{\link[graphics]{segments}} for ploting the lines corresponding to overall SMR confidence intervals. Internally 'x' and 'y' coordinates are replaced.
+#'
+#' @param Overall.p.arg A list of arguments passed to \code{\link[graphics]{points}} for ploting the points corresponding to overall SMR. Internally 'x' and 'y' coordinates are replaced.
+#'
+#' @param Overall.est.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall SMR beside the graph. Internally 'y' coordinate and 'label' argument are replaced.
+#'
+#' @param cat.seg.arg A list of arguments passed to \code{\link[graphics]{segments}} for ploting the lines corresponding to SMR confidence intervals for all groups. Internally 'x' and 'y' coordinates are replaced.
+#'
+#' @param cat.p.arg A list of arguments passed to \code{\link[graphics]{points}} for ploting the points corresponding to all categoreis SMR. Internally 'x' and 'y' coordinates are replaced.
+#'
+#' @param cat.est.arg A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories SMR beside the graph. Internally 'y' coordinate and 'label' argument are replaced.
+#'
+#' @param SMR.head.arg  A list of arguments passed to \code{\link[graphics]{text}} for ploting the label of the SMR column on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.
+#'
+#' @param smr.xlab Label of the x axis. Default is "Standardized Mortality Ratio".
+#'
+#' @param x.n The position on the x axis of colum N (number of observations). Default is 0.5. Reasonble values are between 0 and 1.
+#'
+#' @param x.observed The position on the x axis of colum O (observed deaths). Default is 0.675. Reasonble values are between 0 and 1.
+#'
+#' @param x.expected The position on the x axis of colum E (expected deaths). Default is 0.85. Reasonble values are between 0 and 1.
+#'
+#' @param smr.xlim. Limits of x axis of the SMR plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto" only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.
+#'
+#' @param grid Logical. If TRUE, it will draw a grid with the \code{\link[graphics]{grid}} standards.
+#'
 #' @return
 #' If SMR, then:
 #' \itemize{
@@ -70,7 +96,38 @@
 #' @seealso \link{SRU}
 #'
 #' @examples
+#' # importing a example data
+#' data(icu)
 #'
+#' # Formating the outcome
+#' icu$HospitalDischargeName <- ifelse(icu$HospitalDischargeName == "Alta",0 , 1)
+#'
+#' # Setting labels to the data.frame
+#' attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h","Saps3Points"), names(icu))] <- c("ICU unit","Mechanichal ventilation","SAPS 3 score")
+#'
+#' # The overall SMR for the whole sample
+#' SMR(icu$HospitalDischargeName, icu$Saps3DeathProbabilityStandardEquation)
+#'
+#' # The overall SMR and for some subgroups
+#' x <- SMR.table(data = icu, obs.var = "HospitalDischargeName",
+#'             pred.var = "Saps3DeathProbabilityStandardEquation",
+#'             group.var = c("IsMechanicalVentilation1h", "Unit"),
+#'             reorder = "no",
+#'             decreasing = T)
+#' x
+#'
+#' # A forest plot for all groups SMR
+#' forest.SMR(x, digits = 2)
+#'
+#' # The same thing but reordering the categories
+#' x <- SMR.table(data = icu, obs.var = "HospitalDischargeName",
+#'             pred.var = "Saps3DeathProbabilityStandardEquation",
+#'             group.var = c("IsMechanicalVentilation1h", "Unit"),
+#'             reorder = "SMR",
+#'             decreasing = T)
+#' forest.SMR(x, digits = 2)
+#'
+#' rm(x, icu)
 #' @references
 #'
 #' DAVID W. HOSMER AND STANLEY LEMESHOW. CONFIDENCE INTERVAL ESTIMATES OF AN INDEX OF QUALITY PERFORMANCE BASED ON LOGISTIC REGRESSION MODELS. STATISTICS IN MEDICINE, VOL. 14, 2161-2172 (1995)
@@ -204,60 +261,35 @@ SMR.table <- function(data, group.var, obs.var, pred.var, digits = 5, use.label 
 
 #' @rdname SMR
 #' @import graphics
+#' @import grDevices
 #' @export
-############## Essa fun??o cria um grafico em floresta a partir do SMR.table
-# x ? a saida da fun??o SMR.table
-# mfrow (ver par) - ignorado no momento (em algum momento achei que pudessem entrar SMR de mais de um modelo)
-# mar1 (ver mar em par) - margens da primeira janela
-# mar.SMR - margens da segunda janela
-# seg.col = cor da linhas horizontais do IC dos SMR
-# pch s?o o tipo cor e tamanho da estimativa pontual do SMR
-# cex.var e cex.cat s?os tamanhos das fontes das variaveis e das catagorias
-# var.col e cat.col s?os cores das fontes das variaveis e das catagorias
-# x.var e x.cat, x.observed e x.expected s?o as posi??es das colunas no eixo horizontal
-# adj ? adj que passa pra text na variavel e categorias
-# smr.xlim s?o os limites dos eixo horizontal
-# smr.pos ? o quanto que o textos de estimativas de SMR afastam do limite esquerdo da janela com o grafico
 forest.SMR <- function(x,
                        mar1 = c(5.1, 1, 4.1, 1),
                        mar.SMR = c(5.1, 7, 4.1, 1),
                        overall.arg = list(x = .01, font = 2, las = 1, labels = var.labels[1], xpd = NA, adj = 0),
-                       NOE.overall.args = list(x = c(.5, .675, .85), font = 2, las = 1, xpd = NA),
+                       NOE.overall.args = list(x = c(x.n, x.observed, x.expected), font = 2, las = 1, xpd = NA),
                        var.labels.arg = list(x = .01, font = 2, las = 1, cex = 1, xpd = NA, adj = 0),
-                       cat.labels.arg = list(x = .1, font = 3, las = 1, cex = .95,  col = "gray30", xpd = NA , adj = 0),
-                       N.values.arg = list(x = .5, col = "gray30", xpd = NA),
-                       O.values.arg = list(x = .675, col = "gray30", xpd = NA),
-                       E.values.arg = list(x = .85, col = "gray30", xpd = NA),
+                       cat.labels.arg = list(x = .1, font = 3, las = 1, cex = .95,  col = gray(.4), xpd = NA , adj = 0),
+                       N.values.arg = list(x = x.n, col = gray(.4), xpd = NA),
+                       O.values.arg = list(x = x.observed, col = gray(.4), xpd = NA),
+                       E.values.arg = list(x = x.expected, col = gray(.4), xpd = NA),
                        NOE.head.arg= list(font = 2, labels = c("N","O","E"), xpd = NA),
                        Overall.seg.arg = list(col = "blue", xpd = NA),
                        Overall.p.arg = list(pch = 23, cex = 2, col = "black", bg = gray(.4), xpd = NA),
                        Overall.est.arg = list(x = smr.xlim[1] - .06, las = 1, font = 2, xpd = NA, adj = 1),
+                       cat.seg.arg = list(col = "navyblue", xpd = NA),
+                       cat.p.arg = list(pch = 22 ,cex= 1, col = "black", bg = gray(.4), xpd = NA),
+                       cat.est.arg = list(x = smr.xlim[1] - .06, las = 1, col = gray(.4), xpd = NA, adj = 1),
+                       SMR.head.arg = list(smr.xlim[1] - .06, font = 2, labels = "SMR [95% sCI]", xpd = NA, adj = 1),
                        smr.xlab = "Standardized Mortality Ratio",
-                       seg.col="blue",
-                       seg.lty = 1,
-                       seg.lwd = 1,
-                       pch.type = 18,
-                       pch.cex = 2,
-                       pch.col = 1,
-                       cex.var = 1,
-                       cex.cat = .95,
-                       cat.col = "gray30",
-                       var.col = "black",
-                       font.var = 2,
-                       font.cat = 3,
-                       x.var = .01,
-                       x.cat = .1,
                        x.n = .50,
                        x.observed = .675,
                        x.expected = .85,
-                       adj.var = 0,
-                       adj.cat = 0,
-                       adj.smr = 1,
                        smr.xlim = "auto",
-                       smr.pos = .06,
                        grid = TRUE,
                        digits = 3){
-  on.exit(par())
+  opar <- par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1))
+  on.exit(par(opar))
 
   # Separando os valores da medida preincipal
   main.pos = 1
@@ -373,22 +405,24 @@ forest.SMR <- function(x,
   Overall.est.arg$labels <- sprintf(paste0("%.",digits,"f [%.",digits,"f ; %.",digits,"f]"),main.smr[1],main.smr[2],main.smr[3])
   do.call(text, Overall.est.arg)
 
-  # Das demais vari?veis
-  cat.est.arg$x0 <- smr.ll
-  cat.est.arg$y0 <- cat.pos
-  cat.est.arg$x1 <- smr.ul
-  cat.est.arg$y1 <- cat.pos
-  cat.est.arg = list(lty = seg.lty, lwd = seg.lwd, xpd = NA)
-  segments(smr.ll, cat.pos, smr.ul, cat.pos,col = seg.col, lty = seg.lty, lwd = seg.lwd, xpd = NA)
+  # Segmentos das categorias
+  cat.seg.arg$x0 <- smr.ll
+  cat.seg.arg$y0 <- cat.pos
+  cat.seg.arg$x1 <- smr.ul
+  cat.seg.arg$y1 <- cat.pos
+  do.call(segments, cat.seg.arg)
+  # Ponto das estimativas das categorias
+  cat.p.arg$x <- smr.estimates
+  cat.p.arg$y <- cat.pos
+  cat.p.arg$type <- "p"
+  do.call(points, cat.p.arg)
+  # Estimativas das categorias
+  cat.est.arg$y <- cat.pos
+  cat.est.arg$labels <- sprintf(paste0("%.",digits,"f [%.",digits,"f ; %.",digits,"f]"),smr.estimates,smr.ll,smr.ul)
+  do.call(text, cat.est.arg)
 
-
-  cat.p.arg
-  cat.seg.arg
-
-
-
-  points(smr.estimates, cat.pos, type = "p", pch = pch.type ,cex= pch.cex, col = pch.col, xpd = NA)
-  text(smr.xlim[1] - smr.pos, cat.pos, las = 1, cex = cex.var,  col = cat.col, labels = sprintf("%.3f [%.3f ; %.3f]",smr.estimates,smr.ll,smr.ul), xpd = NA, adj = adj.smr)
-  text(smr.xlim[1] - smr.pos, ylim[2] + 1, font = font.var, cex = cex.var,  col = var.col, labels = "SMR [95% CI]", xpd = NA, adj = adj.smr)
+  # Cabeçalho dos SMRs
+  SMR.head.arg$y <- ylim[2] + 1
+  do.call(text, SMR.head.arg)
 }
 

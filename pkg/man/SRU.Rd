@@ -54,10 +54,8 @@ Two tables: one with information about severity classes, and another with inform
 \item \code{N.Unit} Quantity if ICUs.
 \item \code{N.Pat} Quantity of patients.
 \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation) - see \code{\link{SMR}}.
-\item \code{SRU} Standardized Resource Use Mean (standard deviation) - see \code{\link{SRU}}.
+\item \code{SRU} Standardized Resource Use Mean (standard deviation).
 }
-
-Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > median.
 }
 \description{
 Calculates the standardized resource use for ICUs with information about its patients.
@@ -67,11 +65,34 @@ Calculates the standardized resource use for ICUs with information about its pat
  \code{print.SRU} Prints a object of class 'SRU'.
 }
 \examples{
-data(ICU)
+
+# Loading the dataset
+data(icu)
+
+# Removig data with inapropriate values
 icu <- icu[-which(icu$los < 0 ),]
-SRU(prob = icu$Saps3DeathProbabilityStandardEquation, death = icu$UnitDischargeName, unit = icu$Unit, los = icu$los, score = icu$Saps3Points, originals = T, type = 1, plot = F)
+
+# Estimating the SRU
+x <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation, death = icu$UnitDischargeName, unit = icu$Unit, los = icu$los, score = icu$Saps3Points, originals = T, type = 1, plot = F)
+x
+
+# To see the units rankings and individual SMR and SRU, ordering by it SRU
+x$rates[order(x$rates$sru),]
+
+plot(x)
+
+
+rm(x, icu)
+}
+\author{
+Lunna Borges and Pedro Brasil
+
+Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > median.
 }
 \references{
 Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
+}
+\seealso{
+\code{\link{SMR}}, \code{\link{reclass}}
 }
 

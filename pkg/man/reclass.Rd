@@ -4,7 +4,7 @@
 \alias{plot.reclass}
 \alias{print.reclass}
 \alias{reclass}
-\title{reclass()}
+\title{Comparisson of the Standardized Resource Use (SRU)}
 \usage{
 reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
   "SMR", "BOTH"), decreasing = FALSE)
@@ -31,9 +31,9 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
   "1? Stage"), main.arg_y = list(main = "2? Stage"))
 }
 \arguments{
-\item{x, y}{Objects of class 'SRU'. Be x from the 1st stage and y from the 2nd.}
+\item{x, y}{Objects of class 'SRU'. Be x from the 1st stage and y from the 2nd. For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.}
 
-\item{same}{logical; If TRUE, compare the same units through two diferents times (default).}
+\item{same}{logical; If TRUE, compare the same units, with the same severity classes through two diferents times (default). If FLASE compare the same units, with the different severity classes.}
 
 \item{plot}{logical; If TRUE, plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.}
 
@@ -42,8 +42,6 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 \item{compare}{The way one prefer to benchmark the ICUs: by SRU (default), SMR or both of them.}
 
 \item{decreasing}{logical; Should the sort order of ICU's rank be increasing or decreasing?}
-
-\item{x}{For \code{print.reclass} or \code{plot.reclass}, an object of class 'reclass'.}
 }
 \value{
 A table with information about which ICUs changed from a classification to another, their SMR, SRU and rank among other ICUs.
@@ -59,12 +57,27 @@ To compare ICUs  with diferents severities classes or throught two diferents tim
 data(icu)
 #1st quarter
 x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("01","02","03")),]
+
 #2nd quarter
 y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("04","05","06")),]
+
 FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName, unit = x$Unit, los = x$los, score = x$Saps3Points, originals = T, type = 1, plot = F)
+FirstQ
+
 SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDischargeName, unit = y$Unit, los = y$los, score = y$Saps3Points, originals = T, type = 1, plot = F)
+SecondQ
+
 reclass(x = FirstQ, y = SecondQ)
+
 plot(reclass(x = FirstQ, y = SecondQ))
-#' @export
+
+rm(icu, x, y, FirstQ, SecondQ)
+
+}
+\author{
+Lunna Borges and Pedro Brasil
+}
+\seealso{
+\code{\link{SRU}}
 }
 
