@@ -7,33 +7,37 @@
 \title{Comparisson of the Standardized Resource Use (SRU)}
 \usage{
 reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
-  "SMR", "BOTH"), decreasing = FALSE)
+  "SMR", "BOTH"), decreasing = FALSE, complete.rank = TRUE)
 
 \method{print}{reclass}(x, ...)
 
-\method{plot}{reclass}(x, ..., xlim = range(x$smr_x), ylim = range(x$sru_x),
-  xlab = "SMR", ylab = "SRU", points.arg_x = list(pch = 21, col = "white",
-  bg = "yellow", cex = 2), points.arg_y = list(pch = 21, col = "white", bg =
-  "yellow", cex = 2), med.arg_x = list(col = "dodgerblue4", lwd = 2, lty = 1),
+\method{plot}{reclass}(x, ..., xlim_x = range(x$smr_x),
+  ylim_x = range(x$sru_x), xlim_y = range(x$smr_y),
+  ylim_y = range(x$sru_y), xlab = "SMR", ylab = "SRU",
+  points.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2),
+  points.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2),
+  med.arg_x = list(col = "dodgerblue4", lwd = 2, lty = 1),
   med.arg_y = list(col = "dodgerblue4", lwd = 2, lty = 1),
   tert.arg_x = list(col = "darkorange2", lty = 2, lwd = 1),
   tert.arg_y = list(col = "darkorange2", lty = 2, lwd = 1),
   changes.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2),
   changes.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2),
-  text.arg_x = list(labels = x$tab$Rank, cex = 0.6),
-  text.arg_y = list(labels = x$tab$Rank, cex = 0.6), worse.arg_x = list(pch
-  = 21, col = "white", bg = "tomato", cex = 2), worse.arg_y = list(pch = 21,
-  col = "white", bg = "tomato", cex = 2), better.arg_x = list(pch = 21, col =
-  "white", bg = "mediumseagreen", cex = 2), better.arg_y = list(pch = 21, col
-  = "white", bg = "mediumseagreen", cex = 2), auto.legend = TRUE,
-  leg.arg = list(x = "bottomleft", bty = "n", xpd = T, inset = -0.35, ncol =
-  1, horiz = F, pch = 19, cex = 0.8, pt.cex = 1.5), main.arg_x = list(main =
-  "1? Stage"), main.arg_y = list(main = "2? Stage"))
+  text.arg_x = list(labels = seq(1, nrow(x$tab)), cex = 0.6),
+  text.arg_y = list(labels = seq(1, nrow(x$tab)), cex = 0.6),
+  worse.arg_x = list(x = x$worse_x, pch = 21, col = "white", bg = "tomato",
+  cex = 2), worse.arg_y = list(x = x$worse_y, pch = 21, col = "white", bg =
+  "tomato", cex = 2), better.arg_x = list(x = x$better_x, pch = 21, col =
+  "white", bg = "mediumseagreen", cex = 2), better.arg_y = list(x =
+  x$better_y, pch = 21, col = "white", bg = "mediumseagreen", cex = 2),
+  auto.legend = TRUE, leg.arg = list(x = "topleft", bty = "n", xpd = NA,
+  inset = c(-1.8, -0.2), ncol = 1, horiz = F, pch = 19, cex = 0.8, pt.cex =
+  1.5), main.arg_x = list(main = "1st Stage"), main.arg_y = list(main =
+  "2nd Stage"))
 }
 \arguments{
 \item{x, y}{Objects of class 'SRU'. Be x from the 1st stage and y from the 2nd. For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.}
 
-\item{same}{logical; If TRUE, compare the same units, with the same severity classes through two diferents times (default). If FLASE compare the same units, with the different severity classes.}
+\item{same}{logical; If TRUE, compare the same units, with the same severity classes through two diferents times (default). If FALSE compare the same units, with the different severity classes.}
 
 \item{plot}{logical; If TRUE, plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.}
 
@@ -42,6 +46,8 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 \item{compare}{The way one prefer to benchmark the ICUs: by SRU (default), SMR or both of them.}
 
 \item{decreasing}{logical; Should the sort order of ICU's rank be increasing or decreasing?}
+
+\item{complete.rank}{logical; If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.}
 }
 \value{
 A table with information about which ICUs changed from a classification to another, their SMR, SRU and rank among other ICUs.
@@ -61,10 +67,12 @@ x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("01","02","
 #2nd quarter
 y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("04","05","06")),]
 
-FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName, unit = x$Unit, los = x$los, score = x$Saps3Points, originals = T, type = 1, plot = F)
+FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
+unit = x$Unit, los = x$los, score = x$Saps3Points, originals = T, type = 1, plot = F)
 FirstQ
 
-SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDischargeName, unit = y$Unit, los = y$los, score = y$Saps3Points, originals = T, type = 1, plot = F)
+SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDischargeName,
+unit = y$Unit, los = y$los, score = y$Saps3Points, originals = T, type = 1, plot = F)
 SecondQ
 
 reclass(x = FirstQ, y = SecondQ)

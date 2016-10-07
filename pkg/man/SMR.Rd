@@ -9,20 +9,20 @@
 SMR(obs.var, pred.var, digits = 5, ci.method = c("Hosmer", "Byar"),
   ci.level = 0.95)
 
-SMR.table(data, group.var, obs.var, pred.var, digits = 5, use.label = TRUE,
+SMR.table(data, group.var, obs.var, pred.var, digits = 5, use.label = FALSE,
   var.labels = attr(data, "var.labels")[match(group.var, names(data))],
   ci.method = c("Hosmer", "Byar"), ci.level = 0.95, reorder = c("no",
   "SMR", "lower.Cl", "upper.Cl"), decreasing = FALSE)
 
 forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
   overall.arg = list(x = 0.01, font = 2, las = 1, labels = var.labels[1], xpd
-  = NA, adj = 0), NOE.overall.args = list(x = c(x.n, x.observed, x.expected),
-  font = 2, las = 1, xpd = NA), var.labels.arg = list(x = 0.01, font = 2, las
-  = 1, cex = 1, xpd = NA, adj = 0), cat.labels.arg = list(x = 0.1, font = 3,
-  las = 1, cex = 0.95, col = gray(0.4), xpd = NA, adj = 0),
-  N.values.arg = list(x = x.n, col = gray(0.4), xpd = NA),
-  O.values.arg = list(x = x.observed, col = gray(0.4), xpd = NA),
-  E.values.arg = list(x = x.expected, col = gray(0.4), xpd = NA),
+  = NA, adj = 0), NOE.overall.args = list(x = c(N.values.arg$x,
+  O.values.arg$x, E.values.arg$x), font = 2, las = 1, xpd = NA),
+  var.labels.arg = list(x = 0.01, font = 2, las = 1, cex = 1, xpd = NA, adj =
+  0), cat.labels.arg = list(x = 0.1, font = 3, las = 1, cex = 0.95, col =
+  gray(0.4), xpd = NA, adj = 0), N.values.arg = list(x = 0.5, col = gray(0.4),
+  xpd = NA), O.values.arg = list(x = 0.675, col = gray(0.4), xpd = NA),
+  E.values.arg = list(x = 0.85, col = gray(0.4), xpd = NA),
   NOE.head.arg = list(font = 2, labels = c("N", "O", "E"), xpd = NA),
   Overall.seg.arg = list(col = "blue", xpd = NA), Overall.p.arg = list(pch =
   23, cex = 2, col = "black", bg = gray(0.4), xpd = NA),
@@ -32,9 +32,8 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
   NA), cat.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, col = gray(0.4),
   xpd = NA, adj = 1), SMR.head.arg = list(smr.xlim[1] - 0.06, font = 2, labels
   = "SMR [95\% sCI]", xpd = NA, adj = 1),
-  smr.xlab = "Standardized Mortality Ratio", x.n = 0.5,
-  x.observed = 0.675, x.expected = 0.85, smr.xlim = "auto", grid = TRUE,
-  digits = 3)
+  smr.xlab = "Standardized Mortality Ratio", smr.xlim = "auto",
+  grid = TRUE, digits = 3)
 }
 \arguments{
 \item{obs.var}{Observed death. Accepted values are 0 (absence) or 1 (presence) in a vector. For \code{SMR.table} is must be a character indicating the name of the variable in data.}
@@ -47,17 +46,17 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{ci.level}{Level of the confidence interval. Default is 0.95.}
 
-\item{data}{A dataset where pred.var, obs.var and group.var are in.}
+\item{data}{For \code{SMR.table}, a dataset where pred.var, obs.var and group.var are in.}
 
-\item{group.var}{For \code{SMR.table} is must be a vector indicating the name(s) of the variable(s) in data indicating which variables will form the groups across which SMR will be calculated. Must be factor variables.}
+\item{group.var}{For \code{SMR.table}, this is a character vector indicating the name(s) of the variable(s) in data will form the groups in where SMR will be calculated. Must be factor variables.}
 
-\item{use.label}{Logical. Default is TRUE. For \code{SMR.table} this option will replace the variables names by its lables in var.labels argument.}
+\item{use.label}{Logical. Default is FALSE. For \code{SMR.table} this option will replace the variables names by its labels in var.labels argument.}
 
 \item{var.labels}{A character vector with variables labels. The default is to replace the variable name by the label stored at attr(data, "var.labels"). But one may specify labels directly.}
 
 \item{reorder}{Default is "no". Possible values are: "no", "SMR","lower.Cl", and "upper.Cl". Will make the \code{SMR.table} to be ordered within each varibale by its original order, or by SMR order, or by lower.Cl order, or by upper.Cl.}
 
-\item{decreasing}{Logical. Should the order be decreasing or incresing. See \code{\link[base]{order}}}
+\item{decreasing}{Logical. When 'reorderd' is TRUE, should the order be decreasing or incresing? See \code{\link[base]{order}}}
 
 \item{x}{For the \code{forest.SMR} this is the output of \code{SMR.table}.}
 
@@ -69,13 +68,15 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{var.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the variables labels. Internally  and 'y' coordinate is replaced.}
 
+\item{cat.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories labels. Internally  and 'y' coordinate is replaced.}
+
 \item{N.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of N (number of observations) of each subgroup. Internally the arguments 'label' and 'y' coordinate are replaced.}
 
 \item{O.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Observed deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.}
 
 \item{E.values.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the values of Expected deaths of each subgroup. Internally the arguments 'label'  and 'y' coordinate are replaced.}
 
-\item{NOE.head.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the labels of the columns N, E and O on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.}
+\item{NOE.head.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the labels of the columns N, E and O on the top of the graph. Internally the 'x' and 'y' coordinate are replaced. The x coordinates are taken from the x in N.values.arg, O.values.arg and E.values.arg.}
 
 \item{Overall.seg.arg}{A list of arguments passed to \code{\link[graphics]{segments}} for ploting the lines corresponding to overall SMR confidence intervals. Internally 'x' and 'y' coordinates are replaced.}
 
@@ -87,23 +88,15 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{cat.p.arg}{A list of arguments passed to \code{\link[graphics]{points}} for ploting the points corresponding to all categoreis SMR. Internally 'x' and 'y' coordinates are replaced.}
 
-\item{cat.est.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories SMR beside the graph. Internally 'y' coordinate and 'label' argument are replaced.}
+\item{cat.est.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories SMR beside the graph. Internally 'y' coordinate and 'label' arguments are replaced.}
 
-\item{SMR.head.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the label of the SMR column on the top of the graph. Internally the 'x' and 'y' coordinate are replaced.}
+\item{SMR.head.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the label of the SMR column on the top of the graph. Internally the 'and 'y' coordinate is replaced.}
 
 \item{smr.xlab}{Label of the x axis. Default is "Standardized Mortality Ratio".}
 
-\item{x.n}{The position on the x axis of colum N (number of observations). Default is 0.5. Reasonble values are between 0 and 1.}
-
-\item{x.observed}{The position on the x axis of colum O (observed deaths). Default is 0.675. Reasonble values are between 0 and 1.}
-
-\item{x.expected}{The position on the x axis of colum E (expected deaths). Default is 0.85. Reasonble values are between 0 and 1.}
+\item{smr.xlim}{Limits of x axis of the \code{forest.SMR} plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto" only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.}
 
 \item{grid}{Logical. If TRUE, it will draw a grid with the \code{\link[graphics]{grid}} standards.}
-
-\item{var.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the categories labels. Internally  and 'y' coordinate is replaced.}
-
-\item{smr.xlim.}{Limits of x axis of the SMR plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto" only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.}
 }
 \value{
 If SMR, then:
@@ -116,47 +109,48 @@ If SMR, then:
 \item \code{upper.Cl} upper confidence limit.
 }
 
-If SMR.table, then a data.frame with the the same information as above, and the additional information: "Variables" (variables names), "Levels" (variables levels).
+If SMR.table, then a data.frame with the the same information as above, and the
+ additional information: "Variables" (variables names), "Levels" (variables levels).
 
 If forest.SMR, then a plot is returned.
 }
 \description{
-Calculates the standardized mortality ratio and its confidence interval. SMR, for a group, is defined as the ratio of the observed deaths in this group and the sum of the predicted individual probabilities of death by any model.
+Calculates the standardized mortality ratio and its confidence interval. SMR, for a group, is defined as the ratio of the observed deaths in this group and the sum of the predicted individual probabilities of death by any model (expected deaths).
 
 \code{SMR.table} estimate at once the overall SMR and the SMR across several groups, e.g. ICU units or clinical characteristics. The \code{SMR.table} can be ordered by the SMR estimate or its confidence intervals, facilitating the comparinson of the units ranks.
 
 \code{forest.SMR} shows the \code{SMR.table} output as a forest plot. The plot opens two windows and plot at the left side the values from the \code{SMR.table} and at the right side the points and lines graphically representing each SMR and its confidence interval.
 }
 \examples{
-# importing a example data
+# loading a example data
 data(icu)
 
-# Formating the outcome
-icu$HospitalDischargeName <- ifelse(icu$HospitalDischargeName == "Alta",0 , 1)
-
-# Setting labels to the data.frame
-attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h","Saps3Points"), names(icu))] <- c("ICU unit","Mechanichal ventilation","SAPS 3 score")
+# Setting labels to data
+attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h"), names(icu))] <-
+c("ICU unit","Mechanichal ventilation")
 
 # The overall SMR for the whole sample
-SMR(icu$HospitalDischargeName, icu$Saps3DeathProbabilityStandardEquation)
+SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
 
 # The overall SMR and for some subgroups
-x <- SMR.table(data = icu, obs.var = "HospitalDischargeName",
+x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
             pred.var = "Saps3DeathProbabilityStandardEquation",
             group.var = c("IsMechanicalVentilation1h", "Unit"),
             reorder = "no",
-            decreasing = T)
+            decreasing = TRUE,
+            use.label = TRUE)
 x
 
 # A forest plot for all groups SMR
 forest.SMR(x, digits = 2)
 
 # The same thing but reordering the categories
-x <- SMR.table(data = icu, obs.var = "HospitalDischargeName",
+x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
             pred.var = "Saps3DeathProbabilityStandardEquation",
             group.var = c("IsMechanicalVentilation1h", "Unit"),
             reorder = "SMR",
-            decreasing = T)
+            decreasing = TRUE,
+            use.label = TRUE)
 forest.SMR(x, digits = 2)
 
 rm(x, icu)
@@ -168,6 +162,6 @@ Lunna Borges and Pedro Brasil
 DAVID W. HOSMER AND STANLEY LEMESHOW. CONFIDENCE INTERVAL ESTIMATES OF AN INDEX OF QUALITY PERFORMANCE BASED ON LOGISTIC REGRESSION MODELS. STATISTICS IN MEDICINE, VOL. 14, 2161-2172 (1995)
 }
 \seealso{
-\link{SRU}
+\link{SRU}, \link{reclass}
 }
 

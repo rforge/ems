@@ -11,12 +11,22 @@
 #' @param unit ICU where the patient is admitted.
 #' @param los Observed length of stay.
 #' @param los.esp Estimated length of stay.
-#' @param class Severity range of the patient.
+#' @param class Patient's severity range.
 #' @param score Acute Physiology Score.
 #' @param plot logical; If TRUE plots a SMR versus SRU scatter plot.
 #' @param type Way to calculate SRU. If 1, does it as the article (default).
 #' @param digits,digits2 Integer indicating the number of decimal places to be used in the output.
 #' @param originals logical; If TRUE uses the severity classes and average days as the original article.
+#' @param x  For \code{prin t.SRU}, an object of class 'SRU'.
+#' @param xlim,ylim Limits of x and y axis for \code{plot.SRU}.
+#' @param xlab,ylab Labels of x and y axis for \code{plot.SRU}.
+#' @param points.arg List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units' SMR and SRU for \code{plot.SRU}.
+#' @param med.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians for \code{plot.SRU}.
+#' @param tert.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles for \code{plot.SRU}.
+#' @param auto.legend logical; If TRUE, prints a legend with \code{leg.arg} argumentes for \code{plot.SRU}.
+#' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles for \code{plot.SRU}.
+#' @param ... Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).
+#'
 #' @return Two tables: one with information about severity classes, and another with information about ICUs classified as Most Efficient or Least Efficient.
 #' \itemize{
 #' \item \code{Sev} Severity class.
@@ -24,38 +34,55 @@
 #' \item \code{Surv} Total of survivors.
 #' \item \code{Total.LOS} Total length of stay (days).
 #' \item \code{AvDays} Average days to produce a survivor.
-#' \item \code{N.Unit} Quantity if ICUs.
+#' \item \code{N.Unit} Quantity of ICUs.
 #' \item \code{N.Pat} Quantity of patients.
 #' \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation) - see \code{\link{SMR}}.
 #' \item \code{SRU} Standardized Resource Use Mean (standard deviation).
 #' }
 #'
+#' Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > median.
+#'
 #' @seealso \code{\link{SMR}}, \code{\link{reclass}}
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'
-#' Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > median.
 #' @examples
 #'
 #' # Loading the dataset
 #' data(icu)
 #'
-#' # Removig data with inapropriate values
+#' days = seq(1,100)
+#'
+#' corte = cut_in(icu$Saps3Points,icu$los,icu$UnitDischargeName,icu$Unit,days,exc.ICU=TRUE)
+#'
+#' icu$class=cut(icu$Saps3Points,breaks=corte,include.lowest = TRUE)
+#'
+#' # Removing data with inapropriate values
 #' icu <- icu[-which(icu$los < 0 ),]
 #'
 #' # Estimating the SRU
-#' x <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation, death = icu$UnitDischargeName, unit = icu$Unit, los = icu$los, score = icu$Saps3Points, originals = T, type = 1, plot = F)
-#' x
+#' x <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
+#' death = icu$UnitDischargeName,unit = icu$Unit,
+#' los = icu$los, score = icu$Saps3Points,
+#' originals = TRUE, type = 1, plot = FALSE);x
+#'
+#' plot(x)
 #'
 #' # To see the units rankings and individual SMR and SRU, ordering by it SRU
 #' x$rates[order(x$rates$sru),]
 #'
-#' plot(x)
+#' # SRU with diferent severity classes created by cut_in function
+#'y <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
+#'death = icu$UnitDischargeName, unit = icu$Unit,
+#'los = icu$los, score = icu$Saps3Points,
+#'originals = FALSE, type = 1, plot = FALSE, class = icu$class)
+#' y
 #'
-#'
-#' rm(x, icu)
+#' rm(x, icu, corte)
 #' @references
 #' Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
+#' @import stats
+#' @import graphics
 #' @export
 
 SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, type = 1, digits = 2, digits2 = 5, originals = FALSE){
@@ -68,7 +95,7 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
   if(length(which(is.na(death) == TRUE))){
     stop("Death must not have any NA value.")
   }
-  if(any(as.factor(death) != 0 & as.factor(death) != 1)){
+  if(all(death != 0 & death != 1)){
     stop("Observed death variable must be coded as 0 and 1.")
   }
   if(!is.factor(unit)){
@@ -138,7 +165,7 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
     average_days <- sum_los / surv 	#N? M?DIO DE RECURSOS USADO POR PACIENTE,POR ESTRATO
   }
   if (originals == TRUE){
-    average_days <- matrix(c(2.3,3.2,4.3,7.2,11,16.6,22.2,29.4,39), nc=1)
+    average_days <- matrix(c(2.3,3.2,4.3,7.2,11,16.6,22.2,29.4,39), ncol = 1)
   }
   if (type == 1){
     # unit_death[,1]					#N? DE SOBREVIVENTES POR UNIDADE
@@ -220,6 +247,8 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
 
   n.pacients <- c(pacient_LT, pacient_Menor.Median, pacient_Maior.Median, pacient_HT, pacient_total)
 
+  unit_admissions = apply(unit_death,1,sum)
+
   output <- list(
     LOS.surv = data.frame(row.names=NULL,labels(total), total, surv, round(as.vector(sum_los), digits2), round(average_days,digits2)),
     estim.eff = data.frame(N.Unit=quant_unit, N.Pat = n.pacients, SMR = paste(format(smr.mean,digits = digits, nsmall = digits), " ",
@@ -230,7 +259,7 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
     LOS_obs = LOS_ICU_obs,
     LOS_esp = LOS_ICU_esp,
     ratesef = which(rates$group == "ME" | rates$group == "LE"),
-    totalICU = sum(total)
+    totalICU = nrow(unit_death), totalAd = unit_admissions
   )
   colnames(output$LOS.surv) <- c("Sev","Total","Surv","Total.LOS","AvDays")
   rownames(output$estim.eff) <- c("Low.Tert","<Median",">Median","High.Tert","All.Units")
@@ -243,7 +272,6 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
 }
 
 #' @rdname SRU
-#' @param x  Object of class 'SRU'.
 #' @export
 
 print.SRU <- function(x, ...){
@@ -258,7 +286,7 @@ print.SRU <- function(x, ...){
 
 #' @rdname SRU
 #' @export
-plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]), xlab = "SMR", ylab = "SRU", points.arg = list(pch = 21, col = "white", bg = "cadetblue3"), med.arg = list(col="dodgerblue4",lwd = 2,lty = 1), tert.arg = list(col = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x = "top", bty = "n", xpd = NA, inset = -.15, ncol = 2)){
+plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]), xlab = "SMR", ylab = "SRU", points.arg = list(pch = 21, col = "white", bg = "cadetblue3",cex=1.5), med.arg = list(col="dodgerblue4",lwd = 2,lty = 1), tert.arg = list(col = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x = "top", bty = "n", xpd = NA, inset = -.15, ncol = 2)){
   plot(0, 0, ..., xlim = xlim, ylim = ylim, type = 'n')
   med.arg$v <- x$med[2]
   med.arg$h <- x$med[1]
