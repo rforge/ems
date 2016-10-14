@@ -20,8 +20,6 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
   med.arg_y = list(col = "dodgerblue4", lwd = 2, lty = 1),
   tert.arg_x = list(col = "darkorange2", lty = 2, lwd = 1),
   tert.arg_y = list(col = "darkorange2", lty = 2, lwd = 1),
-  changes.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2),
-  changes.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2),
   text.arg_x = list(labels = seq(1, nrow(x$tab)), cex = 0.6),
   text.arg_y = list(labels = seq(1, nrow(x$tab)), cex = 0.6),
   worse.arg_x = list(x = x$worse_x, pch = 21, col = "white", bg = "tomato",
@@ -48,9 +46,35 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 \item{decreasing}{logical; Should the sort order of ICU's rank be increasing or decreasing?}
 
 \item{complete.rank}{logical; If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.}
+
+\item{...}{Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).}
+
+\item{xlim_x, ylim_x}{Limits for x and y axis for 1st stage plot for \code{plot.reclass}.}
+
+\item{xlim_y, ylim_y}{Limits for x and y axis for 2nd stage plot for \code{plot.reclass}.}
+
+\item{xlab, ylab}{Labels of x and y axis for \code{plot.reclass}.}
+
+\item{points.arg_x, points.arg_y}{List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units' SMR and SRU in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{med.arg_x, med.arg_y}{List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{tert.arg_x, tert.arg_y}{List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{text.arg_x, text.arg_y}{List of arguments passed to \code{\link[graphics]{text}} for plotting units labels in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{worse.arg_x, worse.arg_y}{List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank worse in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{better.arg_x, better.arg_y}{List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank better in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{auto.legend}{logical; If TRUE, prints a legend with \code{leg.arg} argumentes for \code{plot.reclass}.}
+
+\item{leg.arg}{List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles in 1st and 2nd stage plots for \code{plot.reclass}.}
+
+\item{main.arg_x, main.arg_y}{List of arguments passed to \code{\link[graphics]{plot}} for overall title for 1st and 2nd stage plots for \code{plot.reclass}.}
 }
 \value{
-A table with information about which ICUs changed from a classification to another, their SMR, SRU and rank among other ICUs.
+A table with information about the amount of admissions in each unit, which units changed from a classification to another, their SMR and SRU in 1st and 2nd stage, and their 1st and 2nd rank among other ICUs.
 }
 \description{
 To compare ICUs  with diferents severities classes or throught two diferents times about your efficiency classification.
@@ -68,11 +92,11 @@ x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("01","02","
 y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("04","05","06")),]
 
 FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
-unit = x$Unit, los = x$los, score = x$Saps3Points, originals = T, type = 1, plot = F)
+unit = x$Unit, los = x$los, score = x$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 FirstQ
 
 SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDischargeName,
-unit = y$Unit, los = y$los, score = y$Saps3Points, originals = T, type = 1, plot = F)
+unit = y$Unit, los = y$los, score = y$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 SecondQ
 
 reclass(x = FirstQ, y = SecondQ)

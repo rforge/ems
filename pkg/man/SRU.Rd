@@ -90,7 +90,7 @@ Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > m
 \code{cut_in} returns a vector with cut off severity points. Use function \code{\link[base]{cut}} to apply them to the score punctuation and classify your patients data.
 }
 \description{
-Calculates the standardized resource use for ICUs with information about its patients.
+\code{SRU} Calculates the standardized resource use for ICUs with information about its patients.
 
  \code{plot.SRU} Plots a SMR versus SRU scatter plot with your medians and tertiles.
 
@@ -105,16 +105,16 @@ data(icu)
 
 days = seq(1,100)
 
-corte = cut_in(icu$Saps3Points,icu$los,icu$UnitDischargeName,icu$Unit,days,exc.ICU=TRUE)
+corte = cut_in(icu$Saps3Points, icu$los, icu$UnitDischargeName, icu$Unit, days, exc.ICU=TRUE)
 
-icu$class=cut(icu$Saps3Points,breaks=corte,include.lowest = TRUE)
+icu$class=cut(icu$Saps3Points, breaks = corte, include.lowest = TRUE)
 
 # Removing data with inapropriate values
 icu <- icu[-which(icu$los < 0 ),]
 
 # Estimating the SRU
 x <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
-death = icu$UnitDischargeName,unit = icu$Unit,
+death = icu$UnitDischargeName, unit = icu$Unit,
 los = icu$los, score = icu$Saps3Points,
 originals = TRUE, type = 1, plot = FALSE);x
 

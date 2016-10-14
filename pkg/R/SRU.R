@@ -1,6 +1,6 @@
 #' Standardized Resource Use (SRU)
 #'
-#' @description Calculates the standardized resource use for ICUs with information about its patients.
+#' @description \code{SRU} Calculates the standardized resource use for ICUs with information about its patients.
 #'
 #'  \code{plot.SRU} Plots a SMR versus SRU scatter plot with your medians and tertiles.
 #'
@@ -53,16 +53,16 @@
 #'
 #' days = seq(1,100)
 #'
-#' corte = cut_in(icu$Saps3Points,icu$los,icu$UnitDischargeName,icu$Unit,days,exc.ICU=TRUE)
+#' corte = cut_in(icu$Saps3Points, icu$los, icu$UnitDischargeName, icu$Unit, days, exc.ICU=TRUE)
 #'
-#' icu$class=cut(icu$Saps3Points,breaks=corte,include.lowest = TRUE)
+#' icu$class=cut(icu$Saps3Points, breaks = corte, include.lowest = TRUE)
 #'
 #' # Removing data with inapropriate values
 #' icu <- icu[-which(icu$los < 0 ),]
 #'
 #' # Estimating the SRU
 #' x <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
-#' death = icu$UnitDischargeName,unit = icu$Unit,
+#' death = icu$UnitDischargeName, unit = icu$Unit,
 #' los = icu$los, score = icu$Saps3Points,
 #' originals = TRUE, type = 1, plot = FALSE);x
 #'
@@ -287,7 +287,7 @@ print.SRU <- function(x, ...){
 #' @rdname SRU
 #' @export
 plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]), xlab = "SMR", ylab = "SRU", points.arg = list(pch = 21, col = "white", bg = "cadetblue3",cex=1.5), med.arg = list(col="dodgerblue4",lwd = 2,lty = 1), tert.arg = list(col = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x = "top", bty = "n", xpd = NA, inset = -.15, ncol = 2)){
-  plot(0, 0, ..., xlim = xlim, ylim = ylim, type = 'n')
+  plot(0, 0, ..., xlim = xlim, ylim = ylim, type = 'n', xlab = xlab, ylab = ylab)
   med.arg$v <- x$med[2]
   med.arg$h <- x$med[1]
   tert.arg$h <- x$tert[1:2]

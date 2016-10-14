@@ -15,7 +15,21 @@
 #' @param compare The way one prefer to benchmark the ICUs: by SRU (default), SMR or both of them.
 #' @param decreasing logical; Should the sort order of ICU's rank be increasing or decreasing?
 #' @param complete.rank logical; If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.
-#' @return A table with information about which ICUs changed from a classification to another, their SMR, SRU and rank among other ICUs.
+#' @param xlim_x,ylim_x Limits for x and y axis for 1st stage plot for \code{plot.reclass}.
+#' @param xlim_y,ylim_y Limits for x and y axis for 2nd stage plot for \code{plot.reclass}.
+#' @param xlab,ylab Labels of x and y axis for \code{plot.reclass}.
+#' @param points.arg_x,points.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units' SMR and SRU in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param med.arg_x,med.arg_y List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param tert.arg_x,tert.arg_y List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param text.arg_x,text.arg_y List of arguments passed to \code{\link[graphics]{text}} for plotting units labels in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param worse.arg_x,worse.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank worse in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param better.arg_x,better.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank better in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param auto.legend logical; If TRUE, prints a legend with \code{leg.arg} argumentes for \code{plot.reclass}.
+#' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles in 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param main.arg_x,main.arg_y List of arguments passed to \code{\link[graphics]{plot}} for overall title for 1st and 2nd stage plots for \code{plot.reclass}.
+#' @param ... Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).
+#'
+#' @return A table with information about the amount of admissions in each unit, which units changed from a classification to another, their SMR and SRU in 1st and 2nd stage, and their 1st and 2nd rank among other ICUs.
 #'
 #' @seealso \code{\link{SRU}}
 #'
@@ -30,11 +44,11 @@
 #' y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("04","05","06")),]
 #'
 #' FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
-#' unit = x$Unit, los = x$los, score = x$Saps3Points, originals = T, type = 1, plot = F)
+#' unit = x$Unit, los = x$los, score = x$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 #' FirstQ
 #'
 #' SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDischargeName,
-#' unit = y$Unit, los = y$los, score = y$Saps3Points, originals = T, type = 1, plot = F)
+#' unit = y$Unit, los = y$los, score = y$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 #' SecondQ
 #'
 #' reclass(x = FirstQ, y = SecondQ)
@@ -44,7 +58,9 @@
 #' rm(icu, x, y, FirstQ, SecondQ)
 #'
 #' @import stats
+#' @import graphics
 #' @export
+
 reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU","SMR","BOTH"),decreasing = FALSE,complete.rank = TRUE){
   if(class(x) != "SRU" || class(y)!= "SRU"){
     stop("'x','y' must be objects of class 'SRU'.")
@@ -69,8 +85,11 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   if(same){
     a <- x[which(x$unit %in% y$unit),]
     b <- y[which(y$unit %in% a$unit),]
+    exc = nrow(a) != nrow(x)
     totalAdmissions <- totalAd[[1]] + totalAd[[2]]
-    warning(paste0(c("Maybe some units were excluded because their absence in the 1st stage x.")))
+    if (exc){
+    warning(paste0(c("Some units were excluded because their absence in the 1st stage x.")))
+      }
     x <- droplevels(a); y <- droplevels(b)
   } else {
     if(nrow(x) != nrow(y)){
@@ -100,11 +119,12 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   nchanges <- length(which(dt$change == "CHANGE"))
   change_from_to <- data.frame("Unit" = dt$Unit[which(dt$change == "CHANGE")],"Admissions" = dt$Admissions[which(dt$change == "CHANGE")], "From" = dt$Now[which(dt$change == "CHANGE")], "To" = dt$After[which(dt$change == "CHANGE")])
 
+# SMR e SRU apenas para as que mudaram de quadrante
   smrsru_yy <- data.frame("Unit" = change_from_to$Unit, "SMR" = y$smr[which(y$unit %in% change_from_to$Unit)], "SRU" = y$sru[which(y$unit %in% change_from_to$Unit)])
   smrsru_xx <- data.frame("Unit" = change_from_to$Unit, "SMR" = x$smr[which(y$unit %in% change_from_to$Unit)], "SRU" = x$sru[which(y$unit %in% change_from_to$Unit)])
 
   if(!complete.rank){
-    tab <- cbind(change_from_to, "SRU.1st" = round(smrsru_xx[,3],digits),"SRU.2nd" = round(smrsru_yy[,3],digits))
+   tab <- cbind(change_from_to, "SRU.1st" = round(smrsru_xx[,3],digits),"SRU.2nd" = round(smrsru_yy[,3],digits))
 
     if (same){
       tab <- cbind(tab,"SMR.1st" = round(smrsru_xx[,2],digits), "SMR.2nd" = round(smrsru_yy[,2],digits))
@@ -113,14 +133,12 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank2 <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
       }
       if (compare[1] == "SMR"){
         tab$Rank1 <- round(c(rank(tab$SMR.1st)))
         tab$Rank2 <- round(c(rank(tab$SMR.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank2 <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
 
       }
@@ -128,7 +146,6 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
       }
 
@@ -142,20 +159,17 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
       }
       if (compare[1] == "SMR"){
         tab$Rank <- round(c(rank(tab$SMR)))
         tab <- tab[order(tab$Rank,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
       }
       if (compare[1] == "BOTH"){
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nchanges)
         rownames(tab) <- seq(1,nchanges)
       }
 
@@ -164,8 +178,8 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
 
     }
   }
-
-  sru_x = x$sru; smr_x = x$smr; sru_y = y$sru; smr_y =  y$smr #all ICUs
+# SMR e SRU para todas as unidadeas.
+  sru_x = x$sru; smr_x = x$smr; sru_y = y$sru; smr_y =  y$smr
 
   if(complete.rank){
     tab <- data.frame("Unit" = dt$Unit,"Admissons" = totalAdmissions, "From" = dt$Now, "To" = dt$After, "SRU.1st" = round(sru_x,digits),"SRU.2nd" = round(sru_y,digits))
@@ -177,14 +191,12 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
       }
       if (compare[1] == "SMR"){
         tab$Rank1 <- round(c(rank(tab$SMR.1st)))
         tab$Rank2 <- round(c(rank(tab$SMR.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
 
       }
@@ -192,7 +204,6 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
       }
 
@@ -206,20 +217,17 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
       }
       if (compare[1] == "SMR"){
         tab$Rank <- round(c(rank(tab$SMR)))
         tab <- tab[order(tab$Rank,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
       }
       if (compare[1] == "BOTH"){
         tab$Rank1 <- round(c(rank(tab$SRU.1st)))
         tab$Rank2 <- round(c(rank(tab$SRU.2nd)))
         tab <- tab[order(tab$Rank2,decreasing = decreasing),]
-        # tab$Rank <- seq(1,nrow(tab))
         rownames(tab) <- seq(1,nrow(tab))
       }
 
@@ -228,38 +236,6 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
 
     }
   }
-
-  c1 <- 0; c2 <- 0; c3 <- 0; c4 <- 0; c5 <- 0; c6 <- 0; c7 <- 0; c8 <- 0; c9 <- 0; c10 <- 0; c11 <- 0; c12 <- 0;
-
-  quad <- c("OVER", "LE", "UNDER", "ME")
-
-  for(i in 1:nchanges){
-
-    if(change_from_to$From[i] == quad[1] & change_from_to$To[i] == quad[2]){c1 <- c1+1}
-    if(change_from_to$From[i] == quad[1] & change_from_to$To[i] == quad[3]){c2 <- c2+1}
-    if(change_from_to$From[i] == quad[1] & change_from_to$To[i] == quad[4]){c3 <- c3+1}
-    if(change_from_to$From[i] == quad[2] & change_from_to$To[i] == quad[1]){c4 <- c4+1}
-    if(change_from_to$From[i] == quad[2] & change_from_to$To[i] == quad[3]){c5 <- c5+1}
-    if(change_from_to$From[i] == quad[2] & change_from_to$To[i] == quad[4]){c6 <- c6+1}
-    if(change_from_to$From[i] == quad[3] & change_from_to$To[i] == quad[1]){c7 <- c7+1}
-    if(change_from_to$From[i] == quad[3] & change_from_to$To[i] == quad[2]){c8 <- c8+1}
-    if(change_from_to$From[i] == quad[3] & change_from_to$To[i] == quad[4]){c9 <- c9+1}
-    if(change_from_to$From[i] == quad[4] & change_from_to$To[i] == quad[1]){c10 <- c10+1}
-    if(change_from_to$From[i] == quad[4] & change_from_to$To[i] == quad[2]){c11 <- c11+1}
-    if(change_from_to$From[i] == quad[4] & change_from_to$To[i] == quad[3]){c12 <- c12+1}
-  }
-  c <- data.frame("OA-LE" = c1, "OA-UA" = c2, "OA-ME" = c3, "LE-OA" = c4, "LE-UA" = c5,"LE-ME" =  c6, "UA-OA" = c7, "UA-LE" = c8, "UA-ME" = c9,"ME-OA" = c10, "ME-LE" = c11, "ME-UA" = c12
-  )
-
-  #quantas UTIs melhoram e pioraram com rela??o ao SRU
-  better <- sum(c3,c5)
-  worse <- sum(c8,c10)
-  total <- sum(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12)
-
-  if (better + worse == total){c <- cbind(c, "Better" = better, "Worse" = worse, "Total" = total)}
-  c <- t(c)
-  c <- cbind(rownames(c), c)
-  colnames(c) <- c("QuadrantMove", "Quantity")
 
   M_x <- c(median(x$sru), median(x$smr))
   M_y <- c(median(y$sru), median(y$smr))
@@ -276,7 +252,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   better_x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
   better_y <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
 
-  if (compare == "SRU"){
+  if (compare[1] == "SRU"){
     for (i in 1:nrow(tab)){
       if (tab[,3][i] == "ME" && tab[,4][i] == "LE" | tab[,3][i] == "ME" && tab[,4][i] =="UNDER" | tab[,3][i] == "OVER" && tab[,4][i] == "LE" | tab[,3][i] == "OVER" && tab[,4][i] == "UNDER" | tab[,3][i] == "UNDER" && tab[,4][i] == "LE" ){
         worse_x <- rbind(worse_x, smrsru_x[i,])
@@ -289,7 +265,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
     }
   }
 
-  if (compare == "SMR"){
+  if (compare[1] == "SMR"){
     for (i in 1:nrow(tab)){
       if (tab[,3][i] == "ME" && tab[,4][i] == "OVER" | tab[,3][i] == "ME" && tab[,4][i] == "LE" | tab[,3][i] == "UNDER" && tab[,4][i] == "LE" | tab[,3][i] == "UNDER" && tab[,4][i] == "OVER"){
         worse_x <- rbind(worse_x, smrsru_x[i,])
@@ -302,7 +278,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
     }
   }
 
-  if (compare == "BOTH"){
+  if (compare[1] == "BOTH"){
     for (i in 1:nrow(tab)){
       if (tab[,3][i] == "ME" && tab[,4][i] == "OVER" | tab[,3][i] == "ME" && tab[,4][i] == "LE" | tab[,3][i] == "ME" && tab[,4][i] == "UNDER" | tab[,3][i] == "OVER" && tab[,4][i] == "LE" | tab[,3][i] == "UNDER" && tab[,4][i] == "LE" ){
         worse_x <- rbind(worse_x, smrsru_x[i,])
@@ -315,7 +291,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
     }
   }
 
-  output <- list(tab = tab, ICU = change_from_to$Unit, smrsru_y = smrsru_y, nchanges = nchanges, smrsru_x = smrsru_x, count = c, med_x = M_x, med_y = M_y, tert_x = c(Q1_x,Q2_x), tert_y = c(Q1_y,Q2_y), sru_x = sru_x, smr_x = smr_x, sru_y = sru_y, smr_y =  smr_y, worse_y = worse_y, worse_x = worse_x, better_y = better_y, better_x = better_x)
+  output <- list(tab = tab, smrsru_y = smrsru_y, nchanges = nchanges, smrsru_x = smrsru_x, med_x = M_x, med_y = M_y, tert_x = c(Q1_x,Q2_x), tert_y = c(Q1_y,Q2_y), sru_x = sru_x, smr_x = smr_x, sru_y = sru_y, smr_y =  smr_y, worse_y = worse_y, worse_x = worse_x, better_y = better_y, better_x = better_x)
 
   class(output) <- "reclass"
 
@@ -334,7 +310,7 @@ print.reclass <- function(x, ...){
 
 #' @rdname reclass
 #' @export
-plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x), xlim_y = range(x$smr_y), ylim_y = range(x$sru_y), xlab = "SMR", ylab= "SRU", points.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2), points.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2), med.arg_x = list(col = "dodgerblue4",lwd = 2,lty = 1), med.arg_y = list(col = "dodgerblue4", lwd = 2, lty = 1), tert.arg_x = list(col = "darkorange2", lty = 2, lwd = 1), tert.arg_y = list(col = "darkorange2", lty = 2, lwd = 1), changes.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2), changes.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2), text.arg_x = list(labels = seq(1,nrow(x$tab)), cex=.6), text.arg_y = list(labels = seq(1,nrow(x$tab)), cex=.6), worse.arg_x = list(x = x$worse_x, pch = 21, col = "white", bg = "tomato", cex = 2), worse.arg_y = list(x = x$worse_y, pch = 21, col = "white", bg = "tomato", cex = 2), better.arg_x = list(x = x$better_x, pch = 21, col = "white", bg = "mediumseagreen", cex = 2), better.arg_y = list(x = x$better_y, pch = 21, col = "white", bg = "mediumseagreen", cex = 2), auto.legend = TRUE, leg.arg = list(x = "topleft", bty = "n", xpd = NA, inset = c(-1.8,-.2), ncol = 1, horiz = F, pch = 19, cex = .8, pt.cex = 1.5), main.arg_x = list(main = "1st Stage"), main.arg_y = list(main = "2nd Stage")){
+plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x), xlim_y = range(x$smr_y), ylim_y = range(x$sru_y), xlab = "SMR", ylab= "SRU", points.arg_x = list(pch = 21, col = "white", bg = "yellow", cex = 2), points.arg_y = list(pch = 21, col = "white", bg = "yellow", cex = 2), med.arg_x = list(col = "dodgerblue4",lwd = 2,lty = 1), med.arg_y = list(col = "dodgerblue4", lwd = 2, lty = 1), tert.arg_x = list(col = "darkorange2", lty = 2, lwd = 1), tert.arg_y = list(col = "darkorange2", lty = 2, lwd = 1), text.arg_x = list(labels = seq(1,nrow(x$tab)), cex=.6), text.arg_y = list(labels = seq(1,nrow(x$tab)), cex=.6), worse.arg_x = list(x = x$worse_x, pch = 21, col = "white", bg = "tomato", cex = 2), worse.arg_y = list(x = x$worse_y, pch = 21, col = "white", bg = "tomato", cex = 2), better.arg_x = list(x = x$better_x, pch = 21, col = "white", bg = "mediumseagreen", cex = 2), better.arg_y = list(x = x$better_y, pch = 21, col = "white", bg = "mediumseagreen", cex = 2), auto.legend = TRUE, leg.arg = list(x = "topleft", bty = "n", xpd = NA, inset = c(-1.8,-.2), ncol = 1, horiz = F, pch = 19, cex = .8, pt.cex = 1.5), main.arg_x = list(main = "1st Stage"), main.arg_y = list(main = "2nd Stage")){
   med.arg_x$v <- x$med_x[2]
   med.arg_x$h <- x$med_x[1]
   med.arg_y$v <- x$med_y[2]
@@ -345,65 +321,14 @@ plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x
   tert.arg_y$v <- x$tert_y[3:4]
   points.arg_x$x <- cbind(x$smr_x, x$sru_x)
   points.arg_y$x <- cbind(x$smr_y, x$sru_y)
-  # changes.arg_x$x <- x$smrsru_x
-  # changes.arg_y$x <- x$smrsru_y
   text.arg_x$x <- x$smrsru_x
   text.arg_y$x <- x$smrsru_y
-  # worse.arg_x$x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
-  # worse.arg_y$x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
-  # better.arg_x$x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
-  # better.arg_y$x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
-  #
-  # if (x$comp == "SRU"){
-  #   for (i in 1:nrow(x$tab)){
-  #     if (x$tab[,3][i] == "ME" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "ME" && x$tab[,4][i] =="UNDER" | x$tab[,3][i] == "OVER" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "OVER" && x$tab[,4][i] == "UNDER" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "LE" ){
-  #       worse.arg_x$x <- rbind(worse.arg_x$x, x$smrsru_x[i,])
-  #       worse.arg_y$x <- rbind(worse.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #     if (x$tab[,3][i] == "LE" && x$tab[,4][i] == "OVER" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "OVER"){
-  #       better.arg_x$x <- rbind(better.arg_x$x, x$smrsru_x[i,])
-  #       better.arg_y$x <- rbind(better.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #   }
-  # }
-  #
-  # if (x$comp == "SMR"){
-  #   for (i in 1:nrow(x$tab)){
-  #     if (x$tab[,3][i] == "ME" && x$tab[,4][i] == "OVER" | x$tab[,3][i] == "ME" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "OVER"){
-  #       worse.arg_x$x <- rbind(worse.arg_x$x, x$smrsru_x[i,])
-  #       worse.arg_y$x <- rbind(worse.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #     if (x$tab[,3][i] == "OVER" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "OVER" && x$tab[,4][i] == "UNDER" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "UNDER"){
-  #       better.arg_x$x <- rbind(better.arg_x$x, x$smrsru_x[i,])
-  #       better.arg_y$x <- rbind(better.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #   }
-  # }
-  #
-  # if (x$comp == "BOTH"){
-  #   for (i in 1:nrow(x$tab)){
-  #     if (x$tab[,3][i] == "ME" && x$tab[,4][i] == "OVER" | x$tab[,3][i] == "ME" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "ME" && x$tab[,4][i] == "UNDER" | x$tab[,3][i] == "OVER" && x$tab[,4][i] == "LE" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "LE" ){
-  #       worse.arg_x$x <- rbind(worse.arg_x$x, x$smrsru_x[i,])
-  #       worse.arg_y$x <- rbind(worse.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #     if (x$tab[,3][i] == "OVER" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "ME"  | x$tab[,3][i] == "LE" && x$tab[,4][i] == "UNDER" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "ME" | x$tab[,3][i] == "LE" && x$tab[,4][i] == "OVER" | x$tab[,3][i] == "UNDER" && x$tab[,4][i] == "ME" ){
-  #       better.arg_x$x <- rbind(better.arg_x$x, x$smrsru_x[i,])
-  #       better.arg_y$x <- rbind(better.arg_y$x, x$smrsru_y[i,])
-  #     }
-  #   }
-  # }
-
-  # worse.arg_x$x <- worse.arg_x$x[-1,]
-  # worse.arg_y$x <- worse.arg_y$x[-1,]
-  # better.arg_x$x <- better.arg_x$x[-1,]
-  # better.arg_y$x <- better.arg_y$x[-1,]
 
   par(mfrow = c(1,2))
   plot(0, 0, ..., xlim = xlim_x, ylim = ylim_x, type = 'n', xlab = xlab, ylab = ylab, main = main.arg_x[[1]])
   do.call(abline, med.arg_x)
   do.call(abline, tert.arg_x)
   do.call(points, points.arg_x)
-  # do.call(points, changes.arg_x)
   do.call(points, worse.arg_x)
   do.call(points, better.arg_x)
   do.call(text, text.arg_x)
@@ -412,7 +337,6 @@ plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x
   do.call(abline, med.arg_y)
   do.call(abline, tert.arg_y)
   do.call(points, points.arg_y)
-  # do.call(points, changes.arg_y)
   do.call(points, worse.arg_y)
   do.call(points, better.arg_y)
   do.call(text, text.arg_y)

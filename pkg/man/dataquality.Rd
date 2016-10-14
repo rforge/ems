@@ -4,9 +4,10 @@
 \alias{dataquality}
 \alias{factor.table}
 \alias{num.table}
+\alias{t_date}
 \alias{t_factor}
 \alias{t_num}
-\title{Collection of function to check data quality in a dataset}
+\title{Collection of functions to check data quality in a dataset}
 \usage{
 t_factor(data, variable, legal, var.labels = attr(data,
   "var.labels")[match(variable, names(data))], digits = 3)
@@ -20,6 +21,10 @@ t_num(data, num.var, num.max = 100, num.min = 0, var.labels = attr(data,
 
 num.table(data, num.limits, var.labels = attr(data,
   "var.labels")[match(num.limits$num.vars, names(data))], digits = 3)
+
+t_date(data, date.var, date.max = as.Date("2010-11-30"),
+  date.min = as.Date("2010-01-31"), format.date = "auto", digits = 3,
+  var.labels = attr(data, "var.labels")[match(date.var, names(data))])
 }
 \arguments{
 \item{data}{A data.frame where variables will be tested.}
@@ -28,53 +33,76 @@ num.table(data, num.limits, var.labels = attr(data,
 
 \item{legal}{A character vector representeing the expected levels of the tested variable.}
 
-\item{var.labels}{Variables labels to nice output. Must be iformed in the same order as variable argument. By default, it captures the labels stored in attr(data, "var.labels"), if any.}
+\item{var.labels}{Variables labels to nice output. Must be iformed in the same order as variable argument. By default, it captures the labels stored in attr(data, "var.labels"), if any. If not infomred, the function returns the variables names.}
 
-\item{digits}{Decimal for rounding}
+\item{digits}{Decimal for rounding.}
 
-\item{limits}{a list of two or more lists, each containing the arguments variable and legal (in this order). See examples.}
+\item{limits}{a list of two or more lists, each containing the arguments variable name and legal levels (in this order), to check the factor variables. See examples.}
 
 \item{num.var}{A character vector indicating the name of a variable that should be numeric (althoug it can yet be formated as character or factor).}
 
-\item{num.max, num.min}{The limits of acceptable range of a numeric variable.}
+\item{num.max, num.min}{The maximal and minimal limits of acceptable range of a numeric variable.}
 
-\item{num.limits}{A data.frame with the following variables: num.vars, num.max and num.min. See example.}
+\item{num.limits}{A data.frame with the following variables: num.vars, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.}
+
+\item{date.var}{A character vector indicating the name of a variable in data that should be a date (althoug it can yet be formated as character or factor).}
+
+\item{date.max, date.min}{The maximal and minimal limits of acceptable range of a date variable.}
+
+\item{format.date}{Default is "auto". If so, \code{t_date} will use \code{\link{f.date}} to detect the date format and format it as date. If not "auto", it should be a date format to be passed to \code{\link[base]{as.Date}} format argument.}
 }
 \description{
-These functionsn return the counts and fractions of expected values, unexpected values, missing values and non valid values.
+These functionsn return the counts and fractions of expected values, unexpected values, missing values and non valid values. They are able to do it with factor variables, numeric variables and date variables. \code{t_factor}, \code{t_num}, and \code{t_date} do the job for a single variable and have a simpler arguments, while \code{factor.tabel}, \code{num.table}, and \code{date.table} do the job for several variables at once. They all return data.frame.
 
 \code{t_factor} and \code{factor.table} will try to get factor or character variables and check how much of its content match with the expectd. They will try to treat the levels or cells with "" as NAs.
 
-\code{t_num} will try to get a numeric variable and check how much of its content are expected (match a desired range), unexpected, nonnumeric values and missing vlaues. \code{num.table} does the same thing, but with two or more variables at once.
+\code{t_num} will try to get a numeric variable (even if it is currently formated as character or vector) and check how much of its content are expected (match a desired range), unexpected, non-numeric values and missing vlaues. \code{num.table} does the same thing, but with two or more variables at once.
+
+\code{t_date} will try to get a date variable (even if it is currently formated as character or vector) and check how much of its content are expected (match a desired range), unexpected, non-date values and missing vlaues. \code{date.table} does the same thing, but with two or more variables at once.
 }
 \examples{
 # Simulating a dataset with 4 factor variables and assigning labels
 y <- data.frame(Var1 = sample(c("Yes","No", "Ignored", "", "yes ", NA), 200, replace = TRUE),
                 Var2 = sample(c("Death","Discharge", "", NA), 200, replace = TRUE),
                 Var3 = sample(c(16:35, NA), 200, replace = TRUE),
-                Var4 = sample(c(12:300, "Female", "", NA), 200, replace = TRUE))
-attr(y, "var.labels") <- c("Intervention use","Unit detination","BMI","Age")
+                Var4 = sample(c(12:300, "Female", "", NA), 200, replace = TRUE),
+                Var5 = sample(c(60:800), 200, replace = TRUE))
+attr(y, "var.labels") <- c("Intervention use","Unit detination","BMI","Age","Cholesterol")
 
 # Cheking the quality only the first variable
 t_factor(y, "Var1", c("Yes","No","Ignored"))
 
-# Checkin two or more variables at once
+# Checking two or more variables at once
 factor.table(y, limits = list(
                           list("Var1",c("Yes","No")),
                           list("Var2",c("Death","Discharge"))))
 
-# Checking only one "numeric" variable
+# Checking only one variable that shohuld be numeric
 t_num(y,"Var3", num.min = 17, num.max = 32)
 
 # Making the limits data.frame
-num.limits <- data.frame(num.vars = c("Var3","Var4"),
-              num.min = c(17,18), num.max = c(32,110))
+num.limits <- data.frame(num.vars = c("Var3","Var4","Var5"),
+              num.min = c(17,18,70), num.max = c(32,110,300))
 num.limits
 
-# Checkin ntwo or more numeric variables at once
+# Checking two or more numeric variables (or the ones that should be as numeric) at once
 num.table(y, num.limits)
 
-rm(y)
+rm(y, num.limits)
 
+
+# Loading a dataset and assinging labels
+data(icu)
+attr(icu, "var.labels")[match(c("UnitAdmissionDate","UnitDischargeDate", "HospitalAdmissionDate", "HospitalDischargeDate"), names(icu))] <-
+    c("Unit admission","Unit discharge","Hospital admission","Hospital discharge")
+
+# Checkin only one variable that should be a date.
+t_date(icu, "HospitalDischargeDate", date.max = as.Date("2010-10-30"), date.min = as.Date("2010-02-20"))
+
+rm(icu)
+
+}
+\author{
+Lunna Borges & Pedro Brasil
 }
 
