@@ -2,6 +2,7 @@
 % Please edit documentation in R/dataquality.R
 \name{dataquality}
 \alias{dataquality}
+\alias{date.table}
 \alias{factor.table}
 \alias{num.table}
 \alias{t_date}
@@ -20,11 +21,15 @@ t_num(data, num.var, num.max = 100, num.min = 0, var.labels = attr(data,
   "var.labels")[match(num.var, names(data))], digits = 3)
 
 num.table(data, num.limits, var.labels = attr(data,
-  "var.labels")[match(num.limits$num.vars, names(data))], digits = 3)
+  "var.labels")[match(num.limits$num.var, names(data))], digits = 3)
 
 t_date(data, date.var, date.max = as.Date("2010-11-30"),
   date.min = as.Date("2010-01-31"), format.date = "auto", digits = 3,
   var.labels = attr(data, "var.labels")[match(date.var, names(data))])
+
+date.table(data, date.limits, format.date = "auto", digits = 3,
+  var.labels = attr(data, "var.labels")[match(date.limits$date.var,
+  names(data))])
 }
 \arguments{
 \item{data}{A data.frame where variables will be tested.}
@@ -43,13 +48,15 @@ t_date(data, date.var, date.max = as.Date("2010-11-30"),
 
 \item{num.max, num.min}{The maximal and minimal limits of acceptable range of a numeric variable.}
 
-\item{num.limits}{A data.frame with the following variables: num.vars, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.}
+\item{num.limits}{A data.frame with the following variables: num.var, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.}
 
 \item{date.var}{A character vector indicating the name of a variable in data that should be a date (althoug it can yet be formated as character or factor).}
 
 \item{date.max, date.min}{The maximal and minimal limits of acceptable range of a date variable.}
 
-\item{format.date}{Default is "auto". If so, \code{t_date} will use \code{\link{f.date}} to detect the date format and format it as date. If not "auto", it should be a date format to be passed to \code{\link[base]{as.Date}} format argument.}
+\item{format.date}{Default is "auto". If so, \code{t_date} will use \code{\link{f.date}} to detect the date format and format it as date. If not "auto", it should be a date format to be passed to \code{\link[base]{as.Date}} format argument. If format.date is missspecified, then \code{t_date} and \code{date.table} will identify all dates as non-dates. For \code{date.table}, if it is set to 'auto' , it will use \code{\link{f.date}} to detect the date format and format it as date. If different from 'auto', one should specify the desired date formats in the date.limits data.frame. See example.}
+
+\item{date.limits}{A data.frame with the following variables: date.var, date.max, date.min, and (optionaly) format.date. These represent values of the arguments above. See example.}
 }
 \description{
 These functionsn return the counts and fractions of expected values, unexpected values, missing values and non valid values. They are able to do it with factor variables, numeric variables and date variables. \code{t_factor}, \code{t_num}, and \code{t_date} do the job for a single variable and have a simpler arguments, while \code{factor.tabel}, \code{num.table}, and \code{date.table} do the job for several variables at once. They all return data.frame.
@@ -81,7 +88,7 @@ factor.table(y, limits = list(
 t_num(y,"Var3", num.min = 17, num.max = 32)
 
 # Making the limits data.frame
-num.limits <- data.frame(num.vars = c("Var3","Var4","Var5"),
+num.limits <- data.frame(num.var = c("Var3","Var4","Var5"),
               num.min = c(17,18,70), num.max = c(32,110,300))
 num.limits
 
@@ -96,10 +103,30 @@ data(icu)
 attr(icu, "var.labels")[match(c("UnitAdmissionDate","UnitDischargeDate", "HospitalAdmissionDate", "HospitalDischargeDate"), names(icu))] <-
     c("Unit admission","Unit discharge","Hospital admission","Hospital discharge")
 
-# Checkin only one variable that should be a date.
+# Checking only one variable that should be a date.
 t_date(icu, "HospitalDischargeDate", date.max = as.Date("2010-10-30"), date.min = as.Date("2010-02-20"))
 
-rm(icu)
+# Checking a date variable misspecifying the date format
+# will cause the variable dates to be identified as non-date values.
+t_date(data = icu, date.var = "HospitalDischargeDate", date.max = as.Date("2010-10-30"), date.min = as.Date("2010-02-20"), format.date = "\%Y-\%m-\%d")
+
+# Making a limit data.frame assuming an 'auto' format.date
+d.lim <- data.frame(date.var = c("UnitAdmissionDate","UnitDischargeDate","HospitalAdmissionDate","HospitalDischargeDate"), date.min = rep(as.Date("2010-02-28"), 4), date.max = rep(as.Date("2010-11-30"), 4) )
+d.lim
+
+# Checking two or more date variables (or the ones that should be as date) at once
+date.table(data = icu, date.limits = d.lim)
+
+# Making a limit data.frame specifying format.date argument
+# Here the the first 'format.date' is missspecified on purpose
+# So, the first date will be identified as non-date values.
+d.lim <- data.frame(date.var = c("UnitAdmissionDate","UnitDischargeDate","HospitalAdmissionDate","HospitalDischargeDate"), date.min = rep(as.Date("2010-02-28"), 4), date.max = rep(as.Date("2010-11-30"), 4), format.date = c("\%Y/\%m/\%d", rep("\%Y-\%m-\%d", 3)) )
+d.lim
+
+# Checking the quality of date variable with new limits
+date.table(data = icu, date.limits = d.lim, format.date = "")
+
+rm(icu, d.lim)
 
 }
 \author{

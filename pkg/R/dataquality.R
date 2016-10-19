@@ -24,7 +24,7 @@
 #'
 #' @param num.max,num.min The maximal and minimal limits of acceptable range of a numeric variable.
 #'
-#' @param num.limits A data.frame with the following variables: num.vars, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.
+#' @param num.limits A data.frame with the following variables: num.var, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.
 #'
 #' @param digits Decimal for rounding.
 #'
@@ -32,7 +32,9 @@
 #'
 #' @param date.max,date.min The maximal and minimal limits of acceptable range of a date variable.
 #'
-#' @param format.date Default is "auto". If so, \code{t_date} will use \code{\link{f.date}} to detect the date format and format it as date. If not "auto", it should be a date format to be passed to \code{\link[base]{as.Date}} format argument.
+#' @param format.date Default is "auto". If so, \code{t_date} will use \code{\link{f.date}} to detect the date format and format it as date. If not "auto", it should be a date format to be passed to \code{\link[base]{as.Date}} format argument. If format.date is missspecified, then \code{t_date} and \code{date.table} will identify all dates as non-dates. For \code{date.table}, if it is set to 'auto' , it will use \code{\link{f.date}} to detect the date format and format it as date. If different from 'auto', one should specify the desired date formats in the date.limits data.frame. See example.
+#'
+#' @param date.limits A data.frame with the following variables: date.var, date.max, date.min, and (optionaly) format.date. These represent values of the arguments above. See example.
 #'
 #' @author Lunna Borges & Pedro Brasil
 #'
@@ -57,7 +59,7 @@
 #' t_num(y,"Var3", num.min = 17, num.max = 32)
 #'
 #' # Making the limits data.frame
-#' num.limits <- data.frame(num.vars = c("Var3","Var4","Var5"),
+#' num.limits <- data.frame(num.var = c("Var3","Var4","Var5"),
 #'               num.min = c(17,18,70), num.max = c(32,110,300))
 #' num.limits
 #'
@@ -72,13 +74,33 @@
 #' attr(icu, "var.labels")[match(c("UnitAdmissionDate","UnitDischargeDate", "HospitalAdmissionDate", "HospitalDischargeDate"), names(icu))] <-
 #'     c("Unit admission","Unit discharge","Hospital admission","Hospital discharge")
 #'
-#' # Checkin only one variable that should be a date.
+#' # Checking only one variable that should be a date.
 #' t_date(icu, "HospitalDischargeDate", date.max = as.Date("2010-10-30"), date.min = as.Date("2010-02-20"))
 #'
-#' rm(icu)
+#' # Checking a date variable misspecifying the date format
+#' # will cause the variable dates to be identified as non-date values.
+#' t_date(data = icu, date.var = "HospitalDischargeDate", date.max = as.Date("2010-10-30"), date.min = as.Date("2010-02-20"), format.date = "%Y-%m-%d")
+#'
+#' # Making a limit data.frame assuming an 'auto' format.date
+#' d.lim <- data.frame(date.var = c("UnitAdmissionDate","UnitDischargeDate","HospitalAdmissionDate","HospitalDischargeDate"), date.min = rep(as.Date("2010-02-28"), 4), date.max = rep(as.Date("2010-11-30"), 4) )
+#' d.lim
+#'
+#' # Checking two or more date variables (or the ones that should be as date) at once
+#' date.table(data = icu, date.limits = d.lim)
+#'
+#' # Making a limit data.frame specifying format.date argument
+#' # Here the the first 'format.date' is missspecified on purpose
+#' # So, the first date will be identified as non-date values.
+#' d.lim <- data.frame(date.var = c("UnitAdmissionDate","UnitDischargeDate","HospitalAdmissionDate","HospitalDischargeDate"), date.min = rep(as.Date("2010-02-28"), 4), date.max = rep(as.Date("2010-11-30"), 4), format.date = c("%Y/%m/%d", rep("%Y-%m-%d", 3)) )
+#' d.lim
+#'
+#' # Checking the quality of date variable with new limits
+#' date.table(data = icu, date.limits = d.lim, format.date = "")
+#'
+#' rm(icu, d.lim)
 #'
 #' @export
-t_factor <- function(data, variable, legal, var.labels= attr(data, "var.labels")[match(variable, names(data))], digits = 3){
+t_factor <- function(data, variable, legal, var.labels = attr(data, "var.labels")[match(variable, names(data))], digits = 3){
   if (!is.data.frame(data)) {
     stop("Argument 'data' is not a data.frame.")
   }
@@ -176,33 +198,30 @@ t_num <- function(data, num.var, num.max = 100, num.min = 0, var.labels = attr(d
 
 #' @rdname dataquality
 #' @export
-num.table <- function(data, num.limits, var.labels = attr(data, "var.labels")[match(num.limits$num.vars, names(data))], digits = 3){
+num.table <- function(data, num.limits, var.labels = attr(data, "var.labels")[match(num.limits$num.var, names(data))], digits = 3){
   if (!is.data.frame(data)) {
     stop("Argument 'data' is not a data.frame.")
   }
   if (!is.data.frame(num.limits)) {
     stop("Argument 'num.limits' is not a data.frame.")
   }
-  if (!all(names(num.limits) %in% c("num.vars","num.max","num.min"))) {
-    stop("'num.limits' must be a data.frame with the following columns: 'num.vars', 'num.min' and 'num.min'.")
+  if (!all(c("num.var","num.min","num.min") %in% names(num.limits))) {
+    stop("'num.limits' must be a data.frame with the following columns: 'num.var', 'num.min' and 'num.min'.")
   }
-  if (!(is.character(num.limits$num.vars) | is.factor(num.limits$num.vars))) {
-    stop("'num.limits$num.vars' must be a character vector.")
+  if (!is.character(num.limits$num.var) && !is.factor(num.limits$num.var)) {
+    stop("'num.limits$num.var' must be a character or factor variable.")
   }
   if (!is.numeric(num.limits$num.min) || !is.numeric(num.limits$num.max)) {
     stop("'num.limits$num.min' and 'num.limits$num.max' must be numeric vectors.")
   }
-  if (!any(num.limits$num.vars %in% names(data))) {
-    stop(paste0(var[-which(num.limits$num.vars %in% names(data))]," are not in the dataset"))
-  }
-  if (!any(num.limits$num.vars %in% names(data))) {
-    stop(paste0(num.limits$num.vars[-which(num.limits$num.vars %in% names(data))]," are not in the dataset"))
+  if (!any(num.limits$num.var %in% names(data))) {
+    stop(paste0(num.limits$num.var[-which(num.limits$num.var %in% names(data))]," are not in the dataset", collapse = " ,"))
     }
   if (any(num.limits$num.max < num.limits$num.min)) {
-    stop(paste0("num.max is lower than num.min in ",num.limits$num.vars[which(num.limits$num.max < num.limits$num.min)]))
+    stop(paste0("num.max is lower than num.min in ", num.limits$num.var[which(num.limits$num.max < num.limits$num.min)], collapse = ", "))
   }
-  num.limits$num.vars <- as.character(num.limits$num.vars)
-  output <- as.data.frame(t(sapply(1:nrow(num.limits), function(i) t_num(data = data, num.var = num.limits$num.vars[i], num.max = num.limits$num.max[i], num.min = num.limits$num.min[i], digits = digits, var.labels = var.labels[i]))))
+  num.limits$num.var <- as.character(num.limits$num.var)
+  output <- as.data.frame(t(sapply(1:nrow(num.limits), function(i) t_num(data = data, num.var = num.limits$num.var[i], num.max = num.limits$num.max[i], num.min = num.limits$num.min[i], digits = digits, var.labels = var.labels[i]))))
   output
 }
 
@@ -224,7 +243,7 @@ t_date <- function(data, date.var, date.max = as.Date("2010-11-30"), date.min = 
   if (!(date.var %in% names(data))) {
     stop(paste(toString(date.var), "is not a varaible in", substitute(data)))
   }
-  if (any(is.null(var.labels))) {
+  if (is.null(var.labels)) {
     var.labels <- date.var
   }
   date <- data[ , date.var]
@@ -240,14 +259,53 @@ t_date <- function(data, date.var, date.max = as.Date("2010-11-30"), date.min = 
   val.n.date <- sum(table(date[which(is.na(fdate))]))
   val.n.esp <- table(ifelse(fdate > date.max | fdate < date.min, 1, 0))
   val.esp <- val.n.esp[which(names(val.n.esp) == "0")]
-  if (any(is.na(val.esp) | is.null(val.esp) | length(val.esp) == 0)) { val.esp <- 0 }
+  if (is.na(val.esp) || is.null(val.esp) || length(val.esp) == 0) { val.esp <- 0 }
   val.n.esp <- val.n.esp[which(names(val.n.esp) == "1")]
-  if(any(is.na(val.n.esp)|is.null(val.n.esp)|length(val.n.esp)==0)){val.n.esp <- 0}
+  if(is.na(val.n.esp) || is.null(val.n.esp) || length(val.n.esp) == 0){val.n.esp <- 0}
   output <- c(var.labels,
               paste0(val.esp, "(", sprintf(paste0("%.", digits,"f"), val.esp / date.dim), ")"),
               paste0(val.n.esp, "(", sprintf(paste0("%.",digits,"f"), val.n.esp / date.dim), ")"),
               paste0(val.n.date, "(", sprintf(paste0("%.",digits,"f"), val.n.date / date.dim), ")"),
               paste0(na.sum, "(", sprintf(paste0("%.",digits,"f"), na.sum / date.dim), ")"))
   names(output) <- c("Variables","Expected values","Unexpected values","Non-dates values","Missing values")
+  output
+}
+
+#' @rdname dataquality
+#' @export
+date.table <- function(data, date.limits, format.date = "auto", digits = 3, var.labels = attr(data, "var.labels")[match(date.limits$date.var, names(data))]){
+  if (!is.data.frame(data)) {
+    stop("Argument 'data' is not a data.frame.")
+  }
+  if (!is.data.frame(date.limits)) {
+    stop("Argument 'date.limits' is not a data.frame.")
+  }
+  if (!all(c("date.var","date.max","date.min") %in% names(date.limits))) {
+    stop("'date.limits' must be a data.frame having the following columns: 'date.var', 'date.min' and 'date.max'.")
+  }
+  if (!is.character(date.limits$date.var) && !is.factor(date.limits$date.var)) {
+    stop("'date.limits$date.var' must be a character or factor variable.")
+  }
+  if (class(date.limits$date.min) != "Date" || class(date.limits$date.max) != "Date") {
+    stop("'date.limits$date.min' and 'date.limits$date.max' must be Date vectors.")
+  }
+  if (!any(date.limits$date.var %in% names(data))) {
+    stop(paste0(date.limits$date.var[-which(date.limits$date.var %in% names(data))]," are not in the dataset", colapse = " ,"))
+  }
+  if (any(date.limits$date.max < date.limits$date.min)) {
+    stop(paste0("date.max is lower than date.min in ", date.limits$date.var[which(date.limits$date.max < date.limits$date.min)], collapse = " ,"))
+  }
+  date.limits$date.var <- as.character(date.limits$date.var)
+  if ( format.date == "auto") {
+    output <- as.data.frame(t(sapply(1:nrow(date.limits), function(i) t_date(data = data, date.var = date.limits$date.var[i], date.max = date.limits$date.max[i], date.min = date.limits$date.min[i], digits = digits, var.labels = var.labels[i]))))
+  }
+  if ( format.date != "auto") {
+    if ( !any("format.date" %in% names(date.limits)) ) {
+      stop("'date.limits' must have a column 'format.date' with the desired date formats \n
+           or 'format.date' argument must be set to 'auto'")
+    }
+    date.limits$format.date <- as.character(date.limits$format.date)
+    output <- as.data.frame(t(sapply(1:nrow(date.limits), function(i) t_date(data = data, date.var = date.limits$date.var[i], date.max = date.limits$date.max[i], date.min = date.limits$date.min[i], digits = digits, var.labels = var.labels[i], format.date = date.limits$format.date[i]))))
+  }
   output
 }

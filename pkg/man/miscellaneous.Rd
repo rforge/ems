@@ -43,7 +43,7 @@ Collections of functions for data editing ussually used as lower levels for othe
 
 \code{remove.na} identifies all the empties spaces, i.e. the " " cells, of character or factor variables in a data.frame and returns the same data.frame with these empty cells replaced, by default, by NAs. It does not matter the length of the empty spaces. Also, \code{remove.na} trims the leading and trailing empty spaces from all character and factor variables. It does not format the numeric variables. It may also returns at the console a few information about the " " fields.
 
-\code{tab2tex} removes the empty rows, and also tunrs the rownames of a table epiDisplay::tableStack into the first column, to make it easier to paste the table into a rtf or latex document.
+\code{tab2tex} removes the empty rows, and also tunrs the rownames of a table epiDisplay::tableStack into the first column, to make it easier to paste the table into a rtf or latex document without empty rows or rownames conflicts.
 
 \code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively. See example.
 }
