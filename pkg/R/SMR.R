@@ -94,32 +94,56 @@
 #' # loading a example data
 #' data(icu)
 #'
-#' # Setting labels to data
-#' attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h"), names(icu))] <-
-#' c("ICU unit","Mechanichal ventilation")
+#' #' Setting labels to data
+#' attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h",
+#'           "AdmissionTypeName_pri","InfectionIsAtAdmission"), names(icu))] <-
+#'   c("ICU unit","Mechanichal ventilation","Admission type","Infection at admission")
 #'
-#' # The overall SMR for the whole sample
+#' #' The overall SMR for the whole sample
 #' SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
 #'
-#' # The overall SMR and for some subgroups
+#' #' The overall SMR and for some subgroups
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
-#'             pred.var = "Saps3DeathProbabilityStandardEquation",
-#'             group.var = c("IsMechanicalVentilation1h", "Unit"),
-#'             reorder = "no",
-#'             decreasing = TRUE,
-#'             use.label = TRUE)
+#'                pred.var = "Saps3DeathProbabilityStandardEquation",
+#'                group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
+#'                               "InfectionIsAtAdmission"),
+#'                reorder = "no",
+#'                decreasing = TRUE,
+#'                use.label = TRUE)
 #' x
 #'
-#' # A forest plot for all groups SMR
+#' #' A forest plot for all groups SMR (resize the window may be required)
 #' forest.SMR(x, digits = 2)
 #'
-#' # The same thing but reordering the categories
+#' #' The same thing but reordering the categories
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
-#'             pred.var = "Saps3DeathProbabilityStandardEquation",
-#'             group.var = c("IsMechanicalVentilation1h", "Unit"),
-#'             reorder = "SMR",
-#'             decreasing = TRUE,
-#'             use.label = TRUE)
+#'                pred.var = "Saps3DeathProbabilityStandardEquation",
+#'                group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
+#'                               "InfectionIsAtAdmission"),
+#'                reorder = "SMR",
+#'                decreasing = TRUE,
+#'                use.label = TRUE)
+#' forest.SMR(x, digits = 2)
+#'
+#' #' The overall SMR and for all Units
+#' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
+#'                pred.var = "Saps3DeathProbabilityStandardEquation",
+#'                group.var = "Unit",
+#'                reorder = "no",
+#'                decreasing = TRUE,
+#'                use.label = TRUE)
+#' x
+#'
+#' #' A forest plot for all Units
+#' forest.SMR(x, digits = 2)
+#'
+#' #' The same thing but reordering the categories
+#' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
+#'                pred.var = "Saps3DeathProbabilityStandardEquation",
+#'                group.var = "Unit",
+#'                reorder = "SMR",
+#'                decreasing = TRUE,
+#'                use.label = TRUE)
 #' forest.SMR(x, digits = 2)
 #'
 #' rm(x, icu)
@@ -183,14 +207,17 @@ SMR.table <- function(data, group.var, obs.var, pred.var, digits = 5, use.label 
   if (!all(sapply(data[ , group.var], is.factor))) {
     stop("All variables in group.var must be factors.")
   }
+  if (any(is.na(match(c(pred.var, obs.var), names(data))))) {
+    stop("Either 'pred.var' or 'obs.var' is not a variable in data.")
+  }
   if (use.label) {
-    if (is.null(var.labels )) {
+    if (is.null(var.labels)) {
       stop("Either there is no label in attr(data,'var.labels') or 'var.labels argument was not set.")
     }
-    if (length(group.var) != length(var.labels )){
+    if (length(group.var) != length(var.labels)){
       stop("The number of variables and labels are different.")
     }
-    if (!is.character(var.labels )) {
+    if (!is.character(var.labels)) {
       stop("'var.labels ' must be a character vector.")
     }
   }
@@ -275,7 +302,7 @@ forest.SMR <- function(x,
                        cat.seg.arg = list(col = "navyblue", xpd = NA),
                        cat.p.arg = list(pch = 22 ,cex= 1, col = "black", bg = gray(.4), xpd = NA),
                        cat.est.arg = list(x = smr.xlim[1] - .06, las = 1, col = gray(.4), xpd = NA, adj = 1),
-                       SMR.head.arg = list(smr.xlim[1] - .06, font = 2, labels = "SMR [95% sCI]", xpd = NA, adj = 1),
+                       SMR.head.arg = list(smr.xlim[1] - .06, font = 2, labels = "SMR [95% CIs]", xpd = NA, adj = 1),
                        smr.xlab = "Standardized Mortality Ratio",
                        smr.xlim = "auto",
                        grid = TRUE,
@@ -284,16 +311,16 @@ forest.SMR <- function(x,
   on.exit(par(opar))
 
   # Separando os valores da medida preincipal
-  main.pos = 1
-  main.smr = unlist(x[which(x$Variables == "Overall"), c("SMR", "lower.Cl", "upper.Cl")])
-  main.n = unlist(x[which(x$Variables == "Overall"), "N"])
-  main.observed = round(unlist(x[which(x$Variables == "Overall"), "Observed"]), digits = digits)
-  main.expected = round(unlist(x[which(x$Variables == "Overall"), "Expected"]), digits = digits)
+  main.pos <- 1
+  main.smr <- unlist(x[which(x$Variables == "Overall"), c("SMR", "lower.Cl", "upper.Cl")])
+  main.n <- unlist(x[which(x$Variables == "Overall"), "N"])
+  main.observed <- round(unlist(x[which(x$Variables == "Overall"), "Observed"]), digits = digits)
+  main.expected <- round(unlist(x[which(x$Variables == "Overall"), "Expected"]), digits = digits)
 
   # Separando as medidas do SMR para montar o grafico
-  smr.estimates = unlist(x$SMR[-1])
-  smr.ll = unlist(x$lower.Cl[-1])
-  smr.ul = unlist(x$upper.Cl[-1])
+  smr.estimates <- unlist(x$SMR[-1])
+  smr.ll <- unlist(x$lower.Cl[-1])
+  smr.ul <- unlist(x$upper.Cl[-1])
 
   # Separando os valores para serem impressos na direita do grafico
   N <- unlist(x$N[-1])
@@ -302,12 +329,12 @@ forest.SMR <- function(x,
 
   # Achandos os limites do grafico no eixo horizontal
   if (smr.xlim == "auto"){
-    smr.xlim = c(min(unlist(c(main.smr[2], smr.ll)), na.rm = TRUE), max(unlist(c(main.smr[3], smr.ul)), na.rm = TRUE))
+    smr.xlim <- c(min(unlist(c(main.smr[2], smr.ll)), na.rm = TRUE), max(unlist(c(main.smr[3], smr.ul)), na.rm = TRUE))
   }
 
   # Separando os valores das vari?veis e categorias
-  var.labels = x$Variables[-which(is.na(x$Variables))]
-  cat.labels = x$Levels[-which(is.na(x$Levels))]
+  var.labels <- x$Variables[-which(is.na(x$Variables))]
+  cat.labels <- x$Levels[-which(is.na(x$Levels))]
 
   # Achando as posi??es no eixo vertical
   nLevels <- c(which(!is.na(x$Variables))[-1],(nrow(x) + 1))
@@ -318,18 +345,26 @@ forest.SMR <- function(x,
   # x$Levels
   # i = 3
   cat.pos <- seq(1:nLevels[1])
-  for(i in 2:length(nLevels)){
-    ini <- cat.pos[length(cat.pos)]
-    cat.pos <- c(cat.pos, (ini + 3):(ini + 2 + nLevels[i]))
-  }
-  cat.pos <- cat.pos + 2
 
-  var.pos = nLevels[1] + 1
-  # i = 2
-  for(i in 2:length(nLevels)){
-    var.pos <- c(var.pos, var.pos[i-1] + nLevels[i] + 2)
+  if (length(nLevels) == 1) {
+    cat.pos <- cat.pos + 2
+  } else {
+    for(i in 2:length(nLevels)){
+      ini <- cat.pos[length(cat.pos)]
+      cat.pos <- c(cat.pos, (ini + 3):(ini + 2 + nLevels[i]))
+    }
+    cat.pos <- cat.pos + 2
   }
-  var.pos <- var.pos + 2
+  if (length(nLevels) == 1) {
+    var.pos <- cat.pos[length(cat.pos)] + 1
+  } else {
+    var.pos = nLevels[1] + 1
+    # i = 2
+    for(i in 2:length(nLevels)){
+      var.pos <- c(var.pos, var.pos[i-1] + nLevels[i] + 2)
+    }
+    var.pos <- var.pos + 2
+  }
   ylim = c(1, var.pos[length(var.pos)])
   # 5.1 4.1 4.1 2.1
 

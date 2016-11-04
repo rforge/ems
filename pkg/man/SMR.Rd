@@ -31,7 +31,7 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
   cat.p.arg = list(pch = 22, cex = 1, col = "black", bg = gray(0.4), xpd =
   NA), cat.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, col = gray(0.4),
   xpd = NA, adj = 1), SMR.head.arg = list(smr.xlim[1] - 0.06, font = 2, labels
-  = "SMR [95\% sCI]", xpd = NA, adj = 1),
+  = "SMR [95\% CIs]", xpd = NA, adj = 1),
   smr.xlab = "Standardized Mortality Ratio", smr.xlim = "auto",
   grid = TRUE, digits = 3)
 }
@@ -125,32 +125,56 @@ Calculates the standardized mortality ratio and its confidence interval. SMR, fo
 # loading a example data
 data(icu)
 
-# Setting labels to data
-attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h"), names(icu))] <-
-c("ICU unit","Mechanichal ventilation")
+#' Setting labels to data
+attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h",
+          "AdmissionTypeName_pri","InfectionIsAtAdmission"), names(icu))] <-
+  c("ICU unit","Mechanichal ventilation","Admission type","Infection at admission")
 
-# The overall SMR for the whole sample
+#' The overall SMR for the whole sample
 SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
 
-# The overall SMR and for some subgroups
+#' The overall SMR and for some subgroups
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
-            pred.var = "Saps3DeathProbabilityStandardEquation",
-            group.var = c("IsMechanicalVentilation1h", "Unit"),
-            reorder = "no",
-            decreasing = TRUE,
-            use.label = TRUE)
+               pred.var = "Saps3DeathProbabilityStandardEquation",
+               group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
+                              "InfectionIsAtAdmission"),
+               reorder = "no",
+               decreasing = TRUE,
+               use.label = TRUE)
 x
 
-# A forest plot for all groups SMR
+#' A forest plot for all groups SMR (resize the window may be required)
 forest.SMR(x, digits = 2)
 
-# The same thing but reordering the categories
+#' The same thing but reordering the categories
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
-            pred.var = "Saps3DeathProbabilityStandardEquation",
-            group.var = c("IsMechanicalVentilation1h", "Unit"),
-            reorder = "SMR",
-            decreasing = TRUE,
-            use.label = TRUE)
+               pred.var = "Saps3DeathProbabilityStandardEquation",
+               group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
+                              "InfectionIsAtAdmission"),
+               reorder = "SMR",
+               decreasing = TRUE,
+               use.label = TRUE)
+forest.SMR(x, digits = 2)
+
+#' The overall SMR and for all Units
+x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
+               pred.var = "Saps3DeathProbabilityStandardEquation",
+               group.var = "Unit",
+               reorder = "no",
+               decreasing = TRUE,
+               use.label = TRUE)
+x
+
+#' A forest plot for all Units
+forest.SMR(x, digits = 2)
+
+#' The same thing but reordering the categories
+x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
+               pred.var = "Saps3DeathProbabilityStandardEquation",
+               group.var = "Unit",
+               reorder = "SMR",
+               decreasing = TRUE,
+               use.label = TRUE)
 forest.SMR(x, digits = 2)
 
 rm(x, icu)

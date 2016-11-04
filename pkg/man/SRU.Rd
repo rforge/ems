@@ -25,7 +25,7 @@ cut_in(score, los, death, unit, days, min = 200, exc.ICU = TRUE,
 \arguments{
 \item{prob}{Death individual predictions (ranging from 0 to 1) in a vector.}
 
-\item{death}{Observed death (Must be coded as 0 or 1. 1 for death).}
+\item{death}{Observed death (Must be coded as 0 or 1. 1 for death and 0 for survivors).}
 
 \item{unit}{ICU where the patient is admitted.}
 
@@ -90,9 +90,9 @@ Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > m
 \code{cut_in} returns a vector with cut off severity points. Use function \code{\link[base]{cut}} to apply them to the score punctuation and classify your patients data.
 }
 \description{
-\code{SRU} Calculates the standardized resource use for ICUs with information about its patients.
+\code{SRU} Calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions.
 
- \code{plot.SRU} Plots a SMR versus SRU scatter plot with your medians and tertiles.
+ \code{plot.SRU} Plots a SMR versus SRU scatter plot with its medians and tertiles.
 
  \code{print.SRU} Prints a object of class 'SRU'.
 

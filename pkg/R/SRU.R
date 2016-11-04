@@ -1,13 +1,13 @@
 #' Standardized Resource Use (SRU)
 #'
-#' @description \code{SRU} Calculates the standardized resource use for ICUs with information about its patients.
+#' @description \code{SRU} Calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions.
 #'
-#'  \code{plot.SRU} Plots a SMR versus SRU scatter plot with your medians and tertiles.
+#'  \code{plot.SRU} Plots a SMR versus SRU scatter plot with its medians and tertiles.
 #'
 #'  \code{print.SRU} Prints a object of class 'SRU'.
 #'
 #' @param prob Death individual predictions (ranging from 0 to 1) in a vector.
-#' @param death Observed death (Must be coded as 0 or 1. 1 for death).
+#' @param death Observed death (Must be coded as 0 or 1. 1 for death and 0 for survivors).
 #' @param unit ICU where the patient is admitted.
 #' @param los Observed length of stay.
 #' @param los.esp Estimated length of stay.

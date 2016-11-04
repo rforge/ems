@@ -9,8 +9,7 @@
 icu
 }
 \description{
-A dataset containing the data from some ICU admissions and its outcomes at the year 2010.
-The variables are as follows:
+A dataset containing the data from some ICU (intensive care units) admissions and its outcomes at the year 2010.
 }
 \details{
 \itemize{
