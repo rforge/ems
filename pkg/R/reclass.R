@@ -2,45 +2,77 @@
 #'
 #' @name reclass
 #'
-#' @description To compare ICUs  with diferents severities classes or throught two diferents times about your efficiency classification.
+#' @description Compares ICU's (intensive care units) SRU with diferent severity classes or compares ICU's SRU at two diferents times. This comparison checks if the ICUs remains in the same quadrant after a time period, and highlights their rank changes over time.
 #'
-#' \code{plot.reclass} Plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.
+#' \code{plot.reclass} Plots a SMR vs. SRU scatter plot with the ICUs which had their quadrant/rank classification changed.
 #'
 #' \code{print.reclass} Prints a table with information about which ICUs changed from a classification to another.
 #'
-#' @param x,y Objects of class 'SRU'. Be x from the 1st stage and y from the 2nd. For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.
-#' @param same logical; If TRUE, compare the same units, with the same severity classes through two diferents times (default). If FALSE compare the same units, with the different severity classes.
-#' @param plot logical; If TRUE, plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.
+#' @param x,y Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.
+#'
+#' @param same logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
+#'
+#' @param plot Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.
+#'
 #' @param digits Integer indicating the number of decimal places to be used in the output.
-#' @param compare The way one prefer to benchmark the ICUs: by SRU (default), SMR or both of them.
-#' @param decreasing logical; Should the sort order of ICU's rank be increasing or decreasing?
-#' @param complete.rank logical; If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.
+#'
+#' @param compare The way one prefer to benchmark the ICUs: by SRU (default), SMR or BOTH. If BOTH, the ICUs will be ranked by their SRU.
+#'
+#' @param decreasing Logical. Should the sort order of ICU's rank be increasing or decreasing?
+#'
+#' @param complete.rank Logical. If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.
+#'
 #' @param xlim_x,ylim_x Limits for x and y axis for 1st stage plot for \code{plot.reclass}.
+#'
 #' @param xlim_y,ylim_y Limits for x and y axis for 2nd stage plot for \code{plot.reclass}.
+#'
 #' @param xlab,ylab Labels of x and y axis for \code{plot.reclass}.
+#'
 #' @param points.arg_x,points.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units' SMR and SRU in 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param med.arg_x,med.arg_y List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians in 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param tert.arg_x,tert.arg_y List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles in 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param text.arg_x,text.arg_y List of arguments passed to \code{\link[graphics]{text}} for plotting units labels in 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param worse.arg_x,worse.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank worse in 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param better.arg_x,better.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank better in 1st and 2nd stage plots for \code{plot.reclass}.
-#' @param auto.legend logical; If TRUE, prints a legend with \code{leg.arg} argumentes for \code{plot.reclass}.
+#'
+#' @param auto.legend Logical. If TRUE, it prints a legend with \code{leg.arg} arguments for \code{plot.reclass}.
+#'
 #' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles in 1st and 2nd stage plots for \code{plot.reclass}.
 #' @param main.arg_x,main.arg_y List of arguments passed to \code{\link[graphics]{plot}} for overall title for 1st and 2nd stage plots for \code{plot.reclass}.
+#'
 #' @param ... Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).
 #'
-#' @return A table with information about the amount of admissions in each unit, which units changed from a classification to another, their SMR and SRU in 1st and 2nd stage, and their 1st and 2nd rank among other ICUs.
+#' @return \code{reclass} retunrs  a data.frame with the following columns:
+#' \itemize{
+#' \item \code{Unit} Names of the ICU.
+#' \item\code{Admission} Number of admissions in each ICU.
+#' \item \code{From} ICU's initial efficiency quadrant.
+#' \item \code{To} ICU's final efficiency quadrant.
+#' \item \code{SRU.1st} ICU's initial SRU estimate.
+#' \item \code{SRU.2nd} ICU's final SRU estimate.
+#' \item \code{SMR.1st} ICU's initial SMR estimate.
+#' \item \code{SMR.2nd} ICU's final SMR estimate.
+#' \item \code{Rank1} ICU's initial SRU (or SMR) rank.
+#' \item \code{Rank2} ICU's final SRU (or SMR) rank.
+#' }
 #'
-#' @seealso \code{\link{SRU}}
+#' \code{plot.reclass} returns a scatter plot with grpahical comparison of the two periods/stages with their respective medians and tertiles.
+#'
+#' @seealso \code{\link{SRU}}, \code{\link{SMR}}
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'
 #' @examples
 #' data(icu)
-#' #1st quarter
+#' # 1st quarter
 #' x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("01","02","03")),]
 #'
-#' #2nd quarter
+#' # 2nd quarter
 #' y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("04","05","06")),]
 #'
 #' FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
@@ -51,19 +83,19 @@
 #' unit = y$Unit, los = y$los, score = y$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 #' SecondQ
 #'
-#' reclass(x = FirstQ, y = SecondQ)
+#' z <- reclass(x = FirstQ, y = SecondQ)
+#' z
+#' plot(z)
 #'
-#' plot(reclass(x = FirstQ, y = SecondQ))
-#'
-#' rm(icu, x, y, FirstQ, SecondQ)
+#' rm(icu, x, y, FirstQ, SecondQ, z)
 #'
 #' @import stats
 #' @import graphics
 #' @export
 
-reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU","SMR","BOTH"),decreasing = FALSE,complete.rank = TRUE){
+reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU","SMR","BOTH"),decreasing = FALSE, complete.rank = TRUE){
   if(class(x) != "SRU" || class(y)!= "SRU"){
-    stop("'x','y' must be objects of class 'SRU'.")
+    stop("'x'and 'y' must be objects of class 'SRU'.")
   }
   totalAd <- list(x$totalAd, y$totalAd)
   x <- x$rates; y <- y$rates
@@ -74,13 +106,13 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
     stop("'y$rates' must be a data frame.")
   }
   if(compare[1] != "SMR" && compare[1] != "SRU" && compare[1] != "BOTH"){
-    stop("Compare method must be either 'SMR' or 'SRU' or 'BOTH'.")
+    stop("'compare' must be either 'SMR' or 'SRU' or 'BOTH'.")
   }
   if(compare[1] == "BOTH"){
-    warning(paste0("As compare = BOTH, we rank the ICUs by their SRU."))
+    warning(paste0("As compare = 'BOTH', we rank the ICUs by their SRU."))
   }
   if(!is.logical(same)){
-    stop("Same must be either 'TRUE' or 'FALSE'.")
+    stop("'same' must be either 'TRUE' or 'FALSE'.")
   }
   if(same){
     a <- x[which(x$unit %in% y$unit),]
@@ -119,7 +151,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   nchanges <- length(which(dt$change == "CHANGE"))
   change_from_to <- data.frame("Unit" = dt$Unit[which(dt$change == "CHANGE")],"Admissions" = dt$Admissions[which(dt$change == "CHANGE")], "From" = dt$Now[which(dt$change == "CHANGE")], "To" = dt$After[which(dt$change == "CHANGE")])
 
-# SMR e SRU apenas para as que mudaram de quadrante
+# SMR and SRU only for that units whose changed their quadrants
   smrsru_yy <- data.frame("Unit" = change_from_to$Unit, "SMR" = y$smr[which(y$unit %in% change_from_to$Unit)], "SRU" = y$sru[which(y$unit %in% change_from_to$Unit)])
   smrsru_xx <- data.frame("Unit" = change_from_to$Unit, "SMR" = x$smr[which(y$unit %in% change_from_to$Unit)], "SRU" = x$sru[which(y$unit %in% change_from_to$Unit)])
 
@@ -178,7 +210,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
 
     }
   }
-# SMR e SRU para todas as unidadeas.
+# SMR and SRU for all units.
   sru_x = x$sru; smr_x = x$smr; sru_y = y$sru; smr_y =  y$smr
 
   if(complete.rank){
@@ -245,7 +277,7 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   Q1_y <- quantile(y$sru, prob = c(.33, .66))
   Q2_y <- quantile(y$smr, prob = c(.33, .66))
 
-  #criando matrizes com os pontos verdes/vermelhos que mudaram de quadrante
+  #making matrices with green/red points for changind quadrants
 
   worse_x <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))
   worse_y <- matrix(ncol = 2, dimnames = list(NULL, c("SMR", "SRU")))

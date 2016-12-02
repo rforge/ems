@@ -94,15 +94,15 @@
 #' # loading a example data
 #' data(icu)
 #'
-#' #' Setting labels to data
+#' # Setting labels to data
 #' attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h",
 #'           "AdmissionTypeName_pri","InfectionIsAtAdmission"), names(icu))] <-
 #'   c("ICU unit","Mechanichal ventilation","Admission type","Infection at admission")
 #'
-#' #' The overall SMR for the whole sample
+#' # The overall SMR for the whole sample
 #' SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
 #'
-#' #' The overall SMR and for some subgroups
+#' # The overall SMR and for some subgroups
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 #'                pred.var = "Saps3DeathProbabilityStandardEquation",
 #'                group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
@@ -112,10 +112,10 @@
 #'                use.label = TRUE)
 #' x
 #'
-#' #' A forest plot for all groups SMR (resize the window may be required)
+#' # A forest plot for all groups SMR (resize the window may be required)
 #' forest.SMR(x, digits = 2)
 #'
-#' #' The same thing but reordering the categories
+#' # The same thing but reordering the categories
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 #'                pred.var = "Saps3DeathProbabilityStandardEquation",
 #'                group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
@@ -125,7 +125,7 @@
 #'                use.label = TRUE)
 #' forest.SMR(x, digits = 2)
 #'
-#' #' The overall SMR and for all Units
+#' # The overall SMR and for all Units
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 #'                pred.var = "Saps3DeathProbabilityStandardEquation",
 #'                group.var = "Unit",
@@ -134,10 +134,10 @@
 #'                use.label = TRUE)
 #' x
 #'
-#' #' A forest plot for all Units
+#' # A forest plot for all Units
 #' forest.SMR(x, digits = 2)
 #'
-#' #' The same thing but reordering the categories
+#' # The same thing but reordering the categories
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 #'                pred.var = "Saps3DeathProbabilityStandardEquation",
 #'                group.var = "Unit",
@@ -149,7 +149,7 @@
 #' rm(x, icu)
 #' @references
 #'
-#' DAVID W. HOSMER AND STANLEY LEMESHOW. CONFIDENCE INTERVAL ESTIMATES OF AN INDEX OF QUALITY PERFORMANCE BASED ON LOGISTIC REGRESSION MODELS. STATISTICS IN MEDICINE, VOL. 14, 2161-2172 (1995)
+#' David W. Hosmer and Stanley Lemeshow. Confidence intervals estimates of an index of quality performance basend on logistic regression models. Statistics in Medicine , vol. 14, 2161-2172 (1995)
 #'
 #' @import stats
 #' @export
@@ -169,7 +169,7 @@ SMR <- function(obs.var, pred.var, digits = 5, ci.method = c("Hosmer", "Byar"), 
   if (!is.numeric(obs.var)) {
     stop("Observed death variable must be numeric.")
   }
-  if (all(obs.var != 0) && all(obs.var != 1)) {
+  if (any(death != 0 & death != 1)) {
     stop("Observed death variable must be coded as 0 and 1.")
   }
   if (ci.method[1] != "Byar" && ci.method[1] != "Hosmer") {

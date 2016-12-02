@@ -2,7 +2,7 @@
 #'
 #' @name miscellaneous
 #'
-#' @description Collections of functions for data editing ussually used as lower levels for other functions.
+#' @description Collections of functions for data editing usually used as lower levels for other functions.
 #'
 #' \code{f.num} is a wrapper to format numeric variables that are stored as character or factor, simultaneously it will try to detect comma spearated and replace it by dots before formating the variable as numeric. Any non-numeric encoding will be coerced to NA.
 #'
@@ -39,7 +39,7 @@
 #' # Simulating a dataset
 #' y <- data.frame(v1 = sample(c(" F","M  ","   "), 10, replace = TRUE),
 #'                 v2 = sample(c(1:3,"     "), 10, replace = TRUE),
-#'                 v3 = sample(c("Live","Dead",""), 10, replace = TRUE))
+#'                 v3 = sample(c("Alive","Dead",""), 10, replace = TRUE))
 #' y
 #'
 #' # Replacing the "" cells by NA

@@ -33,19 +33,19 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
   "2nd Stage"))
 }
 \arguments{
-\item{x, y}{Objects of class 'SRU'. Be x from the 1st stage and y from the 2nd. For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.}
+\item{x, y}{Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.}
 
-\item{same}{logical; If TRUE, compare the same units, with the same severity classes through two diferents times (default). If FALSE compare the same units, with the different severity classes.}
+\item{same}{logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.}
 
-\item{plot}{logical; If TRUE, plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.}
+\item{plot}{Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.}
 
 \item{digits}{Integer indicating the number of decimal places to be used in the output.}
 
-\item{compare}{The way one prefer to benchmark the ICUs: by SRU (default), SMR or both of them.}
+\item{compare}{The way one prefer to benchmark the ICUs: by SRU (default), SMR or BOTH. If BOTH, the ICUs will be ranked by their SRU.}
 
-\item{decreasing}{logical; Should the sort order of ICU's rank be increasing or decreasing?}
+\item{decreasing}{Logical. Should the sort order of ICU's rank be increasing or decreasing?}
 
-\item{complete.rank}{logical; If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.}
+\item{complete.rank}{Logical. If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.}
 
 \item{...}{Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).}
 
@@ -67,28 +67,42 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 
 \item{better.arg_x, better.arg_y}{List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank better in 1st and 2nd stage plots for \code{plot.reclass}.}
 
-\item{auto.legend}{logical; If TRUE, prints a legend with \code{leg.arg} argumentes for \code{plot.reclass}.}
+\item{auto.legend}{Logical. If TRUE, it prints a legend with \code{leg.arg} arguments for \code{plot.reclass}.}
 
 \item{leg.arg}{List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles in 1st and 2nd stage plots for \code{plot.reclass}.}
 
 \item{main.arg_x, main.arg_y}{List of arguments passed to \code{\link[graphics]{plot}} for overall title for 1st and 2nd stage plots for \code{plot.reclass}.}
 }
 \value{
-A table with information about the amount of admissions in each unit, which units changed from a classification to another, their SMR and SRU in 1st and 2nd stage, and their 1st and 2nd rank among other ICUs.
+\code{reclass} retunrs  a data.frame with the following columns:
+\itemize{
+\item \code{Unit} Names of the ICU.
+\item\code{Admission} Number of admissions in each ICU.
+\item \code{From} ICU's initial efficiency quadrant.
+\item \code{To} ICU's final efficiency quadrant.
+\item \code{SRU.1st} ICU's initial SRU estimate.
+\item \code{SRU.2nd} ICU's final SRU estimate.
+\item \code{SMR.1st} ICU's initial SMR estimate.
+\item \code{SMR.2nd} ICU's final SMR estimate.
+\item \code{Rank1} ICU's initial SRU (or SMR) rank.
+\item \code{Rank2} ICU's final SRU (or SMR) rank.
+}
+
+\code{plot.reclass} returns a scatter plot with grpahical comparison of the two periods/stages with their respective medians and tertiles.
 }
 \description{
-To compare ICUs  with diferents severities classes or throught two diferents times about your efficiency classification.
+Compares ICU's (intensive care units) SRU with diferent severity classes or compares ICU's SRU at two diferents times. This comparison checks if the ICUs remains in the same quadrant after a time period, and highlights their rank changes over time.
 
-\code{plot.reclass} Plots a SMR vs. SRU scatter plot with the ICUs which had your classification changed.
+\code{plot.reclass} Plots a SMR vs. SRU scatter plot with the ICUs which had their quadrant/rank classification changed.
 
 \code{print.reclass} Prints a table with information about which ICUs changed from a classification to another.
 }
 \examples{
 data(icu)
-#1st quarter
+# 1st quarter
 x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("01","02","03")),]
 
-#2nd quarter
+# 2nd quarter
 y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("04","05","06")),]
 
 FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
@@ -99,17 +113,17 @@ SecondQ <- SRU(prob = y$Saps3DeathProbabilityStandardEquation, death = y$UnitDis
 unit = y$Unit, los = y$los, score = y$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 SecondQ
 
-reclass(x = FirstQ, y = SecondQ)
+z <- reclass(x = FirstQ, y = SecondQ)
+z
+plot(z)
 
-plot(reclass(x = FirstQ, y = SecondQ))
-
-rm(icu, x, y, FirstQ, SecondQ)
+rm(icu, x, y, FirstQ, SecondQ, z)
 
 }
 \author{
 Lunna Borges and Pedro Brasil
 }
 \seealso{
-\code{\link{SRU}}
+\code{\link{SRU}}, \code{\link{SMR}}
 }
 
