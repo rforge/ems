@@ -169,7 +169,7 @@ SMR <- function(obs.var, pred.var, digits = 5, ci.method = c("Hosmer", "Byar"), 
   if (!is.numeric(obs.var)) {
     stop("Observed death variable must be numeric.")
   }
-  if (any(death != 0 & death != 1)) {
+  if (any(obs.var != 0 & obs.var != 1)) {
     stop("Observed death variable must be coded as 0 and 1.")
   }
   if (ci.method[1] != "Byar" && ci.method[1] != "Hosmer") {

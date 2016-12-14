@@ -2,37 +2,37 @@
 #'
 #' @name SRU
 #'
-#' @description \code{SRU} calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions. The resource use is represented by the patients' length of stay (LOS). Therefore the SRU for each unit is defined as the observed LOS divided by the expected LOS. To estimate the expected LOS for each ICU one must define severity score, here defined by the SAPS 3 score. But in theory it could be any score/probability estimated to predict death in the whole group. The 'plot.SRU' function will return SRU median and a \code{\link{SMR}} median, and classify each unit in the quadrants formed by these two medians: most efficient (ME) is the lower left quadrant and identify ICUs with SRU and SMR below the median;  least efficient (LE) is the upper right quadrant and identifies ICUs which SRU and SMR are above the median; and least achieving (LE) - the lower right wuadrant, and over achieving (OA) - the upper left quadrant.
-#
-#'  \code{plot.SRU} Plots a \code{\link{SMR}} versus 'SRU' scatter plot with its medians and tertiles.
+#' @description \code{SRU} calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions. The resource use is represented by the patients' length of stay (LOS). Therefore the SRU for each unit is defined as the observed LOS divided by the expected LOS for each ICU. To estimate the expected LOS for each ICU one must define a severity score, here defined by the SAPS 3 score. In theory, the 'score' could be any score/probability estimating death for each ICU admission.
 #'
+#' The \code{plot.SRU} function will return a \code{\link{SMR}} versus SRU scatter plot with its medians and tertiles. Thus, it classifies each unit in the quadrants formed by these two medians: most efficient (ME) is the lower left quadrant (SRU and SMR below the median);  least efficient (LE) is the upper right quadrant (SRU and SMR above the median); and least achieving (LE) - the lower right wuadrant(SRU below and SMR above the median); and over achieving (OA) - the upper left quadrant (SRU above and SMR below the median).
+##'
 #'  \code{print.SRU} Prints a object of class 'SRU'.
 #'
-#'  \code{cut_in} is used to find limits to define severity classes which are used in \code{SRU} function to calculate average days to discharged surviving patients. Its rationale is to find the severity classes limits that yelds a desired average days of survivors. At some point in time, we made a study to test if different arrangements of the severity classes would yeld different classifications in the efficiency quadrants. Despite this study did not show any difference from the original approach, we left the function in the package. Therefore, any arbitrary severity classes should yeld theh same results.
+#'  \code{cut_in} is used to find limits to define severity classes which are used in \code{SRU} function. The severity classes are necessary to calculate average days to produce one survivor and consequently to estimate the expected LOS in each ICU. Its rationale is to find the severity classes limits that yelds a desired average days of survivors. At some point in time, we made a study to test if different arrangements of the severity classes would yeld different classifications in the efficiency quadrants. Despite this study did not show any difference from the original approach, we left the function in the package. Therefore, any arbitrary severity classes should yeld theh same results.
 #'
-#'  \code{SRUcalc} is a simpler function and returns only SRU value for each ICU.
+#'  \code{SRUcalc} is a simpler function to estimte SRU and returns, for each ICU, the SRU value, the obsbserve and expected number os deaths and LOS.
 #'
-#' @param prob Death individual predictions (ranging from 0 to 1) in a vector.
+#' @param prob Individual predicted death (ranging from 0 to 1) in a vector.
 #'
 #' @param death Observed death. Accepted values are 0 (absence) or 1 (presence) in a vector.
 #'
 #' @param unit A character or factor variable indicating the ICU where the patient is admitted.
 #'
-#' @param los A numeric variable indicating the observed length of stay for that patient.
+#' @param los A numeric variable indicating the observed length of stay for each patient.
 #'
-#' @param los.esp Estimated length of stay. This argument is optional and will be required only if type = 2. If the user has an alternative model to estimate the individual LOS,
+#' @param los.exp Estimated length of stay (LOS). This argument is optional and will be required only if \code{type = 2}. If the user has an alternative model to estimate the individual LOS, the predicted individual LOS should passed to this argument. If this is the case, the predicted ICU LOS is estimated as the mean of the individual LOS predictions of these groups.
 #'
-#' @param class Patient's severity range.
+#' @param class A facotr variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored.
 #'
-#' @param score Acute Physiology Score.
+#' @param score A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. This will be required only if \code{original = TRUE}. The function will use this argument to know to wich severity class each patient will assigned to.
 #'
-#' @param plot Logical; If TRUE plots a SMR versus SRU scatter plot.
+#' @param plot Logical; If \code{TRUE} plots a SMR versus SRU scatter plot.
 #'
-#' @param type Way to calculate SRU. If 1, it does as the original article (default); which is to estimate the ICU's expected LOS by multiplying the overall average days within each severity class by the total number of admissions in the same severity class in that ICU, and summing the expected LOS for each severity class in that ICU. If 2, then the user must provide the expected LOS for each subject (i.e. from a prediction model), and the function will estimate the ICU's expected LOS as the mean of the individual LOS.
+#' @param type Way to calculate SRU. If \code{type = 1}, it does as the original article (default); which is to estimate the ICU's expected LOS by multiplying the overall average days within each severity class by the number of survivors in the same severity class in that ICU, and summing the expected LOS for each severity class in that ICU. If \code{type = 2}, then the user must provide the \code{los.exp} (expected LOS) for each subject (i.e. from a prediction model), and the function will estimate the ICU's expected LOS as the mean of the individual LOS.
 #'
 #' @param digits,digits2 Integer indicating the number of decimals to be used in the output.
 #'
-#' @param originals logical; If TRUE it uses the severity classes and average days as the original article and will override the 'class' argument if any. We recommend not to set it TRUE, unless you really know what you are doing.
+#' @param originals Logical; If \code{TRUE} it uses the severity classes and average days as the original article and will override the \code{class} argument if any. It requires the \code{score} argument and it must be the SAPS 3 score. We recommend not to set it \code{TRUE}, unless you really know what you are doing. Even if one wished to have severity classes identical to the original paper, it is better to set the severity classes before running the analysis. Like this, the function will estimate the average days from the data instead of using the fixed the average days from the original paper.
 #'
 #' @param x  For \code{print.SRU} or \code{plot.SRU}, an object of class 'SRU'.
 #'
@@ -40,27 +40,27 @@
 #'
 #' @param xlab,ylab Labels of x and y axis for \code{plot.SRU}.
 #'
-#' @param points.arg List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to ICUs' SMR and SRU for \code{plot.SRU}.
+#' @param points.arg List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to ICUs' SMR and SRU.
 #'
-#' @param med.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians for \code{plot.SRU}.
+#' @param med.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR medians.
 #'
-#' @param tert.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles for \code{plot.SRU}.
+#' @param tert.arg List of arguments passed to \code{\link[graphics]{abline}} for plotting lines corresponding to SRU and SMR tertiles.
 #'
-#' @param auto.legend Logical; If TRUE, prints a legend with \code{leg.arg} arguments for \code{plot.SRU}.
+#' @param auto.legend Logical; If \code{TRUE}, prints a legend with parameters in \code{leg.arg} arguments.
 #'
-#' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles for \code{plot.SRU}.
+#' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends in \code{plot.SRU}.
 #'
-#' @param ... Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).
+#' @param ... Arguments to be passed to \code{\link[graphics]{plot.default}} or to \code{\link[base]{print}}.
 #'
-#' @param days For \code{cut_in}, this is a vector with days which one wants to average days range in. See example.
+#' @param days For \code{cut_in}, this is a vector with days which one wants to average days to match. See example.
 #'
-#' @param min For \code{cut_in}, this is the minimum quantity of patients in each severity class (default \code{min} = 200)
+#' @param min For \code{cut_in}, this is the minimum desired quantity of patients in each severity class (default = 200) to estimate the average days.
 #'
-#' @param exc.ICU Logical; For \code{cut_in}, if TRUE, ICUs without surviving patients are ignored.
+#' @param exc.ICU Logical; For \code{cut_in}, if \code{TRUE}, ICUs without surviving patients are ignored.
 #'
-#' @param complete Logical; For \code{cut_in}, if TRUE, shows additional information about severity classes.
+#' @param complete Logical; For \code{cut_in}, if \code{TRUE}, shows additional information about severity classes.
 #'
-#' @return Two tables: one with information about severity classes, and another with information about ICUs classified as Most Efficient or Least Efficient.
+#' @return Two tables: one with information about severity classes and the respective quantities required to estimate the expected LOS, and another with information about ICUs classified as Most Efficient (ME) or Least Efficient (LE).
 #' \itemize{
 #' \item \code{Sev} Severity class.
 #' \item\code{Total} Total of patients.
@@ -69,13 +69,13 @@
 #' \item \code{AvDays} Average days to produce a survivor.
 #' \item \code{N.Unit} Quantity of ICUs.
 #' \item \code{N.Pat} Quantity of patients.
-#' \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation) - see \code{\link{SMR}}.
+#' \item\code{SMR} Standardized Mortality Ratio Mean (standard deviation).
 #' \item \code{SRU} Standardized Resource Use Mean (standard deviation).
 #' }
 #'
-#' Most Efficient ICUs have SRU,SMR < median. Least Efficient ICUs have SRU,SMR > median.
+#' Most Efficient ICUs have SRU, SMR < median. Least Efficient ICUs have SRU, SMR > median.
 #'
-#' \code{cut_in} returns a vector with cut off severity points. Use function \code{\link[base]{cut}} to apply them to the score punctuation and classify your patients data.
+#' \code{cut_in} returns a vector with the limits to cut the severity score.
 #'
 #' \code{SRUcalc} returns a table with:
 #' \itemize{
@@ -101,9 +101,9 @@
 #'
 #' days <- seq(1,100)
 #'
-#' corte <- cut_in(icu$Saps3Points, icu$los, icu$UnitDischargeName, icu$Unit, days, exc.ICU=TRUE)
+#' cut_lims <- cut_in(icu$Saps3Points, icu$los, icu$UnitDischargeName, icu$Unit, days, exc.ICU=TRUE)
 #'
-#' icu$class <- cut(icu$Saps3Points, breaks = corte, include.lowest = TRUE)
+#' icu$class <- cut(icu$Saps3Points, breaks = cut_lims, include.lowest = TRUE)
 #'
 #' # Removing data with inapropriate values
 #' icu <- icu[-which(icu$los < 0 ),]
@@ -120,22 +120,23 @@
 #' x$rates[order(x$rates$sru),]
 #'
 #' # SRU with diferent severity classes created by cut_in function
-#'y <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
-#'death = icu$UnitDischargeName, unit = icu$Unit,
-#'los = icu$los, score = icu$Saps3Points,
-#'originals = FALSE, type = 1, plot = FALSE, class = icu$class)
+#' y <- SRU(prob = icu$Saps3DeathProbabilityStandardEquation,
+#' death = icu$UnitDischargeName, unit = icu$Unit,
+#' los = icu$los, score = icu$Saps3Points,
+#' originals = FALSE, type = 1, plot = FALSE, class = icu$class)
 #' y
 #'
 #'# Using SRUcalc
-#'SRUcalc(prob = icu$Saps3DeathProbabilityStandardEquation, death = icu$UnitDischargeName, unit = icu$Unit, los = icu$los, score = icu$Saps3Points )
+#' SRUcalc(prob = icu$Saps3DeathProbabilityStandardEquation, death = icu$UnitDischargeName, unit = icu$Unit, los = icu$los, score = icu$Saps3Points)
 #'
-#' rm(x, icu, corte)
+#' rm(x, y, days, icu, cut_lims)
+#'
 #' @import stats
 #' @import graphics
 #' @import utils
 #' @export
 
-SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, type = 1, digits = 2, digits2 = 5, originals = FALSE){
+SRU <- function(prob, death, unit, los, los.exp, class, score, plot = FALSE, type = 1, digits = 2, digits2 = 5, originals = FALSE){
   if(length(which(is.na(prob) == TRUE))){
     stop("'prob' must not have any NA value.")
   }
@@ -167,14 +168,14 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
     stop("'type' must be either 1 or 2.")
   }
   if(type == 2){
-    if(any(is.na(los.esp))){
-      stop("'los.esp' must not have any NA value.")
+    if(any(is.na(los.exp))){
+      stop("'los.exp' must not have any NA value.")
     }
-    if(!is.numeric(los.esp)){
-      stop("'los.esp' must be numeric.")
+    if(!is.numeric(los.exp)){
+      stop("'los.exp' must be numeric.")
     }
-    if (any(los.esp < 0)){
-      stop("There is at least one negative 'los.esp'. It must be a positive number.")
+    if (any(los.exp < 0)){
+      stop("There is at least one negative 'los.exp'. It must be a positive number.")
     }
   }
   if(originals != TRUE && originals != FALSE){
@@ -196,15 +197,14 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
     }
   }
   if(type == 1){dt <- data.frame(prob, death, unit, los, class)}
-  if(type == 2){dt <- data.frame(prob, death, unit, los, los.esp, class)}
+  if(type == 2){dt <- data.frame(prob, death, unit, los, los.exp, class)}
   unit_death <- table(dt$unit, dt$death)
   exc <- rownames(unit_death)[which(unit_death[,1] == 0)]
   if (!is.null(exc) & length(exc) > 0){
     dt <- dt[-which(dt$unit %in% exc),]
     dt <- droplevels(dt)
     unit_death <- table(dt$unit,dt$death)
-    warning(paste(c("The following units were excluded due to absence of survivals:",
-                    exc), collapse = ", "))
+    warning(paste(c("The following units were excluded due to absence of survivals:", exc), collapse = ", "))
   }
 
   cla_los <- aggregate(dt$los, by = list(Class = dt$class), FUN = sum)
@@ -214,11 +214,10 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
   surv <- cla_dea[,1]			#survivors by class
   total <-   cla_dea[,1] + cla_dea[,2]		#total patients by class
 
-  if (originals == FALSE){
-    average_days <- sum_los / surv 	#average days used by patients, by class
-  }
-  if (originals == TRUE){
+  if (originals) {
     average_days <- matrix(c(2.3,3.2,4.3,7.2,11,16.6,22.2,29.4,39), ncol = 1)
+  } else {
+    average_days <- sum_los / surv 	#average days used by patients, by class
   }
   if (type == 1){
     # unit_death[,1]					#survivors by unit
@@ -232,7 +231,7 @@ SRU <- function(prob, death, unit, los, los.esp, class, score, plot = FALSE, typ
     LOS_ICU_esp <- apply(rec_unit_class, MARGIN=1, FUN = sum)		#expected los
   }
   if (type == 2){
-    LOS_ICU_esp <- aggregate(dt$los.esp, by <- list(Class <- dt$unit), FUN = sum)[,2]
+    LOS_ICU_esp <- aggregate(dt$los.exp, by <- list(Class <- dt$unit), FUN = sum)[,2]
   }
 
   LOS_ICU_obs <- aggregate(dt$los, by = list(Class = dt$unit), FUN = sum)[,2]		#total observed los by unit
@@ -457,32 +456,31 @@ if (complete == TRUE){
 #' @rdname SRU
 #' @export
 SRUcalc <- function(prob, death, unit, los, score, digits = 2){
-
-  if(any(is.na(prob))){
+  if (any(is.na(prob))) {
     stop("'prob' must not have any NA value.")
   }
-  if(any(min(prob) <0 | max(prob) > 1)){
+  if (any(min(prob) <0 | max(prob) > 1)) {
     stop("'prob' must range from 0 to 1.")
   }
-  if(any(is.na(death))){
+  if (any(is.na(death))) {
     stop("'death' must not have any NA.")
   }
-  if(any(death != 0 & death != 1)){
+  if (any(death != 0 & death != 1)) {
     stop("'death' must be coded as 0 and 1.")
   }
-  if(!is.factor(unit)){
+  if (!is.factor(unit)) {
     stop("'unit' must be a factor.")
   }
-  if(length(which(is.na(los) == TRUE))){
+  if (any(is.na(los))) {
     stop("'los' must not have NA.")
   }
-  if(!is.numeric(los)){
+  if (!is.numeric(los)) {
     stop("'los' must be numeric.")
   }
-  if (any(los < 0)){
+  if (any(los < 0)) {
     stop("'los' must be positive numbers.")
   }
-  if(length(which(is.na(score) == TRUE))){
+  if (any(is.na(score))) {
     stop("'score' must not have NA.")
   }
   if(!is.numeric(score)){
@@ -497,7 +495,8 @@ SRUcalc <- function(prob, death, unit, los, score, digits = 2){
     dt <- dt[-which(dt$unit %in% exc),]
     dt <- droplevels(dt)
     unit_death <- table(dt$unit,dt$death)
-    warning(paste(c("The following units were excluded due to absence of survivals:", exc), collapse = ", "))	}
+    warning(paste(c("The following units were excluded due to absence of survivals:", exc), collapse = ", "))
+  }
   admissions <- as.vector(table(dt$unit))
   average_days <- matrix(c(2.3,3.2,4.3,7.2,11,16.6,22.2,29.4,39), ncol = 1)
   unit_class <- data.frame(dt$unit, dt$class, dt$death)
@@ -505,14 +504,14 @@ SRUcalc <- function(prob, death, unit, los, score, digits = 2){
   unit_class <- table(unit_class)
   unitnames <- rownames(unit_class)
   unit_class <- matrix(unit_class, length(unique(dt$unit)), nrow(average_days))
-  A <- matrix(average_days[,1], length(unique(dt$unit)), nrow(average_days), byrow=T) #resources by class matrix
-  rec_unit_class <- A*unit_class		#expected average days to produce a survivor by unit and by class
-  LOS_esp <- apply(rec_unit_class, MARGIN=1, FUN = sum)
+  A <- matrix(average_days[,1], length(unique(dt$unit)), nrow(average_days), byrow = TRUE) #resources by class matrix
+  rec_unit_class <- A * unit_class		#expected average days to produce a survivor by unit and by class
+  LOS_esp <- apply(rec_unit_class, MARGIN = 1, FUN = sum)
   LOS_obs <- aggregate(dt$los, by = list(Class = dt$unit), FUN = sum)[,2]		#observed los by unit
   sru <- LOS_obs / LOS_esp
 
   expected <- SMR.table(data = dt, group.var = "unit", obs.var = "death", pred.var = "prob")$Expected[-1]
 
-  output <- data.frame(Unit = unitnames, SRU = round(sru,digits), N = admissions, Observed = unit_death[,2], Expected = expected, LOS_esp = LOS_esp)
+  output <- data.frame(Unit = unitnames, SRU = round(sru, digits), N = admissions, Observed = unit_death[,2], Expected = expected, LOS_obs = LOS_obs, LOS_exp = LOS_esp)
   output
 }
