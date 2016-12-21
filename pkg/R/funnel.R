@@ -10,21 +10,21 @@
 #' @param o1,o2 Observed values at 1st and 2nd periods, respectively.
 #' @param e Expected death vector. Used when \code{direct = FALSE}.
 #' @param e1,e2 Expected values at 1st and 2nd periods, respectively.
-#' @param lambda1,lambda2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Poi(lambda_i). Used when \code{option = 'ratioRates'}
-#' @param pi1,pi2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Bin(pi_i,n_i). Used when \code{option = 'diffProp' or 'ratioProp'}
-#' @param y.type The indicator type. It can be SMR or SRU. (used for \code{option = 'rate' or 'ratioRates'})
-#' @param p Confidence level vector. It will return a confidence interval for all vector components. The default is 2 and 3 standard deviations (p = c(.95, 998).
-#' @param theta Target value which specifies the desired expectation for institutions considered "in control".
+#' @param lambda1,lambda2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Poi(lambda_i). Used when \code{option = ratioRates}
+#' @param pi1,pi2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Bin(pi_i,n_i). Used when \code{option = diffProp or ratioProp}
+#' @param y.type The indicator type. It can be SMR or SRU. (used for \code{option = rate or ratioRates})
+#' @param p Confidence level vector. It will return a confidence interval for all vector components. The default is 2 and 3 standard deviations (p = c(.95, 998)).
+#' @param theta Target value which specifies the desired expectation for institutions considered "in control". Used when \code{option = prop or rate}
+#' @param direct Logical; Used when \code{option = rate}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error may be reported in the size of population \code{n} (CI is made a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made a poisson approximation). See details.
 #' @param method There are two kind of approximations, as discussed in \code{direct} parameter. Inside them, there are two options:  to make the CI from the exact distribuition (binomial or poisson) or from de normal distribution. So, here one could choose between \code{normal} or \code{exact} (default). See details.
-#' @param direct Logical; Used when \code{option = 'rate'}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error may be reported in the size of population \code{n} (CI is made a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made a poisson approximation). See details.
 #' @param myunits A character vector with the unit names which one would like to benchmark among all units.
 #' @param overdispersion Logical; If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.
-#' @param option The type of funnel plot one wants to produce. It can be equal \code{rate, ratioRates, prop, diffProp or ratioProp}. See details
+#' @param option The type of funnel plot one wants to produce. It can be equal \code{rate, ratioRates, prop, diffProp or ratioProp}. See details to understand how to use each of them.
 #' @param printUnits Logical; If \code{TRUE}, the units are identified in the plot and printed in de console. The numbers in the plot correspond to the data.frame printed in the console.
-#' @param plot Logical; If \code{TRUE}, plots the correspondent graphic.
+#' @param plot Logical; If \code{TRUE}, the correspondent graphic is plotted.
 #' @param x An object of class 'funnel'.
-#' @param col Especification vector for the CI lines colors. Must have same length of \code{p} + 1 for the target line in the last position.
-#' @param lwd The lines width, a positive number. It's the same for ao lines in the plot. See \code{\link[graphics]{par}}.
+#' @param col Especification vector for the CI lines colors. Must have same length of \code{p} + 1 with the target line in the last position.
+#' @param lwd The lines width, a positive number. It's the same for all lines in the plot. See \code{\link[graphics]{par}}.
 #' @param lty The CI lines types. See \code{\link[graphics]{par}}.
 #' @param bty A character string which determined the type of \code{\link[graphics]{box}} which is drawn about plots. See \code{\link[graphics]{par}}.
 #' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points. See \code{\link[graphics]{points}} for possible values and their interpretation. Note that only integers and single-character strings can be set as a graphics parameter (and not NA nor NULL).
