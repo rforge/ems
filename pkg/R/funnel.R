@@ -46,6 +46,9 @@
 #' To choose the \code{direct} argument, one should pay attention if one wants to use a Direct Standardized Rate or a Indirect Standardized Rate. If direct, we assume the rate is reported as a rate per (say) 1000 individuals, then it is treated as a proportion. If indirect, it is a cross-sectional data that leads to a standardized event ratio.
 #'
 #' In many circumstances we can assume an exact or approximate normal distribution for the data. Using the \code{type} argument, one could choose between \code{exact} or  \code{normal}. For direct standardized rates, the exact distribuition is binomial and for indirect standardized rates, the exact distribuition is poisson. Assume rho is the precision parameter (volume, for direct rates; expected value, for indirect rates). For rho > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
+#'
+#' The console warns if there are units with volume/expected value less than 100.
+#'
 #' \item If \code{option = ratioRate}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho.
 #'
 #' Suppose we have two measures for each institution: O1; E1 in a baseline period and O2; E2 in a subsequent period, and we wish to assess the change in the underlying rate (SMR or SRU). We shall only consider the ratio of rates: exact methods based on a conditional argument are available if E1 = E2, and otherwise normal approximations are used, in which case for low (especially zero) counts one might add 0.5 to all Os and E’s.
