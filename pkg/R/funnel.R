@@ -106,7 +106,7 @@
 #'  n = x[-1,]$N, method = "exact", myunits = c("A"), option = "prop")
 #'
 #' # to analyse rates (SMR)
-#' s<-funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
+#' funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
 #' theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
 #' option = "rate", myunits = NULL)
 #'
@@ -142,7 +142,7 @@
 #'  funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
 #'  n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp")
 #'
-#'  rm(icu, x, z, w )
+#'  rm(icu, x, z, w, dt1, dt2, unit )
 #'
 #' @import stats
 #' @import graphics

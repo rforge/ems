@@ -48,7 +48,6 @@
 #' @seealso \code{\link{SMR}}, \code{\link{SRU}}
 #' @import stats
 #' @import graphics
-#' @export
 
 
 changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), ..., col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, printUnits = FALSE, auto.xlab = TRUE, xlab = c("Average observed count","Expectation per period"), auto.ylab = TRUE, ylab = c(paste0(y.type[1],"'s Ratio"),paste0("Log(", y.type[1],"'s Ratio)")), ylim = c(max(lowerCI[[which(p == max(p))]]) - 1.5*theta, min(upperCI[[which(p == max(p))]]) + 1.5*theta), xlim = c(0,max(rho)), plot = FALSE, myunits = NULL, mypts.col = "darkblue", digits = 5){

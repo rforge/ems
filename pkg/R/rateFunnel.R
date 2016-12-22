@@ -52,7 +52,6 @@
 #' @author Lunna Borges and Pedro Brasil
 #' @import stats
 #' @import graphics
-#' @export
 
 
 rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, printUnits = FALSE, text.cex = 0.7, text.pos = NULL, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), plot = FALSE, myunits = NULL, mypts.col = "darkblue", overdispersion = FALSE, digits = 5){

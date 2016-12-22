@@ -46,7 +46,7 @@
 #' Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
 #' @import stats
 #' @import graphics
-#' @export
+
 
 
 propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","normal"), ..., col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, printUnits = FALSE, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), plot  = FALSE, myunits = NULL, mypts.col = "darkblue", overdispersion = FALSE, digits = 5){
