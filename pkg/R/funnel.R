@@ -1,5 +1,7 @@
 #' Funnel Plot
 #'
+#' @name funnel
+#'
 #' @description Produces a variety of data funnel plots. Funnel plots are usefull for identifing units which are "in control" or not.
 #'
 #' @param unit The unit names.
@@ -102,13 +104,13 @@
 #' obs.var = "UnitDischargeName", pred.var = "Saps3DeathProbabilityStandardEquation")
 #'
 #' # to analyse proportions
-#' funnel(unit = x$Levels[-1], o = x[-1,]$Observed, theta = x$Observed[1] / x$N[1],
-#'  n = x[-1,]$N, method = "exact", myunits = c("A"), option = "prop")
+#' plot(funnel(unit = x$Levels[-1], o = x[-1,]$Observed, theta = x$Observed[1] / x$N[1],
+#'  n = x[-1,]$N, method = "exact", myunits = c("A"), option = "prop", plot = FALSE), main = "Cross-sectional proportions")
 #'
 #' # to analyse rates (SMR)
-#' funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
+#' plot(funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
 #' theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
-#' option = "rate", myunits = NULL)
+#' option = "rate", myunits = NULL, plot = FALSE), main = "Cross-sectional rate (SMR)")
 #'
 #' # creating a variable containing month information about each admission
 #'  icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDate),"%m"))
@@ -126,21 +128,21 @@
 #'  pred.var = "Saps3DeathProbabilityStandardEquation")
 #'
 #'  # to analyse periods using ratio rates with e1 = e1
-#'  funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1], e1 = z$Expected[-1],
+#'  plot(funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1], e1 = z$Expected[-1],
 #'  n2 = w$N[-1], o2 = w$Observed[-1], e2 = z$Expected[-1],
-#'  myunits = c("A","B"), option = "ratioRates")
+#'  myunits = c("A","B"), option = "ratioRates", plot = FALSE), main = "Ratio of SMRs of periods with same expectation of death")
 #'
 #'  # to analyse periods using ratio rates with e1 =! e1
-#'  funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#'  e1 = z$Expected[-1], n2 = w$N[-1], o2 = w$Observed[-1], e2 = w$Expected[-1], option = "ratioRates")
+#'  plot(funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+#'  e1 = z$Expected[-1], n2 = w$N[-1], o2 = w$Observed[-1], e2 = w$Expected[-1], option = "ratioRates", plot = FALSE), main = "Ratio of SMRs of periods with different expectation of death")
 #'
 #'  # to analyse periods by difference in proportions
-#'  funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#'  n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp")
+#'  plot(funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+#'  n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp", plot = FALSE), main = "Difference in proportions of death for two periods")
 #'
 #'  # to analyse periods by ratio of proportions
-#'  funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#'  n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp")
+#'  plot(funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+#'  n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp", plot = FALSE), main = "Ratio of proportions of death for two periods")
 #'
 #'  rm(icu, x, z, w, dt1, dt2, unit )
 #'

@@ -1,51 +1,4 @@
-#' Funnel Plot for Ratio of Rates
-#'
-#' @description \code{changeRateFunnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho. See details for more information.
-#'
-#' @param unit The unit names.
-#' @param n1,n2 Total of admissions at 1st and 2nd periods, respectively.
-#' @param o1,o2 Observed values at 1st and 2nd periods, respectively.
-#' @param e1,e2 Expected values at 1st and 2nd periods, respectively.
-#' @param lambda1,lambda2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Poi(lambda_i)
-#' @param y.type The indicator type. It can be SMR or SRU.
-#' @param p Confidence level vector. It will return a confidence interval for all vector components. The default is 2 and 3 standard deviations (p = c(.95, 998))
-#' @param col Especification vector for the CI lines colors. Must have same length of \code{p} + 1 for the target line in the last position.
-#' @param lwd The lines width, a positive number. It's the same for ao lines in the plot. See \code{\link[graphics]{par}}
-#' @param lty The CI lines types. See \code{\link[graphics]{par}}.
-#' @param bty A character string which determined the type of \code{\link[graphics]{box}} which is drawn about plots. See \code{\link[graphics]{par}}.
-#' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points. See \code{\link[graphics]{points}} for possible values and their interpretation. Note that only integers and single-character strings can be set as a graphics parameter (and not NA nor NULL).
-#' @param bg The color to be used for the background of the points for \code{pch = 21}. See \code{\link[graphics]{par}}.
-#' @param pt.col Especification vector for the points colors.
-#' @param pt.cex A numerical value giving the amount by which plotting points should be magnified relative to the default.  See \code{\link[graphics]{par}}.
-#' @param auto.legend Logical; If \code{TRUE}, prints a legend with default arguments.
-#' @param printUnits Logical; If \code{TRUE}, the units are identified in the plot and printed in de console. The numbers in the plot correspond to the data.frame printed in the console.
-#' @param text.cex Like \code{pt.cex}, but for the texts numbers correspondents to the units.
-#' @param text.pos a position specifier for numbers that correspond to the units in the plot. Values of 1, 2, 3 and 4, respectively indicate positions below, to the left of, above and to the right of the points.
-#' @param auto.xlab Logical; if \code{TRUE}, the plot is returned with default xlab.
-#' @param xlab A title for the x axis. To change it one must set \code{auto.xlab = FALSE}. See \code{\link[graphics]{title}}
-#' @param auto.ylab Logical; if \code{TRUE}, the plot is returned with default ylab.
-#' @param ylab A title for the y axis. To change it one must set \code{auto.ylab = FALSE}. See \code{\link[graphics]{title}}
-#' @param xlim,ylim Numeric vector giving the x and y coordinates ranges.
-#' @param plot Logical; If \code{TRUE}, plots the correspondent graphic.
-#' @param myunits A character vector with the unit names which one would like to benchmark among all units.
-#' @param mypts.col The color passed to \code{\link[graphics]{points}} for the the units specified in \code{myunits}.
-#' @param digits Integer indicating the number of decimals to be used in the output.
-#' @param ... Further arguments passed to \code{\link[graphics]{plot}}.
-#'
-#' @details
-#' Suppose we have two measures for each institution: O1; E1 in a baseline period and O2; E2 in a subsequent period, and we wish to assess the change in the underlying rate (SMR or SRU). We shall only consider the ratio of rates: exact methods based on a conditional argument are available if E1 = E2, and otherwise normal approximations are used, in which case for low (especially zero) counts one might add 0.5 to all Os and E’s.
-#'
-#' Y = (O1/E1)/(O2/E2) and the target theta =	lambda2/lambda1.
-#'
-#' Theta is the target value which specifies the desired expectation for institutions considered "in control".
-#'
-#' When E1 = E2, y is plotted versus the average observed count (rho).
-#'
-#' When E1 is different of E2, i.e., its used normal approximation, it is convenient to work on a logarithmic scale so that log(theta) is a target for log(Y). And y is plotted versus the expectation per period (rho)
-#' @return A list with usefull information used in \code{\link{funnel}}.
-#' @references
-#' Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
-#' @seealso \code{\link{SMR}}, \code{\link{SRU}}
+
 #' @import stats
 #' @import graphics
 
@@ -92,7 +45,7 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
     # then y = o2/o1
     # exact methods
     secondcolname <- "y"
-    rho <- (o1 + o2)/2  #precision parameter: average observed count
+    rho <- (o1 + o2)/2  # precision parameter: average observed count
     change.table <- data.frame(unit,y,o1,e1,n1,o2,e2,n2,rho)
     change.table <- change.table[order(change.table$rho),]
     unitnames <- data.frame(Unit = change.table$unit)
@@ -111,10 +64,10 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
       lowerCI[[i]] <- theta - (rp - alpha) / expectedRange
       ylowCI[[i]] <- lowerCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
       yuppCI[[i]] <- upperCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-      lowOUT[[i]] <- ifelse(change.table$y < ylowCI[[i]],TRUE,FALSE)
+      lowOUT[[i]] <- ifelse(change.table$y < ylowCI[[i]], TRUE, FALSE)
       uppOUT[[i]]<- ifelse(change.table$y > yuppCI[[i]], TRUE, FALSE)
       outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-      outcolname[i] <- paste0(p[i]*100,"%CI")
+      outcolname[i] <- paste0(p[i]*100, "%CI")
       change.table <- cbind(change.table, outofcontrol[[i]])
     }
     if (auto.xlab){xlab = xlab[1]}
@@ -151,6 +104,8 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
     }
     if (auto.xlab){xlab = xlab[2]}
     if (auto.ylab){ylab = ylab[2]}
+
+      theta <- log(theta)
   }
 
   x <- change.table$rho; y <- change.table$y; range <- expectedRange
