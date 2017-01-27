@@ -24,10 +24,10 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
   xpd = NA), O.values.arg = list(x = 0.675, col = gray(0.4), xpd = NA),
   E.values.arg = list(x = 0.85, col = gray(0.4), xpd = NA),
   NOE.head.arg = list(font = 2, labels = c("N", "O", "E"), xpd = NA),
-  Overall.seg.arg = list(col = "blue", xpd = NA), Overall.p.arg = list(pch =
-  23, cex = 2, col = "black", bg = gray(0.4), xpd = NA),
-  Overall.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, font = 2, xpd = NA,
-  adj = 1), cat.seg.arg = list(col = "navyblue", xpd = NA),
+  Overall.seg.arg = list(col = "navyblue", xpd = NA, lwd = 2),
+  Overall.p.arg = list(pch = 23, cex = 2, col = "black", bg = gray(0.4), xpd =
+  NA), Overall.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, font = 2, xpd =
+  NA, adj = 1), cat.seg.arg = list(col = "navyblue", xpd = NA, lwd = 2),
   cat.p.arg = list(pch = 22, cex = 1, col = "black", bg = gray(0.4), xpd =
   NA), cat.est.arg = list(x = smr.xlim[1] - 0.06, las = 1, col = gray(0.4),
   xpd = NA, adj = 1), SMR.head.arg = list(smr.xlim[1] - 0.06, font = 2, labels
@@ -64,7 +64,7 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{overall.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall label. Internally  and 'y' coordinate is replaced.}
 
-\item{NOE.overall.args}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed eaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.}
+\item{NOE.overall.args}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the overall N (number of observations), O (observed deaths) and E (expected deaths). Internally 'labels' and 'y' arguments are replaced.}
 
 \item{var.labels.arg}{A list of arguments passed to \code{\link[graphics]{text}} for ploting the variables labels. Internally  and 'y' coordinate is replaced.}
 
@@ -94,7 +94,7 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{smr.xlab}{Label of the x axis. Default is "Standardized Mortality Ratio".}
 
-\item{smr.xlim}{Limits of x axis of the \code{forest.SMR} plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto" only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.}
+\item{smr.xlim}{Limits of x axis of the \code{forest.SMR} plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto", only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.}
 
 \item{grid}{Logical. If TRUE, it will draw a grid with the \code{\link[graphics]{grid}} standards.}
 }
@@ -109,7 +109,7 @@ If SMR, then:
 \item \code{upper.Cl} upper confidence limit.
 }
 
-If SMR.table, then a data.frame with the the same information as above, and the
+If SMR.table, then a data.frame with the same information as above, and the
  additional information: "Variables" (variables names), "Levels" (variables levels).
 
 If forest.SMR, then a plot is returned.
@@ -122,13 +122,20 @@ Calculates the standardized mortality ratio and its confidence interval. SMR, fo
 \code{forest.SMR} shows the \code{SMR.table} output as a forest plot. The plot opens two windows and plot at the left side the values from the \code{SMR.table} and at the right side the points and lines graphically representing each SMR and its confidence interval.
 }
 \examples{
-# loading a example data
+# Loading a example data
 data(icu)
 
-# Setting labels to data
+# Setting variable labels to data
 attr(icu, "var.labels")[match(c("Unit", "IsMechanicalVentilation1h",
-          "AdmissionTypeName_pri","InfectionIsAtAdmission"), names(icu))] <-
-  c("ICU unit","Mechanichal ventilation","Admission type","Infection at admission")
+          "AdmissionTypeName_pri","Vasopressors_D1"), names(icu))] <-
+  c("ICU unit","Mechanichal ventilation","Admission type","Vasopressors at admission")
+
+# Some editing
+icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation /100
+icu$IsMechanicalVentilation1h <- as.factor(ifelse(icu$IsMechanicalVentilation1h == 1, "Yes", "No"))
+icu$AdmissionTypeName_pri <- as.factor(icu$AdmissionTypeName_pri)
+levels(icu$AdmissionTypeName_pri) <- c("Clinical","Elective surgery", "Urgent surgery")
+icu$Vasopressors_D1 <- as.factor(ifelse(icu$Vasopressors_D1 == 1, "Yes", "No"))
 
 # The overall SMR for the whole sample
 SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
@@ -136,25 +143,25 @@ SMR(icu$UnitDischargeName, icu$Saps3DeathProbabilityStandardEquation)
 # The overall SMR and for some subgroups
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
                pred.var = "Saps3DeathProbabilityStandardEquation",
-               group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
-                              "InfectionIsAtAdmission"),
+               group.var = c( "IsMechanicalVentilation1h",
+               "AdmissionTypeName_pri","Vasopressors_D1"),
                reorder = "no",
                decreasing = TRUE,
                use.label = TRUE)
 x
 
 # A forest plot for all groups SMR (resize the window may be required)
-forest.SMR(x, digits = 2)
+x11(width = 480, height = 480); forest.SMR(x, digits = 2)
 
 # The same thing but reordering the categories
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
                pred.var = "Saps3DeathProbabilityStandardEquation",
-               group.var = c( "IsMechanicalVentilation1h", "AdmissionTypeName_pri",
-                              "InfectionIsAtAdmission"),
+               group.var = c( "IsMechanicalVentilation1h",
+               "AdmissionTypeName_pri", "Vasopressors_D1"),
                reorder = "SMR",
                decreasing = TRUE,
                use.label = TRUE)
-forest.SMR(x, digits = 2)
+x11(width = 480, height = 480); forest.SMR(x, digits = 2)
 
 # The overall SMR and for all Units
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -166,7 +173,7 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 x
 
 # A forest plot for all Units
-forest.SMR(x, digits = 2)
+x11(width = 480, height = 480); forest.SMR(x, digits = 2)
 
 # The same thing but reordering the categories
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -175,7 +182,7 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
                reorder = "SMR",
                decreasing = TRUE,
                use.label = TRUE)
-forest.SMR(x, digits = 2)
+x11(width = 480, height = 480); forest.SMR(x, digits = 2)
 
 rm(x, icu)
 }

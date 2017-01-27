@@ -10,7 +10,7 @@
 #'
 #' @param x,y Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.
 #'
-#' @param same logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
+#' @param same Logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
 #'
 #' @param plot Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.
 #'
@@ -69,12 +69,18 @@
 #'
 #' @examples
 #' data(icu)
-#' # 1st quarter
-#' x <- icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("01","02","03")),]
+#' # A little editing
+#' icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation / 100
+#' icu <- icu[-which(icu$los < 0 ),]
 #'
-#' # 2nd quarter
-#' y <- icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("04","05","06")),]
+#' # Subseting the data for the 1st quarter
+#' x <- droplevels(icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("01","02","03")),])
 #'
+#' # Subseting the data for the 2nd quarter
+#' y <- droplevels(icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("04","05","06")),])
+#' y <- droplevels(y[-which(y$Unit == "F"),])
+#'
+#' # Running the SRU analysis for both quarters
 #' FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
 #' unit = x$Unit, los = x$los, score = x$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 #' FirstQ
@@ -83,7 +89,7 @@
 #' unit = y$Unit, los = y$los, score = y$Saps3Points, originals = TRUE, type = 1, plot = FALSE)
 #' SecondQ
 #'
-#' z <- reclass(x = FirstQ, y = SecondQ)
+#' z <- reclass(x = FirstQ, y = SecondQ, same = TRUE)
 #' z
 #' plot(z)
 #'
