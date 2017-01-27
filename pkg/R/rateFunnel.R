@@ -3,7 +3,7 @@
 #' @import graphics
 
 
-rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, printUnits = FALSE, text.cex = 0.7, text.pos = NULL, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), plot = FALSE, myunits = NULL, mypts.col = "darkblue", overdispersion = FALSE, digits = 5){
+rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., printUnits = FALSE, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits = NULL, overdispersion = FALSE, digits = 5){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if (!is.numeric(y)){stop("y must be numeric.")}
@@ -18,12 +18,9 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   if (!is.numeric(p)){stop("p must be a numeric vector.")}
   if (!is.vector(p)){stop("p must be a vector.")}
   if (method[1] != "normal" && method[1] != "exact"){stop("method must be either 'normal' or 'exact'.")}
-  if (length(col) != length(p)+1){stop("col must have same length of p + 1 for the target line color in the last position")}
-  # if (length(lty) != length(p)){stop("p and lty must have same length")}
-  if (!is.logical(auto.legend)){stop("auto.legend must be TRUE or FALSE.")}
   if (y.type[1] != "SMR" && y.type[1] != "SRU"){stop("y.type must be either 'SMR' or 'SRU'.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
-  if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
+  # if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
   if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
 
   if (direct){

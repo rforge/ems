@@ -156,6 +156,7 @@ phi = (1/total) * sum((y - theta) ^ 2 * e) / theta
 data(icu)
 
 # Getting the cross-sectional arguments to use in funnel
+icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation / 100
 x <- SMR.table(data = icu, group.var = "Unit",
 obs.var = "UnitDischargeName", pred.var = "Saps3DeathProbabilityStandardEquation")
 
@@ -169,7 +170,7 @@ theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
 option = "rate", myunits = NULL, plot = FALSE), main = "Cross-sectional rate (SMR)")
 
 # creating a variable containing month information about each admission
- icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDate),"\%m"))
+ icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDateTime),"\%m"))
 
 # First quarter
 dt1 <- icu[which(icu$month \%in\% c(1,2,3)),]

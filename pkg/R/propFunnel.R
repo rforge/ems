@@ -4,7 +4,7 @@
 
 
 
-propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","normal"), ..., col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, printUnits = FALSE, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), plot  = FALSE, myunits = NULL, mypts.col = "darkblue", overdispersion = FALSE, digits = 5){
+propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","normal"), ..., printUnits = FALSE, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), myunits = NULL, overdispersion = FALSE, digits = 5){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if(!is.numeric(n)){stop("n must be numeric.")}
@@ -12,13 +12,8 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
   if (!is.numeric(theta)){stop("theta must be numeric.")}
   if (theta < 0 | theta > 1){stop("theta must be between 0 and 1.")}
   if (!is.vector(p)){stop("p must be a vector.")}
-  if (length(col) != length(p)+1){
-    stop("col must have same length of p + 1 for the target line color in the last position")
-  }
   if (method[1] != "normal" && method[1] != "exact"){stop("method must be either 'normal' or 'exact'.")}
-  if (!is.logical(auto.legend)){stop("auto.legend must be TRUE or FALSE.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
-  if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
   if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
 
   y <- (o / n) * 100

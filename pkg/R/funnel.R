@@ -100,6 +100,7 @@
 #' data(icu)
 #'
 #' # Getting the cross-sectional arguments to use in funnel
+#' icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation / 100
 #' x <- SMR.table(data = icu, group.var = "Unit",
 #' obs.var = "UnitDischargeName", pred.var = "Saps3DeathProbabilityStandardEquation")
 #'
@@ -113,7 +114,7 @@
 #' option = "rate", myunits = NULL, plot = FALSE), main = "Cross-sectional rate (SMR)")
 #'
 #' # creating a variable containing month information about each admission
-#'  icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDate),"%m"))
+#'  icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDateTime),"%m"))
 #'
 #' # First quarter
 #' dt1 <- icu[which(icu$month %in% c(1,2,3)),]
@@ -154,15 +155,16 @@
 funnel <- function(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), theta, method = c("exact","normal"), direct = FALSE, myunits = NULL, overdispersion = FALSE, option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE, plot = TRUE, digits = 5){
 
   if (option[1] != "rate" && option[1] != "ratioRates" && option[1] != "prop" && option[1] != "diffProp" && option[1] != "ratioProp"){stop("option must be either 'rate', 'ratioRates', 'prop', 'diffprop' or 'ratioProp'.")}
+  if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
 
   if (option[1] == "rate"){
-    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "ratioRates"){
     output <- changeRateFunnel(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, myunits = myunits, printUnits = printUnits, digits = digits)
   }
   if (option[1] == "prop"){
-    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "diffProp"){
     output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "diff", myunits = myunits, printUnits = printUnits, digits = digits)
@@ -186,6 +188,9 @@ print.funnel <- function(x,...){
 #' @rdname funnel
 #' @export
 plot.funnel <- function(x, ...,col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, mypts.col = "darkblue", printUnits = x$printUnits, xlab = x$xlab, ylab = x$ylab){
+
+  if (length(col) != length(x$p)+1){stop("col must have same length of p + 1 for the target line color in the last position")}
+  if (!is.logical(auto.legend)){stop("auto.legend must be TRUE or FALSE.")}
 
     plot(x$x, x$y, ..., type = "n", xlim = x$xlim, ylim = x$ylim, bty = bty, xlab = xlab, ylab = ylab)
     abline(h = x$theta, col = col[length(x$p)+1], lwd = lwd)
