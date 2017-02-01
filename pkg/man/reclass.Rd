@@ -35,7 +35,7 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 \arguments{
 \item{x, y}{Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.}
 
-\item{same}{Logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.}
+\item{same}{Logical; If TRUE, compare the same units, with the same severity classes at two consecutive time periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.}
 
 \item{plot}{Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.}
 
@@ -108,7 +108,6 @@ x <- droplevels(icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c(
 
 # Subseting the data for the 2nd quarter
 y <- droplevels(icu[which(format(as.Date(icu$UnitAdmissionDate),"\%m") \%in\% c("04","05","06")),])
-y <- droplevels(y[-which(y$Unit == "F"),])
 
 # Running the SRU analysis for both quarters
 FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,

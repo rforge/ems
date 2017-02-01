@@ -10,7 +10,7 @@
 #'
 #' @param x,y Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.
 #'
-#' @param same Logical; If TRUE, compare the same units, with the same severity classes at two consecutive times periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
+#' @param same Logical; If TRUE, compare the same units, with the same severity classes at two consecutive time periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
 #'
 #' @param plot Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.
 #'
@@ -78,7 +78,6 @@
 #'
 #' # Subseting the data for the 2nd quarter
 #' y <- droplevels(icu[which(format(as.Date(icu$UnitAdmissionDate),"%m") %in% c("04","05","06")),])
-#' y <- droplevels(y[-which(y$Unit == "F"),])
 #'
 #' # Running the SRU analysis for both quarters
 #' FirstQ <- SRU(prob = x$Saps3DeathProbabilityStandardEquation, death = x$UnitDischargeName,
@@ -123,10 +122,13 @@ reclass <- function(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SR
   if(same){
     a <- x[which(x$unit %in% y$unit),]
     b <- y[which(y$unit %in% a$unit),]
-    exc = nrow(a) != nrow(x)
-    totalAdmissions <- totalAd[[1]] + totalAd[[2]]
+    exc = nrow(a) != nrow(x) | nrow(b) != nrow(y)
+
     if (exc){
-    warning(paste0(c("Some units were excluded because their absence in the 1st stage x.")))
+    warning(paste0(c("Some units were excluded because their absence in the 1st or 2nd stage.")))
+      totalAdmissions <- totalAd[[1]][which(names(totalAd[[1]]) %in% a$unit)] + totalAd[[2]][which(names(totalAd[[2]]) %in% b$unit)]
+    } else {
+      totalAdmissions <- totalAd[[1]] + totalAd[[2]]
       }
     x <- droplevels(a); y <- droplevels(b)
   } else {
