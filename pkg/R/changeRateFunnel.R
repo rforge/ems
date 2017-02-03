@@ -19,6 +19,11 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   if (!is.logical(auto.xlab)){stop("auto.xlab must be TRUE or FALSE.")}
   if (!is.logical(auto.ylab)){stop("auto.ylab must be TRUE or FALSE.")}
+  exc <- NULL
+  if (any(n1 == 0 | n2 == 0)){
+    exc <- unit[which(n1 == 0 | n2 == 0)]
+    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+  }
 
   if (any(o1 == 0)){o1 <- o1 + .5} #To don't generate NaN values.
   if (any(o2 == 0)){o2 <- o2 + .5}
@@ -43,6 +48,9 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
     rho <- (o1 + o2)/2  # precision parameter: average observed count
     change.table <- data.frame(unit,y,o1,e1,n1,o2,e2,n2,rho)
     change.table <- change.table[order(change.table$rho),]
+    if (length(exc) > 0){
+      change.table <- change.table[-which(change.table$unit %in% exc),]
+    }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(1, max(change.table$rho)+5)
     lambda <- theta*expectedRange
@@ -78,6 +86,9 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
       rho <- gdetheta / varlogy # precision parameter
       change.table <- data.frame(unit,"y" = log(y),o1,e1,n1,o2,e2,n2,rho)
       change.table <- change.table[order(change.table$rho),]
+      if (length(exc) > 0){
+        change.table <- change.table[-which(change.table$unit %in% exc),]
+      }
       unitnames <- data.frame(Unit = change.table$unit)
       expectedRange <- seq(1, max(change.table$rho)+5)
     for (i  in 1:(length(change.table$rho)-1)){ # do not allow repeted values in xCI

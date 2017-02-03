@@ -15,6 +15,11 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
   if (method[1] != "normal" && method[1] != "exact"){stop("method must be either 'normal' or 'exact'.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
+  exc <- NULL
+  if (any(n == 0)){
+    exc <- unit[which(n == 0)]
+    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+  }
 
   y <- (o / n) * 100
   theta <- theta * 100
@@ -32,6 +37,9 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
 
   prop.table <- data.frame(unit, y, o, n)
   prop.table <- prop.table[order(prop.table$n),]
+  if (length(exc) > 0){
+   prop.table <- prop.table[-which(prop.table$unit %in% exc),]
+  }
   unitnames <- data.frame(Unit = prop.table$unit)
   admissionsRange <- seq(1,max(n))
   observedRange <- seq(1, max(o), length.out = length(admissionsRange))

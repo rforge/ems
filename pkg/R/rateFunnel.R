@@ -22,6 +22,11 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   # if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
   if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
+  exc <- NULL
+  if (any(n == 0)){
+    exc <- unit[which(n == 0)]
+    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+  }
 
   if (direct){
     rates.table <- data.frame(unit, Rate = y, Admissions = n, Observed = o)
@@ -29,6 +34,10 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   } else {
     rates.table <- data.frame(unit, Rate = y, Expected = e, Observed = o)
     thirdcolname <- "Expected"
+  }
+
+  if (length(exc) > 0){
+    rates.table <- rates.table[-which(rates.table$unit %in% exc),]
   }
 
   upperCI <- list()

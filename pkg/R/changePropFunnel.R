@@ -13,6 +13,11 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   if (!is.logical(auto.ylab)){stop("auto.ylab must be TRUE or FALSE.")}
   if (method[1] != "diff" && method[1] != "ratio"){stop("method must be either 'diff' or 'ratio'.")}
+  exc <- NULL
+  if (any(n1 == 0 | n2 == 0)){
+    exc <- unit[which(n1 == 0 | n2 == 0)]
+    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+  }
 
   if (any(o1 == 0)){o1 <- o1 + .5} # To don't generate NaN values.
   if (any(o2 == 0)){o2 <- o2 + .5}
@@ -38,6 +43,9 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
     rho <- gdetheta / vary
     change.table <- data.frame(unit,y,o1,n1,o2,n2,rho)
     change.table <- change.table[order(change.table$rho),]
+    if (length(exc) > 0){
+      change.table <- change.table[-which(change.table$unit %in% exc),]
+    }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(0, max(change.table$rho)+5)
 
@@ -70,6 +78,9 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
     rho <- gdetheta / varlogy
     change.table <- data.frame(unit,"y" = log(y),o1,n1,o2,n2,rho)
     change.table <- change.table[order(change.table$rho),]
+    if (length(exc) > 0){
+      change.table <- change.table[-which(change.table$unit %in% exc),]
+    }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(0, max(change.table$rho)+5)
 
