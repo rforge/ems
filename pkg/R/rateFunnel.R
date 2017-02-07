@@ -25,7 +25,11 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   exc <- NULL
   if (any(n == 0)){
     exc <- unit[which(n == 0)]
-    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+    warning(paste0("The following units were excluded due to absence of observations: ", exc, "\n"))
+  }
+  if (any(! myunits %in% unit)){
+    warning(paste0("There is no unit called ", myunits[which(! myunits %in% unit)], "\n"))
+    myunits <- myunits[-which(! myunits %in% unit)]
   }
 
   if (direct){
@@ -38,6 +42,9 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
 
   if (length(exc) > 0){
     rates.table <- rates.table[-which(rates.table$unit %in% exc),]
+    if (any(myunits %in% exc)){
+      myunits <- myunits[-which(myunits %in% exc)]
+    }
   }
 
   upperCI <- list()

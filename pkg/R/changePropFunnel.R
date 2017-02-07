@@ -16,7 +16,11 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
   exc <- NULL
   if (any(n1 == 0 | n2 == 0)){
     exc <- unit[which(n1 == 0 | n2 == 0)]
-    warning(paste0("The following units were excluded due to absence of observations: ", exc))
+    warning(paste0("The following units were excluded due to absence of observations: ", exc, "\n"))
+  }
+  if (any(! myunits %in% unit)){
+    warning(paste0("There is no unit called ", myunits[which(! myunits %in% unit)], "\n"))
+    myunits <- myunits[-which(! myunits %in% unit)]
   }
 
   if (any(o1 == 0)){o1 <- o1 + .5} # To don't generate NaN values.
@@ -45,6 +49,9 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
     change.table <- change.table[order(change.table$rho),]
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
+      if (any(myunits %in% exc)){
+        myunits <- myunits[-which(myunits %in% exc)]
+      }
     }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(0, max(change.table$rho)+5)
@@ -80,6 +87,9 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
     change.table <- change.table[order(change.table$rho),]
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
+      if (any(myunits %in% exc)){
+        myunits <- myunits[-which(myunits %in% exc)]
+      }
     }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(0, max(change.table$rho)+5)
