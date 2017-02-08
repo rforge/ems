@@ -336,7 +336,7 @@ print.SRU <- function(x, ...){
     print(x$estim.eff, ...)
     if (x$estim.eff$N.Unit[1] == 1 | x$estim.eff$N.Unit[4] == 1){
       cat("--------------------------------------------------------\n")
-      cat("It is not possible to calculate standard deviation with one unique unit, that is why it shows 'NA'.\n")
+      cat("It is not possible to calculate standard deviation with a single unit.\n")
     }
   } else{
     cat("There are", as.character(length(x$rates[which(x$rates$group == "ME")])), "Most Efficient and", as.character(length(x$rates[which(x$rates$group == "LE")])), "Least Efficient ICUs in",x$totalICU, "ICUs.", sep= " ")

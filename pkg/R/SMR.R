@@ -68,7 +68,7 @@
 #'
 #' @param smr.xlim Limits of x axis of the \code{forest.SMR} plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto", only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.
 #'
-#' @param grid Logical. If TRUE, it will draw a grid with the \code{\link[graphics]{grid}} standards.
+#' @param grid Logical. If TRUE (default), it will draw a grid with the \code{\link[graphics]{grid}} default arguments.
 #'
 #' @return
 #' If SMR, then:
@@ -120,7 +120,7 @@
 #' x
 #'
 #' # A forest plot for all groups SMR (resize the window may be required)
-#' x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+#' forest.SMR(x, digits = 2)
 #'
 #' # The same thing but reordering the categories
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -130,7 +130,7 @@
 #'                reorder = "SMR",
 #'                decreasing = TRUE,
 #'                use.label = TRUE)
-#' x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+#' forest.SMR(x, digits = 2)
 #'
 #' # The overall SMR and for all Units
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -142,7 +142,7 @@
 #' x
 #'
 #' # A forest plot for all Units
-#' x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+#' forest.SMR(x, digits = 2)
 #'
 #' # The same thing but reordering the categories
 #' x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -151,7 +151,7 @@
 #'                reorder = "SMR",
 #'                decreasing = TRUE,
 #'                use.label = TRUE)
-#' x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+#' forest.SMR(x, digits = 2)
 #'
 #' rm(x, icu)
 #' @references
@@ -230,6 +230,11 @@ SMR.table <- function(data, group.var, obs.var, pred.var, digits = 5, use.label 
   }
   if (reorder !=  "no" && reorder !=  "SMR" && reorder !=  "lower.Cl" && reorder !=  "upper.Cl") {
     stop("'reorder' must be one of 'no','SMR','lower.Cl' or 'upper.Cl'")
+  }
+  cont.table <- sapply(1:length(group.var), function(i) table(data[, group.var[i]]))
+  if (any(unlist(cont.table) == 0)) {
+    warning("In SMR analysis, levels were deleted before analysis due to zero observations.")
+    data[ , group.var] <- droplevels(data[ , group.var])
   }
   Variables <- c("Overall", unlist(sapply(1:length(group.var), function(i) rep(group.var[i], nlevels(data[ , group.var[i]])))))
   if (length(group.var) == 1) {

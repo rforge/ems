@@ -1,44 +1,86 @@
-#' Funnel Plot
+#' @title Funnel plot for benchmarking health units
 #'
 #' @name funnel
 #'
-#' @description Produces a variety of data funnel plots. Funnel plots are usefull for identifing units which are "in control" or not.
+#' @description Produces a variety of funnel plots comparing health units or ICUs (intensive care units) making easy to identify those units which deviate from the group. There is a function that calculates all the values required and returns the values for all units and the funnel, and there is a function that calls graphical parameters from the former values. The options of funnels available are the funnel for rate, for ratio of rates, for proportions, for difference of proportions and for ratio of proportions.
 #'
-#' @param unit The unit names.
-#' @param y Standardized rate vector, as SMR or SRU, accordind to \code{y.type}. It's also called "indicator".
-#' @param n Volume of cases, admissions, for each unit.
-#' @param n1,n2 Total of admissions at 1st and 2nd periods, respectively.
-#' @param o Observed death vector. Accepted values are 0 (absence) or 1 (presence).
-#' @param o1,o2 Observed values at 1st and 2nd periods, respectively.
-#' @param e Expected death vector. Used when \code{direct = FALSE}.
-#' @param e1,e2 Expected values at 1st and 2nd periods, respectively.
+#' The funnel for rates are usually plots of SMR or SRU at verticall axis and the number of admissions (if direct method) or the expected number of deaths (if inderect method) in the horizontal axis. This allows the interpretation regarding the efficiency of preventing deaths (if SMR) or resourse use (if SRU), regardless of volume of addmissions (direct method) or expected number os deaths (indirect method).
+#'
+#' The funnel for ratio of rates are usually plots of SMR ratios within the same units. These two SMRs are, for example, from the same unit in different time periods. Therefore, it express how to SMR changed over time. If the number of expected deaths are different in both periods, then the plot will return at the horizontal axis a parametrization of the geomentric mean of the expected number of deaths in both periods for each unit. If the number of expected deaths are identical in both periods, then the plot will return at the horizontal axis the arithmetic mean of the observed number of deaths in both periods for each unit.
+#'
+#' The funnel for proportions plots on the verticall axis the percentage of observed deaths of the unitis and plots on the horizontal axis the number (volume) of admissions. The funnel for ratio of proportions and for difference of proportions are usually used to express the fraction of deaths of the same units in different time period. Therefore, they express how the fraction of deaths changed over time in each unit. If one picks the difference of proportions, the horizontal axis will be a parametrization of the arithmetic mean of the number of admissions in both periods. If one picks the ratio of proportions, the horizontal axis will be a parametrization of the geometric mean of the number of admissions in both periods.
+#'
+#' @param unit A factor vector representing the unit names.
+#'
+#' @param y A numeric vector representing the "Standardized rate" for each unit, usually the SMR (standardized motality ratio), or possibly the SRU (standardized resource use), accordind to \code{y.type} . It's also called "indicator".
+#'
+#' @param n A numeric vector representing the case volume, or number of admissions, for each unit.
+#'
+#' @param n1,n2 If one picks \code{option = "ratioRates"} or \code{option = "diffProp"} or \code{option = "ratioProp"}, then \code{n1} and \code{n2} are numeric vectors representing the total of admissions at 1st and 2nd periods, respectively.
+#'
+#' @param o A numeric vector representing the observed death. Acceptable values are 0 (absence) or 1 (presence).
+#'
+#' @param o1,o2 If one picks \code{option = "ratioRates"} or \code{option = "diffProp"} or \code{option = "ratioProp"}, then \code{o1} and \code{o2} are numeric vectors representing the observed deaths at 1st and 2nd periods, respectively.
+#'
+#' @param e Used only when \code{option = "rate"} and \code{direct = FALSE}. This is numeric vector representing the expected death.
+#'
+#' @param e1,e2 If one picks \code{option = "ratioRates"}, \code{e1} and \code{e2} are numeric vectors representing the expected deaths at 1st and 2nd periods, respectively.
+#'
 #' @param lambda1,lambda2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Poi(lambda_i). Used when \code{option = ratioRates}
+#'
 #' @param pi1,pi2 Mean values for in control instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Bin(pi_i,n_i). Used when \code{option = diffProp or ratioProp}
-#' @param y.type The indicator type. It can be SMR or SRU. (used for \code{option = rate or ratioRates})
+#'
+#' @param y.type A character vector representign the indicator type. It is used to name the vertical axis if \code{option = rate}) or \code{option = ratioRates}), ignored otherwise. Usually is 'SMR' or 'SRU'.
+#'
 #' @param p Confidence level vector. It will return a confidence interval for all vector components. The default is 2 and 3 standard deviations (p = c(.95, 998)).
+#'
 #' @param theta Target value which specifies the desired expectation for institutions considered "in control". Used when \code{option = prop or rate}
+#'
 #' @param direct Logical; Used when \code{option = rate}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error may be reported in the size of population \code{n} (CI is made a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made a poisson approximation). See details.
+#'
 #' @param method There are two kind of approximations, as discussed in \code{direct} parameter. Inside them, there are two options:  to make the CI from the exact distribuition (binomial or poisson) or from de normal distribution. So, here one could choose between \code{normal} or \code{exact} (default). See details.
+#'
 #' @param myunits A character vector with the unit names which one would like to benchmark among all units.
+#'
 #' @param overdispersion Logical; If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.
+#'
 #' @param option The type of funnel plot one wants to produce. It can be equal \code{rate, ratioRates, prop, diffProp or ratioProp}. See details to understand how to use each of them.
+#'
 #' @param printUnits Logical; If \code{TRUE}, the units are identified in the plot and printed in de console. The numbers in the plot correspond to the data.frame printed in the console.
+#'
 #' @param plot Logical; If \code{TRUE}, the correspondent graphic is plotted.
+#'
 #' @param x An object of class 'funnel'.
+#'
+#' @param xlim,ylim Limits of horizontal and vertical axis. These limits are defined in the funnel plot and passed to \code{plot.funnel}. The user may redefine the limits in \code{plot.funnel}. Ultimately, these arguments are passed to \code{\link[graphics]{plot.default}}.
+#'
 #' @param col Especification vector for the CI lines colors. Must have same length of \code{p} + 1 with the target line in the last position.
+#'
 #' @param lwd The lines width, a positive number. It's the same for all lines in the plot. See \code{\link[graphics]{par}}.
+#'
 #' @param lty The CI lines types. See \code{\link[graphics]{par}}.
+#'
 #' @param bty A character string which determined the type of \code{\link[graphics]{box}} which is drawn about plots. See \code{\link[graphics]{par}}.
+#'
 #' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points. See \code{\link[graphics]{points}} for possible values and their interpretation. Note that only integers and single-character strings can be set as a graphics parameter (and not NA nor NULL).
+#'
 #' @param pt.col Especification vector for the points colors.
+#'
 #' @param bg The color to be used for the background of the points for \code{pch = 21}. See \code{\link[graphics]{par}}.
+#'
 #' @param pt.cex A numerical value giving the amount by which plotting points should be magnified relative to the default.  See \code{\link[graphics]{par}}.
+#'
 #' @param auto.legend Logical; If \code{TRUE}, prints a legend with default arguments.
+#'
 #' @param text.cex Like \code{pt.cex}, but for the texts numbers correspondents to the units.
 #' @param text.pos a position specifier for numbers that correspond to the units in the plot. Values of 1, 2, 3 and 4, respectively indicate positions below, to the left of, above and to the right of the points.
+#'
 #' @param mypts.col The color passed to \code{\link[graphics]{points}} for the the units specified in \code{myunits}.
+#'
 #' @param xlab,ylab A title for the x and y axis. See \code{\link[graphics]{title}}
+#'
 #' @param digits Integer indicating the number of decimals to be used in the output.
+#'
 #' @param ... Further arguments passed to \code{\link[graphics]{plot}}.
 #'
 #' @details
@@ -47,13 +89,13 @@
 #'
 #' To choose the \code{direct} argument, one should pay attention if one wants to use a Direct Standardized Rate or a Indirect Standardized Rate. If direct, we assume the rate is reported as a rate per (say) 1000 individuals, then it is treated as a proportion. If indirect, it is a cross-sectional data that leads to a standardized event ratio.
 #'
-#' In many circumstances we can assume an exact or approximate normal distribution for the data. Using the \code{type} argument, one could choose between \code{exact} or  \code{normal}. For direct standardized rates, the exact distribuition is binomial and for indirect standardized rates, the exact distribuition is poisson. Assume rho is the precision parameter (volume, for direct rates; expected value, for indirect rates). For rho > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
+#' In many circumstances we can assume an exact or approximate normal distribution for the data. Using the \code{type} argument, one could choose between \code{exact} or  \code{normal}. For direct standardized rates, the exact distribuition is binomial and for indirect standardized rates, the exact distribuition is poisson. Assume rho is the precision parameter (volume, for direct rates; expected value, for indirect rates). The origianl report claims that, for rho > 100, the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 #'
 #' The console warns if there are units with volume/expected value less than 100.
 #'
 #' \item If \code{option = ratioRate}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho.
 #'
-#' Suppose we have two measures for each institution: O1; E1 in a baseline period and O2; E2 in a subsequent period, and we wish to assess the change in the underlying rate (SMR or SRU). We shall only consider the ratio of rates: exact methods based on a conditional argument are available if E1 = E2, and otherwise normal approximations are used, in which case for low (especially zero) counts one might add 0.5 to all Os and E’s.
+#' Suppose we have two measures for each institution: O1; E1 in a baseline period and O2; E2 in a subsequent period, and we wish to assess the change in the underlying rate (SMR or SRU). We shall only consider the ratio of rates: exact methods based on a conditional argument are available if E1 = E2, and otherwise normal approximations are used, in which case for low (especially zero) counts one might add 0.5 to all Os and E's.
 #'
 #' Y = (O1/E1)/(O2/E2) and the target theta =	lambda2/lambda1.
 #'
@@ -78,7 +120,7 @@
 #'
 #' \item If \code{option = ratioProp or diffProp}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio (or difference) of proportions y versus a precision parameter rho.
 #'
-#'  Suppose we have two measures for each institution: O1; N1 in a baseline period and O2; N2 in a subsequent period, and we wish to assess the change in the underlying proportion form pi1 to pi2. Two different measures might be of interest: the difference in proportions or the ratio of proportions. Normal approximations are used throughout, and for low (especially zero) counts \code{changePropFunnel} add 0.5 to all r’s and 1 to all n’s in order to stabilize the estimates.
+#'  Suppose we have two measures for each institution: O1; N1 in a baseline period and O2; N2 in a subsequent period, and we wish to assess the change in the underlying proportion form pi1 to pi2. Two different measures might be of interest: the difference in proportions or the ratio of proportions. Normal approximations are used throughout, and for low (especially zero) counts \code{changePropFunnel} add 0.5 to all r's and 1 to all n's in order to stabilize the estimates.
 #'
 #' In case of \code{method = "diff"}, the indicator is Y = (O2/N2 - O1/N1) and theta = pi2-pi1. If \code{method = "ratio"}, the indicator is Y = (O2/N2)/(O1/N1) and theta = pi2/pi1. Also, it is convenient to work on a logarithmic scale, so that log(theta) is a target for log(Y). Theta is the target value which specifies the desired expectation for institutions considered "in control".
 #'
@@ -93,22 +135,23 @@
 #' \eqn{var(y|theta,n) = (phi * g(theta)) / e}
 #'
 #' @return A table with unit names, y, observed (Obs), expected (Exp) and admissions (N) for each unit, and final columns show which units are out of control.
-#' @references
-#' Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
+#'
+#' @references Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
+#'
 #' @examples
 #' # Loading data
 #' data(icu)
 #'
-#' # some edit
+#' # Some edition
 #' icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation / 100
 #' icu <- icu[-which(icu$Unit == "F"),]
 #' icu <- droplevels(icu)
 #'
 #' # Getting the cross-sectional arguments to use in funnel
 #' x <- SMR.table(data = icu, group.var = "Unit",
-#' obs.var = "UnitDischargeName", pred.var = "Saps3DeathProbabilityStandardEquation")
+#'      obs.var = "UnitDischargeName", pred.var = "Saps3DeathProbabilityStandardEquation")
 #'
-#' # to analyse proportions
+#' # Analysis of proportions
 #' f1 <- funnel(unit = x$Levels[-1], o = x[-1,]$Observed, theta = x$Observed[1] / x$N[1],
 #'  n = x[-1,]$N, method = "exact", myunits = c("A"), option = "prop", plot = FALSE)
 #'  f1
@@ -137,7 +180,8 @@
 #'  pred.var = "Saps3DeathProbabilityStandardEquation")
 #'
 #'  # to analyse periods using ratio rates with e1 = e1
-#'  f3 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1], e1 = z$Expected[-1],
+#'  f3 <- funnel(unit = z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+#'        e1 = z$Expected[-1],
 #'  n2 = w$N[-1], o2 = w$Observed[-1], e2 = z$Expected[-1],
 #'  myunits = c("A","B"), option = "ratioRates", plot = FALSE)
 #'  f3
@@ -146,9 +190,11 @@
 #'
 #'  # to analyse periods using ratio rates with e1 =! e1
 #'  f4 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#'  e1 = z$Expected[-1], n2 = w$N[-1], o2 = w$Observed[-1], e2 = w$Expected[-1], option = "ratioRates", plot = FALSE)
+#'        e1 = z$Expected[-1], n2 = w$N[-1], o2 = w$Observed[-1], e2 = w$Expected[-1],
+#'        option = "ratioRates", plot = FALSE)
 #'  f4
-#'  plot(f4, main = "Ratio of SMRs of periods with different expectation of death", ylim = c(-1.5,1.5), xlim = c(0,200))
+#'  plot(f4, main = "Ratio of SMRs of periods with different expectation of death",
+#'       ylim = c(-1.5,1.5), xlim = c(0,200))
 #'
 #'  # to analyse periods by difference in proportions
 #'  f5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
