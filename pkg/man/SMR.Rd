@@ -96,7 +96,7 @@ forest.SMR(x, mar1 = c(5.1, 1, 4.1, 1), mar.SMR = c(5.1, 7, 4.1, 1),
 
 \item{smr.xlim}{Limits of x axis of the \code{forest.SMR} plot. Default is "auto", which internally will pick the highest values of all upper.Cl and the lowest lower.Cl. Besides "auto", only a vector of 2 numbers are valid, and will be passed to \code{\link[graphics]{plot.default}}.}
 
-\item{grid}{Logical. If TRUE, it will draw a grid with the \code{\link[graphics]{grid}} standards.}
+\item{grid}{Logical. If TRUE (default), it will draw a grid with the \code{\link[graphics]{grid}} default arguments.}
 }
 \value{
 If SMR, then:
@@ -151,7 +151,7 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 x
 
 # A forest plot for all groups SMR (resize the window may be required)
-x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+forest.SMR(x, digits = 2)
 
 # The same thing but reordering the categories
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -161,7 +161,7 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
                reorder = "SMR",
                decreasing = TRUE,
                use.label = TRUE)
-x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+forest.SMR(x, digits = 2)
 
 # The overall SMR and for all Units
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -173,7 +173,7 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
 x
 
 # A forest plot for all Units
-x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+forest.SMR(x, digits = 2)
 
 # The same thing but reordering the categories
 x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
@@ -182,12 +182,9 @@ x <- SMR.table(data = icu, obs.var = "UnitDischargeName",
                reorder = "SMR",
                decreasing = TRUE,
                use.label = TRUE)
-x11(width = 480, height = 480); forest.SMR(x, digits = 2)
+forest.SMR(x, digits = 2)
 
 rm(x, icu)
-}
-\author{
-Lunna Borges and Pedro Brasil
 }
 \references{
 David W. Hosmer and Stanley Lemeshow. Confidence intervals estimates of an index of quality performance basend on logistic regression models. Statistics in Medicine , vol. 14, 2161-2172 (1995)
@@ -195,4 +192,6 @@ David W. Hosmer and Stanley Lemeshow. Confidence intervals estimates of an index
 \seealso{
 \code{\link{SRU}}, \code{\link{reclass}}
 }
-
+\author{
+Lunna Borges and Pedro Brasil
+}
