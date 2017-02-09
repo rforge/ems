@@ -2,10 +2,10 @@
 % Please edit documentation in R/SRU.R
 \name{SRU}
 \alias{SRU}
-\alias{print.SRU}
-\alias{plot.SRU}
-\alias{cut_in}
 \alias{SRUcalc}
+\alias{cut_in}
+\alias{plot.SRU}
+\alias{print.SRU}
 \title{Standardized Resource Use (SRU)}
 \usage{
 SRU(prob, death, unit, los, los.exp, class, score, plot = FALSE, type = 1,
@@ -154,12 +154,13 @@ SRUcalc(prob = icu$Saps3DeathProbabilityStandardEquation,
 rm(x, y, days, icu, cut_lims)
 
 }
+\author{
+Lunna Borges and Pedro Brasil
+}
 \references{
 Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
 }
 \seealso{
 \code{\link{SMR}}, \code{\link{reclass}}
 }
-\author{
-Lunna Borges and Pedro Brasil
-}
+
