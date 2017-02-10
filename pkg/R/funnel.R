@@ -204,7 +204,7 @@
 #'       ylim = c(-1.5,1.5), xlim = c(0,200))
 #'
 #' # To analyze periods by difference in proportions
-#' 5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+#' f5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
 #' n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp", plot = FALSE)
 #' f5
 #' plot(f5, main = "Difference in proportions of death for two periods")
