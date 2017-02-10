@@ -10,17 +10,17 @@
 #'
 #' @param x,y Objects of class 'SRU'. x is the SRU analsys from the 1st period (e.g. first trimester) and y from the 2nd period (e.g. second trimester). For \code{print.reclass} or \code{plot.reclass}, x is an object of class 'reclass'.
 #'
-#' @param same Logical; If TRUE, compare the same units, with the same severity classes at two consecutive time periods (default). If 'same' = TRUE and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If FALSE compare the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
+#' @param same Logical; If \code{TRUE}, compare the same units, with the same severity classes at two consecutive time periods (default). If \code{same = TRUE} and the ICUs do not match exactly in 'x' and 'y', there is a warning and non matching units are discarded from the analysis. If \code{FALSE}, it compares the same units, with the different severity classes within the same period. In this case, if the ICUs do not match exactly in 'x' and'y', the function will return an error.
 #'
-#' @param plot Logical. If TRUE (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.
+#' @param plot Logical. If \code{TRUE} (default), plots a SMR vs. SRU scatter plot highlighting the ICUs which had their classification changed.
 #'
 #' @param digits Integer indicating the number of decimal places to be used in the output.
 #'
-#' @param compare The way one prefer to benchmark the ICUs: by SRU (default), SMR or BOTH. If BOTH, the ICUs will be ranked by their SRU.
+#' @param compare The way one prefer to benchmark the ICUs: by "SRU" (default), "SMR" or "BOTH". If "BOTH", the ICUs will be ranked by their SRU.
 #'
 #' @param decreasing Logical. Should the sort order of ICU's rank be increasing or decreasing?
 #'
-#' @param complete.rank Logical. If TRUE (default), returns all ICUs ranked. If FALSE, returns only ICUs whose changed their efficiency classification ranked.
+#' @param complete.rank Logical. If \code{TRUE} (default), returns all ICUs ranked. If \code{FALSE}, returns only ICUs whose changed their efficiency classification ranked.
 #'
 #' @param xlim_x,ylim_x Limits for x and y axis for 1st stage plot for \code{plot.reclass}.
 #'
@@ -40,7 +40,7 @@
 #'
 #' @param better.arg_x,better.arg_y List of arguments passed to \code{\link[graphics]{points}} for plotting points correponding to units which got your rank better in 1st and 2nd stage plots for \code{plot.reclass}.
 #'
-#' @param auto.legend Logical. If TRUE, it prints a legend with \code{leg.arg} arguments for \code{plot.reclass}.
+#' @param auto.legend Logical. If \code{TRUE}, it prints a legend with \code{leg.arg} arguments for \code{plot.reclass}.
 #'
 #' @param leg.arg List of arguments passed to \code{\link[graphics]{legend}} for plotting legends corresponding to SRU and SMR medians and tertiles in 1st and 2nd stage plots for \code{plot.reclass}.
 #' @param main.arg_x,main.arg_y List of arguments passed to \code{\link[graphics]{plot}} for overall title for 1st and 2nd stage plots for \code{plot.reclass}.
@@ -63,11 +63,12 @@
 #'
 #' \code{plot.reclass} returns a scatter plot with grpahical comparison of the two periods/stages with their respective medians and tertiles.
 #'
-#' @seealso \code{\link{SRU}}, \code{\link{SMR}}
+#' @seealso \code{\link{SRU}}, \code{\link{SMR}}, \code{\link{funnel}}
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'
 #' @examples
+#'
 #' data(icu)
 #' # A little editing
 #' icu$Saps3DeathProbabilityStandardEquation <- icu$Saps3DeathProbabilityStandardEquation / 100

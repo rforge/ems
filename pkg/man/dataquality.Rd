@@ -2,12 +2,12 @@
 % Please edit documentation in R/dataquality.R
 \name{dataquality}
 \alias{dataquality}
-\alias{date.table}
+\alias{t_factor}
 \alias{factor.table}
+\alias{t_num}
 \alias{num.table}
 \alias{t_date}
-\alias{t_factor}
-\alias{t_num}
+\alias{date.table}
 \title{Collection of functions to check data quality in a dataset}
 \usage{
 t_factor(data, variable, legal, var.labels = attr(data,
@@ -63,9 +63,9 @@ These functionsn return the counts and fractions of expected values, unexpected 
 
 \code{t_factor} and \code{factor.table} will try to get factor or character variables and check how much of its content match with the expectd. They will try to treat the levels or cells with " " as \code{NAs}.
 
-\code{t_num} will try to get a numeric variable (even if it is currently formated as character or vector) and check how much of its content are expected (match a desired range), unexpected, non-numeric values and missing vlaues. \code{num.table} does the same thing, but with two or more variables at once.
+\code{t_num} will try to get a numeric variable (even if it is currently formated as character or factor) and check how much of its content are expected (match a desired range), unexpected, non-numeric values and missing vlaues. \code{num.table} does the same thing, but with two or more variables at once.
 
-\code{t_date} will try to get a date variable (even if it is currently formated as character or vector) and check how much of its content are expected (match a desired range), unexpected, non-date values and missing vlaues. \code{date.table} does the same thing, but with two or more variables at once.
+\code{t_date} will try to get a date variable (even if it is currently formated as character or factor) and check how much of its content are expected (match a desired range), unexpected, non-date values and missing vlaues. \code{date.table} does the same thing, but with two or more variables at once.
 }
 \examples{
 # Simulating a dataset with 5 factor variables and assigning labels
@@ -142,7 +142,9 @@ date.table(data = icu, date.limits = d.lim, format.date = "")
 rm(icu, d.lim)
 
 }
+\seealso{
+\code{\link{miscellaneous}}
+}
 \author{
 Lunna Borges & Pedro Brasil
 }
-

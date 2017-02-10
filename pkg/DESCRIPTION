@@ -2,7 +2,7 @@ Package: ems
 Title: Epimed Solutions collection for data editing, analysis, and bechmarking
     of health units
 Version: 0.3.1
-Date: 2017-02-08
+Date: 2017-02-10
 Authors@R: c(person("Lunna", "Borges", role = c("aut"),
 	             email = "lunna.borges@epimedsolutions.com"),
              person("Pedro", "Brasil", role = c("aut", "cre"),
@@ -13,4 +13,4 @@ Depends:
     R (>= 3.3.1)
 License: GPL (>= 2)
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

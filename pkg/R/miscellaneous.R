@@ -33,7 +33,7 @@
 #' @seealso \code{\link{dataquality}}
 #'
 #' @examples
-#' # Formating character or vector variable that should be numeric variables
+#' # Formating character or factor variable that should be numeric variables
 #' f.num(c("2,4000","10,0000","5.0400"))
 #'
 #' # Simulating a dataset

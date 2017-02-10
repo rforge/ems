@@ -2,8 +2,8 @@
 % Please edit documentation in R/funnel.R
 \name{funnel}
 \alias{funnel}
-\alias{plot.funnel}
 \alias{print.funnel}
+\alias{plot.funnel}
 \title{Funnel plot for benchmarking health units}
 \usage{
 funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
@@ -42,25 +42,29 @@ funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
 
 \item{pi1, pi2}{A value correponding to the probability wich a death occurs in the instituitions at 1st and 2nd periods, respectively. Its assumed that O_i ~ Bin(pi_i,n_i). Used when \code{option = "diffProp"} or \code{option = "ratioProp"}. Default is \code{pii = sum(oi)/sum(ni)}, the poisson distribuition mean estimative.}
 
-\item{y.type}{A character vector representing the indicator type. It is used to name the vertical axis if \code{option = "rate"}) or \code{option = "ratioRate"s}), ignored otherwise. Usually is 'SMR' or 'SRU'.}
+\item{y.type}{A character vector representing the indicator type. It is used to name the vertical axis if \code{option = "rate"} or \code{option = "ratioRate"}, ignored otherwise. Usually is 'SMR' or 'SRU'.}
 
 \item{p}{A confidence level numeric vector. It will return a confidence interval for all vector components. The default is 2 and 3 standard deviations (\code{p = c(.95, 998)}).}
 
-\item{theta}{Target value which specifies the desired expectation for institutions considered "in control". Used when \code{option = "prop"} or \code{option = "rate"}.}
+\item{theta}{Target value which specifies the desired expectation for institutions considered "in control". Used when \code{option = "prop"} or \code{option = "rate"}. The function internally estimates a thetha to represent a central tendency of the group. But one may want to set a pre-specified value for thetha to indicate a "baseline" parameter for comparison (e.g 1 for \code{option = "rate"} or .20 for \code{option = "prop"}). If this is the case, the horizontal line representing the thetha may not be centralized in the funnel or may be even outside the funnel (making the plot look weird).}
 
-\item{method}{There are two kind of approximations, as discussed in \code{direct} parameter. Inside them, there are two options:  to approximate the CI from the exact distribuition (binomial or poisson) or from de normal distribution. So, \code{method} is a character vector representing the kind of approximation required. One could choose between \code{"normal"} or \code{"exact"} (default). It is used when \code{option = "rate"} or \code{option = "prop"}. See details.}
+\item{method}{There are two kind of approximations, as discussed in \code{direct} parameter. Inside them, there are two options:  to approximate the CI from the exact distribuition (binomial or poisson) or from de normal distribution. So, \code{method} is a character vector representing the kind of approximation required. One could choose between \code{"normal"} or \code{"exact"} (default). It is used when \code{option = "rate"} or \code{option = "prop"}. The original report make no formal comparison of which method is best, however there are mention that the funnels from different methods should look identical or very similar if all units have 100 or more observations. If any unit has less, the funnel from the normal approximation may mislead the desired interpretation. See details.}
 
-\item{direct}{Logical; Used when \code{option = "rate"}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error (horizontal axis) may be reported in the size of population \code{n} (CI - confidence interval - is made by a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made by a poisson approximation). See details.}
+\item{direct}{Logical (default = \code{FALSE}); Used when \code{option = "rate"}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error (horizontal axis) may be reported in the size of population \code{n} (CI - confidence interval - is made by a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made by a poisson approximation). See details.}
 
-\item{myunits}{A character vector with the unit names which one would like to benchmark among all units. Default is \code{NULL}.}
+\item{myunits}{A character vector with the unit names which one would like to benchmark among all units. These units will be highlighted with dots of different collors in the plot. Default is \code{NULL}.}
 
-\item{overdispersion}{Logical; If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.}
+\item{overdispersion}{Logical (default = \code{FALSE}); If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.}
 
-\item{option}{A character specifying the type of funnel plot one wants to produce. It can assume \code{"rate"}, \code{"ratioRates"}, \code{"prop"}, \code{"diffProp"} or \code{"ratioProp"}. See details to understand how to use each of them.}
+\item{option}{A character specifying the type of funnel plot one wants to produce. It can assume \code{"rate"}, \code{"ratioRates"}, \code{"prop"}, \code{"diffProp"} or \code{"ratioProp"}. If \code{option = "rate"}, \code{funnel} plots a standardized rate y versus the expected death or case volume (number of unit admissions) for all units. If \code{option = "ratioRate"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho. If \code{option = "prop"}, \code{funnel} plots a proportion y versus its case volume (number of admissions). If \code{option = "ratioProp"} or \code{option = "diffProp"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio (or difference) of proportions y versus a precision parameter rho. See details.
 
-\item{printUnits}{Logical; If \code{TRUE} (default), the units are identified in the plot and printed in de console. The numbers plotted correspond to the table row names printed in the console.}
+ Suppose we have two measures for each institution: O1, N1 in a baseline period; and O2, N2 in a subsequent period; and we wish to assess the change in the underlying proportion form pi1 to pi2. Two different measures might be of interest: the difference in proportions or the ratio of proportions. Normal approximations are used throughout, and for low (especially zero) counts \code{funnel} function add 0.5 to all r's and 1 to all n's in order to stabilize the estimates.
 
-\item{plot}{Logical; If \code{TRUE} (dafault), the correspondent graphic is plotted.}
+In case of \code{option = "diffProp"}, the indicator is Y = (O2/N2 - O1/N1) and theta = pi2 - pi1. If \code{option = "ratioProp"}, the indicator is Y = (O2/N2)/(O1/N1) and theta = pi2/pi1.}
+
+\item{printUnits}{Logical (default = \code{TRUE}); If \code{TRUE}, the units are identified in the plot and printed in de console. The numbers plotted correspond to the row numbers printed in the console.}
+
+\item{plot}{Logical; If \code{TRUE} (default), the correspondent graphic is plotted with the standard option.}
 
 \item{digits}{Integer indicating the number of decimals to be used in the output.}
 
@@ -68,15 +72,15 @@ funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
 
 \item{...}{Further arguments passed to \code{\link[graphics]{plot}}.}
 
-\item{col}{Specification character vector for the CI lines colors. Must have same length of \code{p} + 1 with the target line color in the last position.}
+\item{col}{A character vector representing the collors for the CI funnel lines. Must have same length of \code{p} + 1 with the target line color in the last position.}
 
-\item{lwd}{A value specifying the lines width, a positive number. It's the same for all lines in the plot. See \code{\link[graphics]{par}}.}
+\item{lwd}{A positive number specifying the lines width. It's the same for all lines in the plot. See \code{\link[graphics]{par}}.}
 
 \item{lty}{A numeric vector representing the CI lines types. See \code{\link[graphics]{par}}.}
 
-\item{bty}{A character string which determined the type of \code{\link[graphics]{box}} which is drawn about plots. See \code{\link[graphics]{par}}.}
+\item{bty}{A character string which representing the type of \code{\link[graphics]{box}} which is drawn around plots. See \code{\link[graphics]{par}}.}
 
-\item{pch}{Either an integer specifying a symbol or a single character to be used as the default in plotting points. See \code{\link[graphics]{points}} for possible values and their interpretation. Note that only integers and single-character strings can be set as a graphics parameter (and not NA nor NULL).}
+\item{pch}{Either an integer or a single character specifying a symbol to be used as the default in plotting points. See \code{\link[graphics]{points}} for possible values and their interpretation. Note that only integers and single-character strings can be set as a graphics parameter (and not NA nor NULL).}
 
 \item{pt.col}{A character specifying the points colors.}
 
@@ -178,14 +182,14 @@ f1 <- funnel(unit = x$Levels[-1], o = x[-1,]$Observed, theta = x$Observed[1] / x
  f1
 plot(f1, main = "Cross-sectional proportions")
 
-# to analyse rates (SMR)
+# To analyze rates (SMR)
 f2 <- funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
 theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
 option = "rate", myunits = NULL, plot = FALSE)
 f2
 plot(f2, main = "Cross-sectional rate (SMR)")
 
-# creating a variable containing month information about each admission
+# Creating a variable containing month information about each admission
  icu$month <- as.numeric(format(as.Date(icu$UnitAdmissionDateTime),"\%m"))
 
 # First quarter
@@ -200,34 +204,34 @@ z <- SMR.table(data = dt1, group.var = "Unit", obs.var = "UnitDischargeName",
 w <- SMR.table(data = dt2, group.var = "Unit", obs.var = "UnitDischargeName",
  pred.var = "Saps3DeathProbabilityStandardEquation")
 
- # to analyse periods using ratio rates with e1 = e1
- f3 <- funnel(unit = z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+# To analyze periods using ratio rates with e1 = e1
+f3 <- funnel(unit = z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
        e1 = z$Expected[-1],
  n2 = w$N[-1], o2 = w$Observed[-1], e2 = z$Expected[-1],
  myunits = c("A","B"), option = "ratioRates", plot = FALSE)
- f3
- plot(f3, main = "Ratio of SMRs of periods with same expectation of death")
+f3
+plot(f3, main = "Ratio of SMRs of periods with same expectation of death")
 
 
- # to analyse periods using ratio rates with e1 =! e1
- f4 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+# To analyze periods using ratio rates with e1 =! e1
+f4 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
        e1 = z$Expected[-1], n2 = w$N[-1], o2 = w$Observed[-1], e2 = w$Expected[-1],
        option = "ratioRates", plot = FALSE)
- f4
- plot(f4, main = "Ratio of SMRs of periods with different expectation of death",
+f4
+plot(f4, main = "Ratio of SMRs of periods with different expectation of death",
       ylim = c(-1.5,1.5), xlim = c(0,200))
 
- # to analyse periods by difference in proportions
- f5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
- n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp", plot = FALSE)
- f5
- plot(f5, main = "Difference in proportions of death for two periods")
+# To analyze periods by difference in proportions
+5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp", plot = FALSE)
+f5
+plot(f5, main = "Difference in proportions of death for two periods")
 
- # to analyse periods by ratio of proportions
- f6 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
- n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp", plot = FALSE)
- f6
- plot(f6, main = "Ratio of proportions of death for two periods")
+# To analyze periods by ratio of proportions
+f6 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
+n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp", plot = FALSE)
+f6
+plot(f6, main = "Ratio of proportions of death for two periods")
 
  rm(icu, x, z, w, dt1, dt2, unit )
 
@@ -235,4 +239,6 @@ w <- SMR.table(data = dt2, group.var = "Unit", obs.var = "UnitDischargeName",
 \references{
 Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
 }
-
+\seealso{
+\code{\link{SMR}}, \code{\link{SRU}}, \code{\link{reclass}}
+}

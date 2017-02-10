@@ -5,10 +5,10 @@
 #' @description \code{SRU} calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions. The resource use is represented by the patients' length of stay (LOS). Therefore the SRU for each unit is defined as the observed LOS divided by the expected LOS for each ICU. To estimate the expected LOS for each ICU one must define a severity score, here defined by the SAPS 3 score. In theory, the 'score' could be any score/probability estimating death for each ICU admission.
 #'
 #' The \code{plot.SRU} function will return a \code{\link{SMR}} versus SRU scatter plot with its medians and tertiles. Thus, it classifies each unit in the quadrants formed by these two medians: most efficient (ME) is the lower left quadrant (SRU and SMR below the median);  least efficient (LE) is the upper right quadrant (SRU and SMR above the median); and least achieving (LE) - the lower right wuadrant(SRU below and SMR above the median); and over achieving (OA) - the upper left quadrant (SRU above and SMR below the median).
-##'
+#'
 #'  \code{print.SRU} Prints a object of class 'SRU'.
 #'
-#'  \code{cut_in} is used to find limits to define severity classes which are used in \code{SRU} function. The severity classes are necessary to calculate average days to produce one survivor and consequently to estimate the expected LOS in each ICU. Its rationale is to find the severity classes limits that yelds a desired average days of survivors. At some point in time, we made a study to test if different arrangements of the severity classes would yeld different classifications in the efficiency quadrants. Despite this study did not show any difference from the original approach, we left the function in the package. Therefore, any arbitrary severity classes should yeld theh same results.
+#'  \code{cut_in} is used to find limits to define severity classes which are used in \code{SRU} function. The severity classes are necessary to calculate average days to produce one survivor and consequently to estimate the expected LOS in each ICU. Its rationale is to find the severity classes limits that yelds a desired average days of survivors. At some point in time, we made a study to test if different arrangements of the severity classes would yeld different classifications in the efficiency quadrants. Despite this study did not show any difference from the original approach, we left the function in the package. Therefore, any arbitrary severity classes should yeld the same results.
 #'
 #'  \code{SRUcalc} is a simpler function to estimte SRU and returns, for each ICU, the SRU value, the obsbserve and expected number os deaths and LOS.
 #'
@@ -22,7 +22,7 @@
 #'
 #' @param los.exp Estimated length of stay (LOS). This argument is optional and will be required only if \code{type = 2}. If the user has an alternative model to estimate the individual LOS, the predicted individual LOS should passed to this argument. If this is the case, the predicted ICU LOS is estimated as the mean of the individual LOS predictions of these groups.
 #'
-#' @param class A facotr variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored.
+#' @param class A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored.
 #'
 #' @param score A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. This will be required only if \code{original = TRUE}. The function will use this argument to know to wich severity class each patient will assigned to.
 #'
@@ -32,7 +32,7 @@
 #'
 #' @param digits,digits2 Integer indicating the number of decimals to be used in the output.
 #'
-#' @param originals Logical; If \code{TRUE} it uses the severity classes and average days as the original article and will override the \code{class} argument if any. It requires the \code{score} argument and it must be the SAPS 3 score. We recommend not to set it \code{TRUE}, unless you really know what you are doing. Even if one wished to have severity classes identical to the original paper, it is better to set the severity classes before running the analysis. Like this, the function will estimate the average days from the data instead of using the fixed the average days from the original paper.
+#' @param originals Logical; If \code{TRUE} it uses the severity classes and average days as the original article and will override the \code{class} argument if any. It requires the \code{score} argument and it must be the SAPS 3 score. We recommend not to set it \code{TRUE}, unless you really know what you are doing. Even if one wished to have severity classes identical to the original paper, it is better to set the severity classes before running the analysis. Like this, the function will estimate the average days from the data instead of using the fixed average days from the original paper.
 #'
 #' @param x  For \code{print.SRU} or \code{plot.SRU}, an object of class 'SRU'.
 #'
@@ -90,7 +90,7 @@
 #' @references
 #' Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
 #'
-#' @seealso \code{\link{SMR}}, \code{\link{reclass}}
+#' @seealso \code{\link{SMR}}, \code{\link{reclass}}, \code{\link{funnel}}
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'

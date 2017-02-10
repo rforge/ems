@@ -88,7 +88,7 @@
 #'
 #' @author Lunna Borges and Pedro Brasil
 #'
-#' @seealso \code{\link{SRU}}, \code{\link{reclass}}
+#' @seealso \code{\link{SRU}}, \code{\link{reclass}}, \code{\link{funnel}}
 #'
 #' @examples
 #' # Loading a example data
