@@ -340,7 +340,7 @@ forest.SMR <- function(x,
   expected <- round(unlist(x$Expected[-1]), digits = digits)
 
   # Achandos os limites do grafico no eixo horizontal
-  if (smr.xlim == "auto"){
+  if (smr.xlim[1] == "auto"){
     smr.xlim <- c(min(unlist(c(main.smr[2], smr.ll)), na.rm = TRUE), max(unlist(c(main.smr[3], smr.ul)), na.rm = TRUE))
   }
 
