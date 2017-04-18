@@ -22,7 +22,7 @@
 #'
 #' @param los.exp Estimated length of stay (LOS). This argument is optional and will be required only if \code{type = 2}. If the user has an alternative model to estimate the individual LOS, the predicted individual LOS should passed to this argument. If this is the case, the predicted ICU LOS is estimated as the mean of the individual LOS predictions of these groups.
 #'
-#' @param class A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored.
+#' @param class A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored. To create a \code{class} one needs to be aware if there aren't patients with missing information about their SAPS 3 score.
 #'
 #' @param score A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. This will be required only if \code{original = TRUE}. The function will use this argument to know to wich severity class each patient will assigned to.
 #'
@@ -196,6 +196,7 @@ SRU <- function(prob, death, unit, los, los.exp, class, score, plot = FALSE, typ
                 include.lowest = T)
   }
   if (originals == FALSE){
+    warning(paste(c("Be aware that there weren't NA's in SAPS 3 score when you created the severity classes.")))
     if(!is.factor(class)){
       stop("'class' must be a factor.")
     }
@@ -373,97 +374,99 @@ plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]
 #' @rdname SRU
 #' @export
 cut_in <- function (score, los, death, unit, days, min = 200, exc.ICU = TRUE, complete = FALSE, digits = 5){
-if(!is.numeric(score)){
-  stop("score must be numeric.")}
-if(!is.numeric(los)){
-  stop("LOS must be numeric.")}
-if(any(as.factor(death) != 0 & as.factor(death) != 1)){
-  stop("Observed death variable must be coded as 0 and 1.")}
-if (!is.numeric(days)){
-  stop("Days to be tested must be numeric.")}
-if(!is.factor(unit)){
-  stop("Unit must be a factor.")}
-if(exc.ICU != TRUE && exc.ICU != FALSE){
-  stop("Exc.ICU must be either 'TRUE' or 'FALSE'.")}
-if(complete != TRUE && complete != FALSE){
-  stop("Complete must be either 'TRUE' or 'FALSE'.")}
+  if(length(which(is.na(score))) > 0){
+    stop("'score' must not have any NA value.")}
+  if(!is.numeric(score)){
+    stop("score must be numeric.")}
+  if(!is.numeric(los)){
+    stop("LOS must be numeric.")}
+  if(any(as.factor(death) != 0 & as.factor(death) != 1)){
+    stop("Observed death variable must be coded as 0 and 1.")}
+  if (!is.numeric(days)){
+    stop("Days to be tested must be numeric.")}
+  if(!is.factor(unit)){
+    stop("Unit must be a factor.")}
+  if(exc.ICU != TRUE && exc.ICU != FALSE){
+    stop("Exc.ICU must be either 'TRUE' or 'FALSE'.")}
+  if(complete != TRUE && complete != FALSE){
+    stop("Complete must be either 'TRUE' or 'FALSE'.")}
 
-dt <- data.frame(score, los, death, unit)
+  dt <- data.frame(score, los, death, unit)
 
-if (exc.ICU == TRUE){
-  unit_death <- table(dt$unit, dt$death)
-  exc <- rownames(unit_death)[which(unit_death[,1] == 0)]
+  if (exc.ICU == TRUE){
+    unit_death <- table(dt$unit, dt$death)
+    exc <- rownames(unit_death)[which(unit_death[,1] == 0)]
 
-  if (!is.null(exc) & length(exc) > 0){
-    dt <- dt[-which(dt$unit %in% exc),]			#exclude units without survivors
-    dt <- droplevels(dt)
-    warning(paste(c("The following units were excluded due to absence of survivals:", exc), collapse=" "))
-  }
-}
-un <- sort(unique(dt$score))
-breaks <- NULL; avdays <- c(); pt.corte <- c(); b <- c(); d <- c(); da <- c(); tail <- c()
-j <- 1;	w <- days[1]
-
-for (i in 2:length(un)) {
-  breaks[j:i] <- un[j:i]
-  cond <- which(dt$score >= breaks[j] & dt$score < breaks[i])
-
-  if (length(dt$score[cond]) >= min) {
-    sum_los <- sum(dt$los[cond])		#los sum
-    surv <- (length(dt$death[cond]) - sum(dt$death[cond]))		#survivors
-    avdays <- append(avdays, sum_los / surv) 		#average days used to produce a survivor
-    b <- append(b,breaks[i-1])		#possibles cut offs
-
-    if (tail(avdays,1) > w){
-      tail <- append(tail, tail(avdays,1))
-      da <- append(da, w)
-      pt.corte <- append(pt.corte, b[which.min(abs(avdays - w))])
-      d <- append(d, avdays[which.min(abs(avdays - w))])	#average days
-      w <- days[match(which(days > tail(d,1) & days > w), days)][1]
-      avdays <- c()
-      b <- c()
-      i <- which(un == tail(pt.corte, 1) + 1)
-      j <- which(un == tail(pt.corte, 1) + 1)
+    if (!is.null(exc) & length(exc) > 0){
+      dt <- dt[-which(dt$unit %in% exc),]			#exclude units without survivors
+      dt <- droplevels(dt)
+      warning(paste(c("The following units were excluded due to absence of survivals:", exc), collapse=" "))
     }
-    i <- i + 1
-  } else {i <- i + 1}
-}
-
-corte <- c(min(score), pt.corte, max(score))
-L <- c()
-lowest <- min(score) - 1
-
-for (k in 1:length(corte)){			#patients by class
-  cond2 <- length(which(dt$score > lowest & dt$score <= corte[k + 1]))
-  lowest <- corte[k + 1]
-  L <- append(L, cond2)
-}
-L=L[-length(L)]
-
-if (L[length(L)] < min){ 	#If last class has less than minimum of patients, put it together with the second-last
-  pt.corte <- pt.corte[-length(pt.corte)]
-  da <- da[-length(da)]
-  tail <- tail[-length(tail)]
-  d <- d[-length(d)]
-  L2 <- L[-length(L)]
-  corte <- c(min(score), pt.corte, max(score))
-}
-if (complete == TRUE){
-  cond3 <- which(dt$score > corte[length(corte) - 1] & dt$score <= max(dt$score))
-  sum_los <- sum(dt$los[cond3])
-  surv <- (length(dt$death[cond3]) - sum(dt$death[cond3]))
-  high.avday <- sum_los / surv
-
-  if (L[length(L)] < min){
-    output <- data.frame("Days"=da, "Tail" = round(tail,digits), "Corte" = pt.corte, "AvDays" = round(d,digits), "Total.Pacients" = L2[-length(L2)])
-    highest <- c("-", "-", max(dt$score), round(high.avday, digits), sum(L[length(L)], L[length(L) - 1]))
-    output <- rbind(output, highest)
-  }else{
-    output <- data.frame("Days" = da, "Tail" = round(tail, digits), "Corte" = pt.corte, "AvDays" = round(d,digits), "Total.Pacients" = L[-length(L)])
-    highest <- c("-", "-", max(dt$score), round(high.avday, digits), L[length(L)])
-    output <- rbind(output, highest)
   }
-} else {corte}
+  un <- sort(unique(dt$score))
+  breaks <- NULL; avdays <- c(); pt.corte <- c(); b <- c(); d <- c(); da <- c(); tail <- c()
+  j <- 1;	w <- days[1]
+
+  for (i in 2:length(un)) {
+    breaks[j:i] <- un[j:i]
+    cond <- which(dt$score >= breaks[j] & dt$score < breaks[i])
+
+    if (length(dt$score[cond]) >= min) {
+      sum_los <- sum(dt$los[cond])		#los sum
+      surv <- (length(dt$death[cond]) - sum(dt$death[cond]))		#survivors
+      avdays <- append(avdays, sum_los / surv) 		#average days used to produce a survivor
+      b <- append(b,breaks[i-1])		#possibles cut offs
+
+      if (tail(avdays,1) > w){
+        tail <- append(tail, tail(avdays,1))
+        da <- append(da, w)
+        pt.corte <- append(pt.corte, b[which.min(abs(avdays - w))])
+        d <- append(d, avdays[which.min(abs(avdays - w))])	#average days
+        w <- days[match(which(days > tail(d,1) & days > w), days)][1]
+        avdays <- c()
+        b <- c()
+        i <- which(un == tail(pt.corte, 1) + 1)
+        j <- which(un == tail(pt.corte, 1) + 1)
+      }
+      i <- i + 1
+    } else {i <- i + 1}
+  }
+
+  corte <- c(min(score), pt.corte, max(score))
+  L <- c()
+  lowest <- min(score) - 1
+
+  for (k in 1:length(corte)){			#patients by class
+    cond2 <- length(which(dt$score > lowest & dt$score <= corte[k + 1]))
+    lowest <- corte[k + 1]
+    L <- append(L, cond2)
+  }
+  L=L[-length(L)]
+
+  if (L[length(L)] < min){ 	#If last class has less than minimum of patients, put it together with the second-last
+    pt.corte <- pt.corte[-length(pt.corte)]
+    da <- da[-length(da)]
+    tail <- tail[-length(tail)]
+    d <- d[-length(d)]
+    L2 <- L[-length(L)]
+    corte <- c(min(score), pt.corte, max(score))
+  }
+  if (complete == TRUE){
+    cond3 <- which(dt$score > corte[length(corte) - 1] & dt$score <= max(dt$score))
+    sum_los <- sum(dt$los[cond3])
+    surv <- (length(dt$death[cond3]) - sum(dt$death[cond3]))
+    high.avday <- sum_los / surv
+
+    if (L[length(L)] < min){
+      output <- data.frame("Days"=da, "Tail" = round(tail,digits), "Corte" = pt.corte, "AvDays" = round(d,digits), "Total.Pacients" = L2[-length(L2)])
+      highest <- c("-", "-", max(dt$score), round(high.avday, digits), sum(L[length(L)], L[length(L) - 1]))
+      output <- rbind(output, highest)
+    }else{
+      output <- data.frame("Days" = da, "Tail" = round(tail, digits), "Corte" = pt.corte, "AvDays" = round(d,digits), "Total.Pacients" = L[-length(L)])
+      highest <- c("-", "-", max(dt$score), round(high.avday, digits), L[length(L)])
+      output <- rbind(output, highest)
+    }
+  } else {corte}
 }
 
 #' @rdname SRU
