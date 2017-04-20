@@ -185,13 +185,20 @@ SRU <- function(prob, death, unit, los, los.exp, class, score, plot = FALSE, typ
   if(originals != TRUE && originals != FALSE){
     stop("'originals' must be either 'TRUE' or 'FALSE'.")
   }
-  if(any(is.na(score))){
-    stop("'score' must not have any NA value.")
-  }
-  if(!is.numeric(score)){
-    stop("'score' must be numeric.")
-  }
+  # if(any(is.na(score))){
+  #   stop("'score' must not have any NA value.")
+  # }
+  # if(!is.numeric(score)){
+  #   stop("'score' must be numeric.")
+  # }
   if (originals){
+
+    if(any(is.na(score))){
+      stop("'score' must not have any NA value.")
+    }
+    if(!is.numeric(score)){
+      stop("'score' must be numeric.")
+    }
     class = cut(score, breaks = c(min(score),24,34,44,54,64,74,84,94,max(score)),
                 include.lowest = T)
   }else{
