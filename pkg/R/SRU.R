@@ -24,7 +24,7 @@
 #'
 #' @param class A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored. To create a \code{class} one needs to be aware if there aren't patients with missing information about their SAPS 3 score.
 #'
-#' @param score A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to.
+#' @param score A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to. It's used only when \code{originals = TRUE}.
 #'
 #' @param plot Logical; If \code{TRUE} plots a SMR versus SRU scatter plot.
 #'
@@ -185,12 +185,7 @@ SRU <- function(prob, death, unit, los, los.exp, class, score, plot = FALSE, typ
   if(originals != TRUE && originals != FALSE){
     stop("'originals' must be either 'TRUE' or 'FALSE'.")
   }
-  # if(any(is.na(score))){
-  #   stop("'score' must not have any NA value.")
-  # }
-  # if(!is.numeric(score)){
-  #   stop("'score' must be numeric.")
-  # }
+
   if (originals){
 
     if(any(is.na(score))){
@@ -202,7 +197,10 @@ SRU <- function(prob, death, unit, los, los.exp, class, score, plot = FALSE, typ
     class = cut(score, breaks = c(min(score),24,34,44,54,64,74,84,94,max(score)),
                 include.lowest = T)
   }else{
-    # warning(paste(c("Be aware that there weren't NA's in SAPS 3 score when you created the severity classes.")))
+
+    if(any(is.na(class))){
+      stop("'class' must not have any NA value.")
+    }
     if(!is.factor(class)){
       stop("'class' must be a factor.")
     }

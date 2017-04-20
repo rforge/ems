@@ -38,7 +38,7 @@ SRUcalc(prob, death, unit, los, score, digits = 2)
 
 \item{class}{A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored. To create a \code{class} one needs to be aware if there aren't patients with missing information about their SAPS 3 score.}
 
-\item{score}{A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to.}
+\item{score}{A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to. It's used only when \code{originals = TRUE}.}
 
 \item{plot}{Logical; If \code{TRUE} plots a SMR versus SRU scatter plot.}
 
