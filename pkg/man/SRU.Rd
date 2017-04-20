@@ -18,7 +18,7 @@ SRU(prob, death, unit, los, los.exp, class, score, plot = FALSE, type = 1,
   points.arg = list(pch = 21, col = "white", bg = "cadetblue3", cex = 1.5),
   med.arg = list(col = "dodgerblue4", lwd = 2, lty = 1), tert.arg = list(col
   = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x =
-  "top", bty = "n", xpd = NA, inset = -0.15, ncol = 2), bty = "n")
+  "top", bty = "n", xpd = NA, inset = -0.2, ncol = 2), bty = "n")
 
 cut_in(score, los, death, unit, days, min = 200, exc.ICU = TRUE,
   complete = FALSE, digits = 5)

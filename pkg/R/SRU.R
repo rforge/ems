@@ -356,8 +356,18 @@ print.SRU <- function(x, ...){
 
 #' @rdname SRU
 #' @export
-plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]), xlab = "SMR", ylab = "SRU", points.arg = list(pch = 21, col = "white", bg = "cadetblue3",cex=1.5), med.arg = list(col="dodgerblue4",lwd = 2,lty = 1), tert.arg = list(col = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x = "top", bty = "n", xpd = NA, inset = -.15, ncol = 2), bty = "n"){
-  plot(0, 0, ..., xlim = xlim, ylim = ylim, type = 'n', xlab = xlab, ylab = ylab, bty = bty)
+plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]), xlab = "SMR", ylab = "SRU", points.arg = list(pch = 21, col = "white", bg = "cadetblue3",cex=1.5), med.arg = list(col="dodgerblue4",lwd = 2,lty = 1), tert.arg = list(col = "darkorange2", lty = 2, lwd = 1), auto.legend = TRUE, leg.arg = list(x = "top", bty = "n", xpd = NA, inset = -.2, ncol = 2), bty = "n"){
+
+  plot(0, 0, ..., xlim = xlim, ylim = ylim, type = 'n', xlab = "", ylab = "", bty = bty, xaxt = "n", yaxt = "n")
+
+  mtext(text = xlab, side = 1, line = 2.5, font = 2)
+
+  mtext(text = ylab, side = 2, line = 2.5, font = 2)
+
+  axis(side = 1, tick = T, pos = NA, lwd = 1, lwd.ticks = 1, col.axis = "gray60", col.ticks = "gray60", lty = 1, col = "gray60")
+
+  axis(side = 2, tick = T, pos = NA, lwd = 1, lwd.ticks = 1, col.axis = "gray60", col.ticks = "gray60", lty = 1, col = "gray60")
+
   med.arg$v <- x$med[2]
   med.arg$h <- x$med[1]
   tert.arg$h <- x$tert[1:2]
@@ -374,6 +384,7 @@ plot.SRU <- function(x, ..., xlim = range(x$rates[,2]), ylim = range(x$rates[,1]
     do.call(legend, leg.arg)
   }
 }
+
 
 #' @rdname SRU
 #' @export

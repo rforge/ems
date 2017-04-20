@@ -366,7 +366,12 @@ plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x
   text.arg_y$x <- x$smrsru_y
 
   par(mfrow = c(1,2))
-  plot(0, 0, ..., xlim = xlim_x, ylim = ylim_x, type = 'n', xlab = xlab, ylab = ylab, main = main.arg_x[[1]])
+  plot(0, 0, ..., xlim = xlim_x, ylim = ylim_x, type = 'n', xlab = "", ylab = "", main = main.arg_x[[1]])
+
+  mtext(text = xlab, side = 1, line = 2.5, font = 2)
+
+  mtext(text = ylab, side = 2, line = 2.5, font = 2)
+
   do.call(abline, med.arg_x)
   do.call(abline, tert.arg_x)
   do.call(points, points.arg_x)
@@ -374,7 +379,12 @@ plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x
   do.call(points, better.arg_x)
   do.call(text, text.arg_x)
 
-  plot(0, 0, ..., xlim = xlim_y, ylim = ylim_y, type = 'n', xlab = xlab, ylab = ylab, main = main.arg_y[[1]])
+  plot(0, 0, ..., xlim = xlim_y, ylim = ylim_y, type = 'n', xlab = "", ylab = "", main = main.arg_y[[1]])
+
+  mtext(text = xlab, side = 1, line = 2.5, font = 2)
+
+  mtext(text = ylab, side = 2, line = 2.5, font = 2)
+
   do.call(abline, med.arg_y)
   do.call(abline, tert.arg_y)
   do.call(points, points.arg_y)
@@ -388,3 +398,4 @@ plot.reclass <- function(x, ..., xlim_x = range(x$smr_x), ylim_x = range(x$sru_x
   }
   on.exit(par(mfrow = c(1,1)))
 }
+
