@@ -382,7 +382,7 @@ forest.SMR <- function(x,
 
   par(mfrow = c(1,2))
 
-  # Janela com textos com variáveis e categorias
+  # Janela com textos com variaveis e categorias
   par(mar = mar1)
   plot(NA, NA, xlim = c(0,1), ylim = ylim , xlab = "", ylab = "",yaxt = "n", xaxt = "n", xaxs = "i", bty = "n", xpd = NA)
 
@@ -460,7 +460,7 @@ forest.SMR <- function(x,
   cat.est.arg$labels <- sprintf(paste0("%.",digits,"f [%.",digits,"f ; %.",digits,"f]"),smr.estimates,smr.ll,smr.ul)
   do.call(text, cat.est.arg)
 
-  # Cabeçalho dos SMRs
+  # Cabecalho dos SMRs
   SMR.head.arg$y <- ylim[2] + 1
   do.call(text, SMR.head.arg)
 }

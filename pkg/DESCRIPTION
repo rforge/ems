@@ -1,13 +1,13 @@
 Package: ems
-Title: Epimed Solutions collection for data editing, analysis, and bechmarking
-    of health units
-Version: 0.3.1.4
-Date: 2017-04-20
+Title: Epimed Solutions Collection for Data Editing, Analysis, and Benchmarking
+    of Health Units
+Version: 0.3.1.5
+Date: 2017-04-26
 Authors@R: c(person("Lunna", "Borges", role = c("aut"),
 	             email = "lunna.borges@epimedsolutions.com"),
              person("Pedro", "Brasil", role = c("aut", "cre"),
                     email = "pedro.brasil@epimedsolutions.com"))
-Description: This package is a collection of functions for data analysis and
+Description: Collection of functions for data analysis and
     editing. Most of them are related to benchmarking with prediction models.
 Depends:
     R (>= 3.3.1)
