@@ -2,10 +2,10 @@
 % Please edit documentation in R/SRU.R
 \name{SRU}
 \alias{SRU}
-\alias{SRUcalc}
-\alias{cut_in}
-\alias{plot.SRU}
 \alias{print.SRU}
+\alias{plot.SRU}
+\alias{cut_in}
+\alias{SRUcalc}
 \title{Standardized Resource Use (SRU)}
 \usage{
 SRU(prob, death, unit, los, los.exp, class, score, plot = FALSE, type = 1,
@@ -36,9 +36,9 @@ SRUcalc(prob, death, unit, los, score, digits = 2)
 
 \item{los.exp}{Estimated length of stay (LOS). This argument is optional and will be required only if \code{type = 2}. If the user has an alternative model to estimate the individual LOS, the predicted individual LOS should passed to this argument. If this is the case, the predicted ICU LOS is estimated as the mean of the individual LOS predictions of these groups.}
 
-\item{class}{A factor variable indicating the class of severity score (SAPS 3). This will be required if the argument \code{original = FALSE}; if \code{original = TRUE}, class is ignored. To create a \code{class} one needs to be aware if there aren't patients with missing information about their SAPS 3 score.}
+\item{class}{A factor variable indicating the class of severity score (e.g. SAPS 3). In the case of SAPS 3, this is a cut in the SAPS 3 score grouping patients into severity classes. This will be required if the argument \code{original = FALSE} and NAs are not allowed; if \code{original = TRUE}, class is ignored.}
 
-\item{score}{A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to. It's used only when \code{originals = TRUE}.}
+\item{score}{A numeric vector with the Acute Physiology Score (SAPS) 3 score for each admission. The function will use this argument to know to wich severity class each patient will assigned to. It's used only when \code{originals = TRUE} and ignored otherwise. NAs are not allowed.}
 
 \item{plot}{Logical; If \code{TRUE} plots a SMR versus SRU scatter plot.}
 
@@ -113,7 +113,7 @@ The \code{plot.SRU} function will return a \code{\link{SMR}} versus SRU scatter 
 
  \code{cut_in} is used to find limits to define severity classes which are used in \code{SRU} function. The severity classes are necessary to calculate average days to produce one survivor and consequently to estimate the expected LOS in each ICU. Its rationale is to find the severity classes limits that yelds a desired average days of survivors. At some point in time, we made a study to test if different arrangements of the severity classes would yeld different classifications in the efficiency quadrants. Despite this study did not show any difference from the original approach, we left the function in the package. Therefore, any arbitrary severity classes should yeld the same results.
 
- \code{SRUcalc} is a simpler function to estimte SRU and returns, for each unit, the SRU value, the observed and expected number of deaths and LOS.
+ \code{SRUcalc} is a simpler function to estimte SRU and returns, for each unit, the SRU value, the observed and expected number of deaths, and the observed and expected LOS.
 }
 \examples{
 
@@ -156,13 +156,12 @@ SRUcalc(prob = icu$Saps3DeathProbabilityStandardEquation,
 rm(x, y, days, icu, cut_lims)
 
 }
-\author{
-Lunna Borges and Pedro Brasil
-}
 \references{
 Rothen HU, Stricker K, Einfalt J, Bauer P, Metnitz PGH, Moreno RP, Takala J (2007) Variability in outcome and resource use in intensive care units. Intensive Care Med 33:1329-1336
 }
 \seealso{
 \code{\link{SMR}}, \code{\link{reclass}}, \code{\link{funnel}}
 }
-
+\author{
+Lunna Borges and Pedro Brasil
+}
