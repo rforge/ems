@@ -2,12 +2,12 @@
 % Please edit documentation in R/dataquality.R
 \name{dataquality}
 \alias{dataquality}
-\alias{t_factor}
+\alias{date.table}
 \alias{factor.table}
-\alias{t_num}
 \alias{num.table}
 \alias{t_date}
-\alias{date.table}
+\alias{t_factor}
+\alias{t_num}
 \title{Collection of functions to check data quality in a dataset}
 \usage{
 t_factor(data, variable, legal, var.labels = attr(data,
@@ -142,9 +142,10 @@ date.table(data = icu, date.limits = d.lim, format.date = "")
 rm(icu, d.lim)
 
 }
-\seealso{
-\code{\link{miscellaneous}}
-}
 \author{
 Lunna Borges & Pedro Brasil
 }
+\seealso{
+\code{\link{miscellaneous}}
+}
+
