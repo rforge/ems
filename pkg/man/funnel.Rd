@@ -15,7 +15,7 @@ funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
 
 \method{print}{funnel}(x, ...)
 
-\method{plot}{funnel}(x, ..., col = c("skyblue4", "skyblue2", "snow4"),
+\method{plot}{funnel}(x, ..., col = c("darkblue", "paleturquoise3", "gray26"),
   lwd = 2, lty = c(2, 6, 1), bty = "n", pch = 21, pt.col = "white",
   bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7,
   text.pos = NULL, mypts.col = "darkblue", printUnits = x$printUnits,
@@ -233,7 +233,7 @@ n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp", plot =
 f6
 plot(f6, main = "Ratio of proportions of death for two periods")
 
- rm(icu, x, z, w, dt1, dt2, unit )
+ rm(icu, x, z, w, dt1, dt2, unit, f1, f2, f3, f4, f5, f6)
 
 }
 \references{

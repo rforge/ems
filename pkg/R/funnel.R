@@ -215,7 +215,7 @@
 #' f6
 #' plot(f6, main = "Ratio of proportions of death for two periods")
 #'
-#'  rm(icu, x, z, w, dt1, dt2, unit )
+#'  rm(icu, x, z, w, dt1, dt2, unit, f1, f2, f3, f4, f5, f6)
 #'
 #' @import stats
 #' @import graphics
@@ -257,13 +257,22 @@ print.funnel <- function(x,...){
 
 #' @rdname funnel
 #' @export
-plot.funnel <- function(x, ...,col = c("skyblue4","skyblue2","snow4"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, mypts.col = "darkblue", printUnits = x$printUnits, xlab = x$xlab, ylab = x$ylab, xlim = x$xlim, ylim = x$ylim){
+plot.funnel <- function(x, ...,col = c("darkblue","paleturquoise3","gray26"), lwd = 2, lty = c(2,6,1), bty = "n", pch = 21, pt.col = "white", bg = "orange", pt.cex = 1.5, auto.legend = TRUE, text.cex = 0.7, text.pos = NULL, mypts.col = "darkblue", printUnits = x$printUnits, xlab = x$xlab, ylab = x$ylab, xlim = x$xlim, ylim = x$ylim){
 
   if (length(col) != length(x$p)+1){stop("col must have same length of p + 1 for the target line color in the last position")}
   if (!is.logical(auto.legend)){stop("auto.legend must be TRUE or FALSE.")}
 
-    plot(x$x, x$y, ..., type = "n", xlim = xlim, ylim = ylim, bty = bty, xlab = xlab, ylab = ylab)
+    plot(x$x, x$y, ..., type = "n", xlim = xlim, ylim = ylim, bty = bty, xlab = "", ylab = "", xaxt = "n", yaxt = "n")
+    grid()
+    axis(side = 1, tick = T, pos = NA, lwd = 0, lwd.ticks = 1, col.axis = "gray49", col.ticks = "lightgray", tcl = -1, lty = 3)
+    axis(side = 2, tick = T, pos = NA, lwd = 0, lwd.ticks = 1, col.axis = "gray49", col.ticks = "lightgray", tcl = -1, lty = 3)
+
+    mtext(text = xlab, side = 1, line = 2.5, font = 2)
+
+    mtext(text = ylab, side = 2, line = 2.5, font = 2)
+
     abline(h = x$theta, col = col[length(x$p)+1], lwd = lwd)
+
     for (i in 1:length(x$p)){
       lines(x$range, x$upperCI[[i]], col = col[i], lwd = lwd, lty = lty[i])
       lines(x$range, x$lowerCI[[i]], col = col[i], lwd = lwd, lty = lty[i])
@@ -275,12 +284,15 @@ plot.funnel <- function(x, ...,col = c("skyblue4","skyblue2","snow4"), lwd = 2, 
     }
     if (printUnits) {
       if (length(x$myunits) > 0 ){
-
+        par(font = 2)
         text(x$x[-which(x$unitnames$Unit %in% x$myunits)], x$y[-which(x$unitnames$Unit %in% x$myunits)], labels = rownames(x$unitnames)[-which(x$unitnames$Unit %in% x$myunits)], cex = text.cex, pos = text.pos)
 
         text(x$x[which(x$unitnames$Unit %in% x$myunits)], x$y[which(x$unitnames$Unit %in% x$myunits)], labels = rownames(x$unitnames)[which(x$unitnames$Unit %in% x$myunits)], cex = text.cex, pos = length(text.pos) + 1)
+        par(font = 1)
       } else {
+        par(font = 2)
         text(x$x, x$y, labels = rownames(x$unitnames), cex = text.cex, pos = text.pos)
+        par(font = 1)
       }
     }
     if (auto.legend){
@@ -293,3 +305,4 @@ plot.funnel <- function(x, ...,col = c("skyblue4","skyblue2","snow4"), lwd = 2, 
     }
     on.exit(par(mfrow = c(1,1)))
 }
+
