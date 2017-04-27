@@ -42,7 +42,6 @@
 #'
 #' @param myunits A character vector with the unit names which one would like to benchmark among all units. These units will be highlighted with dots of different collors in the plot. Default is \code{NULL}.
 #'
-#' @param overdispersion Logical (default = \code{FALSE}); If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.
 #'
 #' @param option A character specifying the type of funnel plot one wants to produce. It can assume \code{"rate"}, \code{"ratioRates"}, \code{"prop"}, \code{"diffProp"} or \code{"ratioProp"}. If \code{option = "rate"}, \code{funnel} plots a standardized rate y versus the expected death or case volume (number of unit admissions) for all units. If \code{option = "ratioRate"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho. If \code{option = "prop"}, \code{funnel} plots a proportion y versus its case volume (number of admissions). If \code{option = "ratioProp"} or \code{option = "diffProp"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio (or difference) of proportions y versus a precision parameter rho. See details.
 #'
@@ -117,7 +116,6 @@
 #'
 #' Assume \code{N} is the precision parameter (volume). For \code{N} > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 #'
-#' If \code{overdispersion = TRUE}, the normal CI is inflated by a overdispersion parameter phi. It is kind of arbitrary and usefull in high-volume outcome measures, when the large majority of institutions lie outside the funnel, casting doubt on the appropriateness of the limits.
 #'
 #' phi = (1/total) * sum((y - theta) ^ 2 * N)/g(theta)
 #'
@@ -133,7 +131,6 @@
 #'
 #'}
 #'
-#'If \code{overdispersion = TRUE}, the normal CI is inflated by a overdispersion parameter phi. It is kind of arbitrary and usefull in high-volume outcome measures, when the large majority of institutions lie outside the funnel, casting doubt on the appropriateness of the limits.
 #'
 #' phi = (1/total) * sum((y - theta) ^ 2 * e) / theta
 #'
@@ -222,19 +219,19 @@
 #' @export
 
 
-funnel <- function(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), theta, method = c("exact","normal"), direct = FALSE, myunits = NULL, overdispersion = FALSE, option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE, plot = TRUE, digits = 5){
+funnel <- function(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), theta, method = c("exact","normal"), direct = FALSE, myunits = NULL, option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE, plot = TRUE, digits = 5){
 
   if (option[1] != "rate" && option[1] != "ratioRates" && option[1] != "prop" && option[1] != "diffProp" && option[1] != "ratioProp"){stop("option must be either 'rate', 'ratioRates', 'prop', 'diffprop' or 'ratioProp'.")}
   if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
 
   if (option[1] == "rate"){
-    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
+    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits)
   }
   if (option[1] == "ratioRates"){
     output <- changeRateFunnel(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, myunits = myunits, printUnits = printUnits, digits = digits)
   }
   if (option[1] == "prop"){
-    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
+    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits)
   }
   if (option[1] == "diffProp"){
     output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "diff", myunits = myunits, printUnits = printUnits, digits = digits)

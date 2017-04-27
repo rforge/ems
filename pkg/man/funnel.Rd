@@ -9,9 +9,9 @@
 funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
   lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2),
   y.type = c("SMR", "SRU"), p = c(0.95, 0.998), theta, method = c("exact",
-  "normal"), direct = FALSE, myunits = NULL, overdispersion = FALSE,
-  option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"),
-  printUnits = TRUE, plot = TRUE, digits = 5)
+  "normal"), direct = FALSE, myunits = NULL, option = c("rate",
+  "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE,
+  plot = TRUE, digits = 5)
 
 \method{print}{funnel}(x, ...)
 
@@ -53,8 +53,6 @@ funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
 \item{direct}{Logical (default = \code{FALSE}); Used when \code{option = "rate"}. If \code{TRUE}, we assume the rates are reported as a rate per (say) 1000 individuals, and that the rate has been transformed to a proportion y between 0 and 1. The measure of the associated error (horizontal axis) may be reported in the size of population \code{n} (CI - confidence interval - is made by a binomial approximation). If \code{FALSE}, it may be reported in the population expected death \code{e} (CI is made by a poisson approximation). See details.}
 
 \item{myunits}{A character vector with the unit names which one would like to benchmark among all units. These units will be highlighted with dots of different collors in the plot. Default is \code{NULL}.}
-
-\item{overdispersion}{Logical (default = \code{FALSE}); If \code{TRUE}, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.}
 
 \item{option}{A character specifying the type of funnel plot one wants to produce. It can assume \code{"rate"}, \code{"ratioRates"}, \code{"prop"}, \code{"diffProp"} or \code{"ratioProp"}. If \code{option = "rate"}, \code{funnel} plots a standardized rate y versus the expected death or case volume (number of unit admissions) for all units. If \code{option = "ratioRate"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho. If \code{option = "prop"}, \code{funnel} plots a proportion y versus its case volume (number of admissions). If \code{option = "ratioProp"} or \code{option = "diffProp"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio (or difference) of proportions y versus a precision parameter rho. See details.
 
@@ -141,7 +139,6 @@ The indicator is the observed proportion y = O/N
 
 Assume \code{N} is the precision parameter (volume). For \code{N} > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 
-If \code{overdispersion = TRUE}, the normal CI is inflated by a overdispersion parameter phi. It is kind of arbitrary and usefull in high-volume outcome measures, when the large majority of institutions lie outside the funnel, casting doubt on the appropriateness of the limits.
 
 phi = (1/total) * sum((y - theta) ^ 2 * N)/g(theta)
 
@@ -157,7 +154,6 @@ For each cases, the precision parameter (plotted at x axis) can be interpreted a
 
 }
 
-If \code{overdispersion = TRUE}, the normal CI is inflated by a overdispersion parameter phi. It is kind of arbitrary and usefull in high-volume outcome measures, when the large majority of institutions lie outside the funnel, casting doubt on the appropriateness of the limits.
 
 phi = (1/total) * sum((y - theta) ^ 2 * e) / theta
 

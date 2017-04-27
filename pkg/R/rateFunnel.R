@@ -3,7 +3,7 @@
 #' @import graphics
 
 
-rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., printUnits = FALSE, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits = NULL, overdispersion = FALSE, digits = 5){
+rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., printUnits = FALSE, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits = NULL, digits = 5){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if (!is.numeric(y)){stop("y must be numeric.")}
@@ -21,7 +21,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   if (y.type[1] != "SMR" && y.type[1] != "SRU"){stop("y.type must be either 'SMR' or 'SRU'.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   # if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
-  if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
+  # if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
   exc <- NULL
   if (any(n == 0)){
     exc <- unit[which(n == 0)]
@@ -83,15 +83,34 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
         outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
         outcolname[i] <- paste0(p[i]*100,"%CI")
       }
-        rates.table <- cbind(rates.table, outofcontrol)
-        x <- admissions; y <- smr; range <- admissionsRange
+      rates.table <- cbind(rates.table, outofcontrol)
+      x <- admissions; y <- smr; range <- admissionsRange
     }
     if (method[1] == "normal"){
       if (any(admissions < 100)){
         warning("Normal distribuition is not a good approximation for units whose has less than 100 admissions. There are ", length(which(admissions < 100)), " units with less than 100 admissions")
       }
-      if (overdispersion){
-        phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * admissions)/(theta))
+
+      # Calculate the z-score
+      z_score <- (y - theta) * sqrt(rho / theta)
+
+      # Calculate the 10% and 90% percentiles.
+      q90 <- quantile(z_score,probs=c(0.9))
+      q10 <- quantile(z_score,probs=c(0.1))
+
+      # Set z-scores larger than the 90% percentile to the 90% percentile.
+      z_score <- ifelse(z_score>q90,q90,z_score)
+
+      # Set z-scores smaller than the 10% percentile to the 10% percentile.
+      z_score <- ifelse(z_score<q10,q10,z_score)
+
+      # Calculate the Winsorised estimate
+      # Used when overdispersion of the indicator
+      phi <- (1/nrow(rates.table)) * sum(z_score ^ 2)
+
+      # if (overdispersion){
+      if (phi > 1){ # overdispersion = TRUE
+        # phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * admissions)/(theta))
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta * phi / admissionsRange)
@@ -115,10 +134,10 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
           outcolname[i] <- paste0(p[i]*100,"%CI")
         }
       }
-        rates.table <- cbind(rates.table, outofcontrol)
-        x <- admissions; y <- smr; range <- admissionsRange
+      rates.table <- cbind(rates.table, outofcontrol)
+      x <- admissions; y <- smr; range <- admissionsRange
     }
-  } else {
+  } else { # indirect method
     rates.table <-  rates.table[order(rates.table$Expected),] # ordering by expected death
     smr <- rates.table$Rate
     e <- rates.table$Expected
@@ -126,7 +145,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
     rho <- e
     unitnames <- data.frame(Unit = rates.table$unit)
     if (auto.xlab){ xlab = xlab[2]}
-  # "exact" formula using poisson approximation
+    # "exact" formula using poisson approximation
     if (method[1] == "exact"){
       lambda <- theta*expectedRange
       for (i in 1:length(p)){
@@ -141,16 +160,35 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
         outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
         outcolname[i] <- paste0(p[i]*100,"%CI")
       }
-        rates.table <- cbind(rates.table, outofcontrol)
-        x <- e; y <- smr; range <- expectedRange
+      rates.table <- cbind(rates.table, outofcontrol)
+      x <- e; y <- smr; range <- expectedRange
     }
-  # Normal approximation
+    # Normal approximation
     if (method[1] == "normal"){
       if (any(e < 100)){
         warning("Normal distribuition is not a good approximation for units whose has less than 100 expected values. There are ", length(which(e < 100)), " units with less than 100 expected values")
       }
-      if (overdispersion){
-        phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * e)/(theta))
+
+      # Calculate the z-score
+      z_score <- (y - theta) * sqrt(rho / theta)
+
+      # Calculate the 10% and 90% percentiles.
+      q90 <- quantile(z_score,probs=c(0.9))
+      q10 <- quantile(z_score,probs=c(0.1))
+
+      # Set z-scores larger than the 90% percentile to the 90% percentile.
+      z_score <- ifelse(z_score>q90,q90,z_score)
+
+      # Set z-scores smaller than the 10% percentile to the 10% percentile.
+      z_score <- ifelse(z_score<q10,q10,z_score)
+
+      # Calculate the Winsorised estimate
+      # Used when overdispersion of the indicator
+      phi <- (1/nrow(rates.table)) * sum(z_score ^ 2)
+
+      # if (overdispersion){
+      if (phi > 1) { # overdispersion = TRUE
+        # phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * e)/(theta))
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta * phi / expectedRange)
@@ -163,7 +201,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
           outcolname[i] <- paste0(p[i]*100,"%CI")
         }
       } else {
-      for (i in 1:length(p)){
+        for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta/expectedRange)
           lowerCI[[i]] <- theta - zp * sqrt(theta/expectedRange)
@@ -172,13 +210,13 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
           lowOUT[[i]] <- ifelse(smr < ylowCI[[i]],TRUE, FALSE)
           uppOUT[[i]] <- ifelse(smr > yuppCI[[i]], TRUE, FALSE)
           outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-        outcolname[i] <- paste0(p[i]*100,"%CI")
+          outcolname[i] <- paste0(p[i]*100,"%CI")
+        }
       }
-    }
       rates.table <- cbind(rates.table, outofcontrol)
       x <- e; y <- smr; range <- expectedRange
+    }
   }
- }
 
   output <- list(x = x, y = y, theta = theta, range = range, tab = rates.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits)
   colnames(output$tab) <- c("Unit", y.type[1], thirdcolname, "Observed", outcolname)
