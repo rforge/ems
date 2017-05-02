@@ -3,7 +3,7 @@
 #' @import graphics
 
 
-rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., printUnits = FALSE, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits = NULL, digits = 5){
+rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998), theta = 1, method = c("exact","normal"), direct = FALSE, ..., printUnits = FALSE, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits = NULL, digits = 5, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if (!is.numeric(y)){stop("y must be numeric.")}
@@ -21,7 +21,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   if (y.type[1] != "SMR" && y.type[1] != "SRU"){stop("y.type must be either 'SMR' or 'SRU'.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
   # if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
-  # if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
+  if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
   exc <- NULL
   if (any(n == 0)){
     exc <- unit[which(n == 0)]
@@ -92,7 +92,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
       }
 
       # Calculate the z-score
-      z_score <- (y - theta) * sqrt(rho / theta)
+      z_score <- (y - theta) * sqrt( rho / theta)
 
       # Calculate the 10% and 90% percentiles.
       q90 <- quantile(z_score,probs=c(0.9))
@@ -106,11 +106,12 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
 
       # Calculate the Winsorised estimate
       # Used when overdispersion of the indicator
-      phi <- (1/nrow(rates.table)) * sum(z_score ^ 2)
+      phi <- (1 / nrow(rates.table)) * sum(z_score ^ 2)
 
-      # if (overdispersion){
-      if (phi > 1){ # overdispersion = TRUE
+      if (overdispersion){
+        if (phi > (1 + 2 * sqrt( 2 / nrow(rates.table) ))){ # overdispersion = TRUE
         # phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * admissions)/(theta))
+        warning("The funnel limits were inflated due overdispersion presence.")
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta * phi / admissionsRange)
@@ -121,7 +122,8 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
           uppOUT[[i]] <- ifelse(smr > yuppCI[[i]], TRUE, FALSE)
           outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
         }
-      } else {
+      }
+    } else {
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta / admissionsRange)
@@ -170,7 +172,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
       }
 
       # Calculate the z-score
-      z_score <- (y - theta) * sqrt(rho / theta)
+      z_score <- (y - theta) * sqrt( rho / theta)
 
       # Calculate the 10% and 90% percentiles.
       q90 <- quantile(z_score,probs=c(0.9))
@@ -184,11 +186,12 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
 
       # Calculate the Winsorised estimate
       # Used when overdispersion of the indicator
-      phi <- (1/nrow(rates.table)) * sum(z_score ^ 2)
+      phi <- (1 / nrow(rates.table)) * sum(z_score ^ 2)
 
-      # if (overdispersion){
-      if (phi > 1) { # overdispersion = TRUE
+      if (overdispersion){
+        if (phi > (1 + 2 * sqrt( 2 / nrow(rates.table) ))) { # overdispersion = TRUE
         # phi <- (1/nrow(rates.table)) * sum(((y - theta) ^ 2 * e)/(theta))
+        warning("The funnel limits were inflated due overdispersion presence.")
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta * phi / expectedRange)
@@ -200,7 +203,8 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
           outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
           outcolname[i] <- paste0(p[i]*100,"%CI")
         }
-      } else {
+      }
+    } else {
         for (i in 1:length(p)){
           zp <- qnorm(1 - (1 - p[i]) / 2)
           upperCI[[i]] <- theta + zp * sqrt(theta/expectedRange)

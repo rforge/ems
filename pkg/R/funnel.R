@@ -87,6 +87,8 @@
 #'
 #' @param ... Further arguments passed to \code{\link[graphics]{plot}}.
 #'
+#' @param overdispersion Logical (default = FALSE); If TRUE, introduces an multiplicative over-dispersion factor phi that will inflate the normal CI null variance. See details.
+#'
 #' @details
 #' \itemize{
 #' \item If \code{option = "rate"}, \code{funnel} plots a standardized rate y versus its expected death or volume value for several units.
@@ -96,6 +98,12 @@
 #' In many circumstances we can assume an exact or approximate normal distribution for the data. Using the \code{method} argument, one could choose between \code{"exact"} or  \code{"normal"}. For direct standardized rates, the exact distribuition is binomial and for indirect standardized rates, the exact distribuition is poisson. Assume rho is the precision parameter (volume, for direct rates; expected value, for indirect rates). The original report claims that, for rho > 100, the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 #'
 #' The console warns if there are units with volume/expected value less than 100.
+#'
+#' If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1.
+#'
+#' phi = (1/total) * sum((y - theta) ^ 2 * rho)/g(theta)
+#'
+#' var(y|theta,rho) = (phi * g(theta))/rho
 #'
 #' \item If \code{option = "ratioRate"}, \code{funnel} can be used to compare units at two diferent periods. It plots a ratio of rates y versus a precision parameter rho.
 #'
@@ -116,6 +124,7 @@
 #'
 #' Assume \code{N} is the precision parameter (volume). For \code{N} > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 #'
+#' If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1.
 #'
 #' phi = (1/total) * sum((y - theta) ^ 2 * N)/g(theta)
 #'
@@ -130,11 +139,6 @@
 #' For each cases, the precision parameter (plotted at x axis) can be interpreted as approximately the sample size per period.
 #'
 #'}
-#'
-#'
-#' phi = (1/total) * sum((y - theta) ^ 2 * e) / theta
-#'
-#' \eqn{var(y|theta,n) = (phi * g(theta)) / e}
 #'
 #' @return A table with unit names, y, observed (Obs), expected (Exp) and admissions (N) for each unit, and final columns show which units are out of control.
 #'
@@ -202,13 +206,13 @@
 #'
 #' # To analyze periods by difference in proportions
 #' f5 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#' n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "diffProp", plot = FALSE)
+#' n2 = w$N[-1], o2 = w$Observed[-1], option = "diffProp", plot = FALSE)
 #' f5
 #' plot(f5, main = "Difference in proportions of death for two periods")
 #'
 #' # To analyze periods by ratio of proportions
 #' f6 <- funnel(unit <- z$Levels[-1], n1 = z$N[-1], o1 = z$Observed[-1],
-#' n2 = w$N[-1], o2 = w$Observed[-1], method = "diff", option = "ratioProp", plot = FALSE)
+#' n2 = w$N[-1], o2 = w$Observed[-1], option = "ratioProp", plot = FALSE)
 #' f6
 #' plot(f6, main = "Ratio of proportions of death for two periods")
 #'
@@ -219,25 +223,25 @@
 #' @export
 
 
-funnel <- function(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), theta, method = c("exact","normal"), direct = FALSE, myunits = NULL, option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE, plot = TRUE, digits = 5){
+funnel <- function(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1), lambda2 = sum(o2)/sum(n2), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), y.type = c("SMR","SRU"), p = c(.95,.998), theta, method = c("exact","normal"), direct = FALSE, myunits = NULL, option = c("rate", "ratioRates", "prop", "diffProp", "ratioProp"), printUnits = TRUE, plot = TRUE, digits = 5, overdispersion = FALSE){
 
   if (option[1] != "rate" && option[1] != "ratioRates" && option[1] != "prop" && option[1] != "diffProp" && option[1] != "ratioProp"){stop("option must be either 'rate', 'ratioRates', 'prop', 'diffprop' or 'ratioProp'.")}
   if (!is.logical(plot)){stop("plot must be TRUE or FALSE.")}
 
   if (option[1] == "rate"){
-    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- rateFunnel(unit, y, n, o, e, y.type, p, theta, method, direct, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "ratioRates"){
-    output <- changeRateFunnel(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- changeRateFunnel(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "prop"){
-    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- propFunnel(unit, o, n, theta, p, method, myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "diffProp"){
-    output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "diff", myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "diff", myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
   if (option[1] == "ratioProp"){
-    output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "ratio", myunits = myunits, printUnits = printUnits, digits = digits)
+    output <- changePropFunnel(unit, o1, o2, n1, n2, p, pi1, pi2, method = "ratio", myunits = myunits, printUnits = printUnits, digits = digits, overdispersion = overdispersion)
   }
 
   class(output) <- "funnel"
@@ -298,7 +302,7 @@ plot.funnel <- function(x, ...,col = c("darkblue","paleturquoise3","gray26"), lw
         legend.arg <- append(legend.arg, paste0(x$p[i]*100,"% limits"))
       }
       legend.arg <- append(legend.arg, paste0("Theta = ",format(round(x$theta,2), nsmall = 2)))
-      legend(x = "topright", legend = as.expression(legend.arg), lwd = lwd, lty = lty, bty = "n", col = col[0:length(x$p)+1])
+      legend(x = "topright", legend = as.expression(legend.arg), lwd = lwd, lty = lty, bty = "n", col = col[0:length(x$p)+1], xpd = NA, inset = c(0,-.15))
     }
     on.exit(par(mfrow = c(1,1)))
 }

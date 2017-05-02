@@ -4,7 +4,7 @@
 
 
 
-propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","normal"), ..., printUnits = FALSE, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), myunits = NULL, digits = 5){
+propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","normal"), ..., printUnits = FALSE, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), myunits = NULL, digits = 5, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if(!is.numeric(n)){stop("n must be numeric.")}
@@ -14,7 +14,7 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
   if (!is.vector(p)){stop("p must be a vector.")}
   if (method[1] != "normal" && method[1] != "exact"){stop("method must be either 'normal' or 'exact'.")}
   if (!is.logical(printUnits)){stop("printUnits must be TRUE or FALSE.")}
-  # if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
+  if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
   exc <- NULL
   if (any(n == 0)){
     exc <- unit[which(n == 0)]
@@ -43,7 +43,7 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
   prop.table <- prop.table[order(prop.table$n),]
 
   # Calculate the z-score
-  z_score <- (y - theta) * sqrt(n / gdetheta)
+  z_score <- (y - theta) * sqrt( n / gdetheta)
 
   # Calculate the 10% and 90% percentiles.
   q90 <- quantile(z_score,probs=c(0.9))
@@ -57,7 +57,7 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
 
   # Calculate the Winsorised estimate
   # Used when overdispersion of the indicator
-  phi <- (1/nrow(prop.table)) * sum(z_score ^ 2)
+  phi <- (1 / nrow(prop.table)) * sum(z_score ^ 2)
 
   if (length(exc) > 0){
     prop.table <- prop.table[-which(prop.table$unit %in% exc),]
@@ -87,16 +87,25 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
     }
   } else { # using normal approximation
 
-    # if (overdispersion){
-      if (phi > 1){ # overdispersion = TRUE
+    if (overdispersion){
+      if (phi > (1 + 2 * sqrt( 2 / nrow(prop.table) ))){ # overdispersion = TRUE
       # phi <- (1/nrow(prop.table)) * sum(((y - theta) ^ 2 * (n/gdetheta)))
+       warning("The funnel limits were inflated due overdispersion presence.")
 
       for (i in 1:length(p)){
         zp <- qnorm(1 - (1 - p[i]) / 2)
         upperCI[[i]] <- theta + zp * sqrt(gdetheta * phi / admissionsRange)
         lowerCI[[i]] <- theta - zp * sqrt(gdetheta * phi / admissionsRange)
+        ylowCI[[i]] <- lowerCI[[i]][which(admissionsRange %in% prop.table$n == TRUE)]
+        yuppCI[[i]] <- upperCI[[i]][which(admissionsRange %in% prop.table$n == TRUE)]
+        lowOUT[[i]] <- ifelse(prop.table$y < ylowCI[[i]],TRUE,FALSE)
+        uppOUT[[i]]<- ifelse(prop.table$y > yuppCI[[i]], TRUE, FALSE)
+        outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
+        outcolname[i] <- paste0(p[i]*100,"%CI")
+        prop.table <- cbind(prop.table, outofcontrol[[i]])
       }
-    } else {
+    }
+  } else {
       for (i in 1:length(p)){
         zp <- qnorm(1 - (1 - p[i]) / 2)
         upperCI[[i]] <- theta + zp * sqrt(gdetheta / admissionsRange)
