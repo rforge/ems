@@ -168,7 +168,7 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
   }
 
   x <- change.table$rho; y <- change.table$y; range <- expectedRange
-  output <- list(x = x, y = y, theta = theta, range = range, tab = change.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits)
+  output <- list(x = x, y = y, theta = theta, range = range, tab = change.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits, phi = phi)
   colnames(output$tab) <- c("Unit",secondcolname, "Obs1", "Exp1","N1", "Obs2","Exp2","N2","rho", outcolname)
   rownames(output$tab) <- seq(1,nrow(output$tab))
   output$tab[,2:9] <- round(output$tab[,2:9], digits)

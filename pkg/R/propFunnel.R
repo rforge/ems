@@ -122,7 +122,7 @@ propFunnel <- function(unit, o, n, theta, p = c(.95,.998), method = c("exact","n
   }
 
   x <- prop.table$n; y <- prop.table$y; range <- admissionsRange
-  output <- list(x = x, y = y, theta = theta, range = range, tab = prop.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits)
+  output <- list(x = x, y = y, theta = theta, range = range, tab = prop.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits, phi = phi)
   colnames(output$tab) <- c("Unit","y(%)", "Observed","Admissions", outcolname)
   rownames(output$tab) <- seq(1,nrow(output$tab))
   output$tab[,2] <- round(output$tab[,2], digits)

@@ -207,7 +207,7 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1
   }
 
   x <- change.table$rho; y <- change.table$y; range <- expectedRange
-  output <- list(x = x, y = y, theta = theta, range = range, tab = change.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits)
+  output <- list(x = x, y = y, theta = theta, range = range, tab = change.table, upperCI = upperCI, lowerCI = lowerCI, xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, myunits = myunits, p = p, unitnames = unitnames, printUnits = printUnits, phi = phi)
   colnames(output$tab) <- c("Unit",secondcolname, "Obs1", "N1", "Obs2","N2","rho", outcolname)
   rownames(output$tab) <- seq(1,nrow(output$tab))
   output$tab[,2:7] <- round(output$tab[,2:7], digits)
