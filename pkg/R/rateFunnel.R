@@ -55,6 +55,7 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
   uppOUT <- list()
   outofcontrol <- list()
   outcolname <- c()
+  phi <- NULL # will be calculated only if overdispersion = TRUE and method = "normal"
 
   if (direct){
     rates.table <-  rates.table[order(rates.table$Admissions),] # ordering by total of admissions

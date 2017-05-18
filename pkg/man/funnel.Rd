@@ -122,7 +122,7 @@ In many circumstances we can assume an exact or approximate normal distribution 
 
 The console warns if there are units with volume/expected value less than 100.
 
-If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1.
+If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1. The parameter phi is returned as an funnel object.
 
 phi = (1/total) * sum((y - theta) ^ 2 * rho)/g(theta)
 
@@ -140,6 +140,8 @@ When E1 = E2, y is plotted versus the average observed count (rho).
 
 When E1 is different of E2, i.e., its used normal approximation, it is convenient to work on a logarithmic scale so that log(theta) is a target for log(Y). And y is plotted versus the expectation per period (rho)
 
+If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1. The parameter phi is returned as an funnel object.
+
 \item If \code{option = "prop"}, \code{funnel} plots a proportion y versus its volume.
 It is used for cross-sectional data. Suppose in each institution that O events are observed out of a sample size of N:
 
@@ -147,7 +149,7 @@ The indicator is the observed proportion y = O/N
 
 Assume \code{N} is the precision parameter (volume). For \code{N} > 100 the normal and exact curves almost coincide. So, one could perfectly use  normal approximation if ones data parameter precision is greater than 100, in general.
 
-If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1.
+If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1. The parameter phi is returned as an funnel object.
 
 phi = (1/total) * sum((y - theta) ^ 2 * N)/g(theta)
 
@@ -160,6 +162,8 @@ var(y|theta,N) = (phi * g(theta))/N
 In case of \code{option = "diffProp"}, the indicator is Y = (O2/N2 - O1/N1) and theta = pi2 - pi1. If \code{option = "ratioProp"}, the indicator is Y = (O2/N2)/(O1/N1) and theta = pi2/pi1. Also, it is convenient to work on a logarithmic scale, so that log(theta) is a target for log(Y). Theta is the target value which specifies the desired expectation for institutions considered "in control".
 
 For each cases, the precision parameter (plotted at x axis) can be interpreted as approximately the sample size per period.
+
+If \code{overdispersion = TRUE}, the normal CI can be inflated by a overdispersion parameter phi. There are a test for overdispersion which inflate the funnel if it's necessary. An "Winsorezed" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1. The parameter phi is returned as an funnel object.
 
 }
 }

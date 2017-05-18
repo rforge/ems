@@ -45,6 +45,7 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
   uppOUT <- list()
   outofcontrol <- list()
   outcolname <- c()
+  phi <- NULL # will be calculated only if overdispersion = TRUE and e1 != e2
 
   if (all.equal(e1, e2) == TRUE){
     # then y = o2/o1
