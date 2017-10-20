@@ -10,7 +10,7 @@ Authors@R: c(person("Lunna", "Borges", role = c("aut"),
 Description: Collection of functions for data analysis and
     editing. Most of them are related to benchmarking with prediction models.
 Depends:
-    R (>= 3.2.2)
+    R (>= 3.3.1)
 License: GPL (>= 2)
 LazyData: true
 RoxygenNote: 5.0.1
