@@ -4,7 +4,7 @@
 #'
 #' @description \code{SRU} calculates the standardized resource use for ICUs (Intensive Care Units) from information regarding individual patients admissions. The resource use is represented by the patients' length of stay (LOS). Therefore the SRU for each unit is defined as the observed LOS divided by the expected LOS for each ICU. To estimate the expected LOS for each ICU one must define a severity score, here defined by the SAPS 3 score. In theory, the 'score' could be any score/probability estimating death for each ICU admission.
 #'
-#' The \code{plot.SRU} function will return a \code{\link{SMR}} versus SRU scatter plot with its medians and tertiles. Thus, it classifies each unit in the quadrants formed by these two medians: most efficient (ME) is the lower left quadrant (SRU and SMR below the median);  least efficient (LE) is the upper right quadrant (SRU and SMR above the median); and least achieving (LE) - the lower right wuadrant(SRU below and SMR above the median); and over achieving (OA) - the upper left quadrant (SRU above and SMR below the median).
+#' The \code{plot.SRU} function will return a \code{\link{SMR}} versus SRU scatter plot with its medians and tertiles. Thus, it classifies each unit in the quadrants formed by these two medians: most efficient (ME) is the lower left quadrant (SRU and SMR below the median);  least efficient (LE) is the upper right quadrant (SRU and SMR above the median); and least achieving (LA) - the lower right quadrant(SRU below and SMR above the median); and over achieving (OA) - the upper left quadrant (SRU above and SMR below the median).
 #'
 #'  \code{print.SRU} Prints a object of class 'SRU'.
 #'
