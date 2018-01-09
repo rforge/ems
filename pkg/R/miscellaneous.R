@@ -14,11 +14,13 @@
 #'
 #' \code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively. See example.
 #'
+#' \code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below.
+#'
 #' @param num.var A character, or factor variable to be formated as numeric.
 #'
 #' @param date A character or factor variable to be formated as date.
 #'
-#' @param data A data.frame.
+#' @param data A \code{data.frame}.
 #'
 #' @param replace By default, NA. But could be any vector of length 1.
 #'
@@ -27,6 +29,16 @@
 #' @param x,nc For \code{tab2tex} x is a object from epiDisplay::tableStack. nc is the number of the last column to keep in the table. If the table has 5 columns and nc = 3, then columns 4 and 5 are removed. For \code{trunc_num}, x is a numeric vector.
 #'
 #' @param min,max For \code{trunc_num}, min and max are the minimal and maximal numeric values where the numeric vector will be truncated.
+#'
+#' @param original.column A character vector representing the name of the column the be transformed in dummy variables.
+#'
+#' @param factors A character vector to make new dummy columns and to match values in \code{original.column}. This is interesting if the user desires to make dummy only from a few factors in the originlal column. Ignored if scan.oc = TRUE
+#'
+#' @param scan.oc Default = FALSE, if TRUE, \code{dummy.columns} scans the specified \code{original.column} and uses all factors to generate dummy variables. It overrides the \code{factor} argument.
+#'
+#' @param sep A character of legth one that systematically split the factors in the original columns. It wil be passed to the \code{sep} argument in the \code{\link[base]{scan}} function.
+#'
+#' @param colnames.add = "Dummy_"
 #'
 #' @author Lunna Borges & Pedro Brasil
 #'
@@ -66,6 +78,22 @@
 #' # Truncating numeric vectors
 #' trunc_num(1:12, min = 3, max = 10)
 #'
+#'# Simulating a dataset for dummy.columns example
+#'
+#'y <- data.frame(v1 = 1:20,
+#'                v2 = sapply(1:20, function(i) toString(sample(c("Code1","Code2","Code3","Code4"),
+#'                      size = sample(2:4, 1), replace = FALSE))))
+#'y
+#'
+#' # For a few of the codes in the original column
+#'y <- dummy.columns(y, original.column = "v2", factor = c("Code2","Code3"))
+#'y
+#'
+#' # For all codes in the original column
+#'y <- dummy.columns(y[, 1:2], original.column = "v2", scan.oc = TRUE)
+#'y
+#'
+#'rm(y)
 #' @rdname miscellaneous
 #' @export
 f.num <- function(num.var){
@@ -163,4 +191,42 @@ tab2tex <- function(x, nc = ncol(x)){
 trunc_num <- function(x, min, max) {
   if (!is.numeric(x)) { stop("'x' is not numeric.")}
   ifelse(x > max, max, ifelse(x < min, min, x))
+}
+
+#' @rdname miscellaneous
+#' @export
+dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep = ",", colnames.add = "Dummy.") {
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data.frame.")
+  }
+  if (!is.character(original.column) && !is.numeric(original.column)) {
+    stop("'original.colum' must be either a character or a numeric vector.")
+  }
+  if (length(original.column) != 1) {
+    stop("'original.colum' must have length one.")
+  }
+  if (!any(grepl(original.column, colnames(data)))) {
+    stop("'original.colum' is not a variable in 'data'.")
+  }
+  if (!is.character(sep) || length(sep) != 1) {
+    stop("'sep' must be a character vector of length 1.")
+  }
+  if (!is.logical(scan.oc)) {
+    stop("'scan.oc' must be logical.")
+  }
+  if (scan.oc) {
+    factors <- as.character(sort(unique(trimws(scan(text = as.character(data[, original.column]), sep = sep, what = "character",quiet = TRUE)))))
+  }
+  if (!is.character(factors)) {
+    stop("'factors' must be a character vector.")
+  }
+  nr <- nrow(data)
+  lf <- length(factors)
+  b <- as.data.frame(matrix(NA, nrow = nr, ncol = lf))
+  colnames(b) <- paste0(colnames.add, factors)
+  for (i in 1:lf) {
+    b[, i] <- ifelse(grepl(factors[i], data[, original.column]), 1, 0)
+  }
+  output <- cbind(data, b)
+  output
 }

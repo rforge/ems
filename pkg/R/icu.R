@@ -27,9 +27,5 @@
 #'
 #' @format A data frame with 13709 rows and 24 variables
 #' @source Organizational characteristics, outcomes, and resource use in 78 Brazilian intensive care units: the ORCHESTRA study. Intensive Care Med. 2015 Dec;41(12):2149-60.
-
-
-
-
 "icu"
-#> [1] "icu"
+#>[1]"icu"
