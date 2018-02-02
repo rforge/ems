@@ -269,8 +269,8 @@ t_date <- function(data, date.var, date.max = as.Date("2010-11-30"), date.min = 
     fdate <- f.date(date) # class(fdate) ; head(fdate)
   } else {
     fdate <- as.Date(date, format = format.date) # class(fdate) ; head(fdate)
-    if (any(class(fdate) %in% c("POSIXlt", "POSIXt"))) {fdate <- as.Date(fdate)}
   }
+  if (any(class(fdate) %in% c("POSIXlt", "POSIXt"))) {fdate <- as.Date(fdate)}
   date <- as.character(date) # class(date) ; head(date)
   val.n.date <- sum(table(date[which(is.na(fdate))]))
   val.n.esp <- table(ifelse(fdate > date.max | fdate < date.min, 1, 0))

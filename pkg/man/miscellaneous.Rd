@@ -18,7 +18,7 @@ remove.na(data, replace = NA, console.output = TRUE)
 
 tab2tex(x, nc = ncol(x))
 
-trunc_num(x, min, max)
+trunc_num(x, min, max, toNA = FALSE)
 
 dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
   colnames.add = "Dummy.")
@@ -37,6 +37,8 @@ dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
 \item{x, nc}{For \code{tab2tex} x is a object from epiDisplay::tableStack. nc is the number of the last column to keep in the table. If the table has 5 columns and nc = 3, then columns 4 and 5 are removed. For \code{trunc_num}, x is a numeric vector.}
 
 \item{min, max}{For \code{trunc_num}, min and max are the minimal and maximal numeric values where the numeric vector will be truncated.}
+
+\item{toNA}{For \code{trunc_num}, if FALSE any min and max are the minimal and maximal numeric values where the numeric vector will be truncated.}
 
 \item{original.column}{A character vector representing the name of the column the be transformed in dummy variables.}
 

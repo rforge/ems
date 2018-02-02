@@ -30,6 +30,8 @@
 #'
 #' @param min,max For \code{trunc_num}, min and max are the minimal and maximal numeric values where the numeric vector will be truncated.
 #'
+#' @param toNA For \code{trunc_num}, if FALSE any min and max are the minimal and maximal numeric values where the numeric vector will be truncated.
+#'
 #' @param original.column A character vector representing the name of the column the be transformed in dummy variables.
 #'
 #' @param factors A character vector to make new dummy columns and to match values in \code{original.column}. This is interesting if the user desires to make dummy only from a few factors in the originlal column. Ignored if scan.oc = TRUE
@@ -114,7 +116,7 @@ f.num <- function(num.var){
 #' @export
 f.date <- function(date){
   l.date.2 <- length(date) / 2
-  if (class(date) != "Date") {
+  if (class(date) != "Date" && any(class(date) != c("POSIXlt", "POSIXt"))) {
     date <- as.character(date)
     if ((sum(substr(date, 5, 5) == "-", na.rm = TRUE) > l.date.2) &
         (sum(substr(date, 14, 14) == ":", na.rm = TRUE) > l.date.2)) {
@@ -188,9 +190,14 @@ tab2tex <- function(x, nc = ncol(x)){
 
 #' @rdname miscellaneous
 #' @export
-trunc_num <- function(x, min, max) {
-  if (!is.numeric(x)) { stop("'x' is not numeric.")}
-  ifelse(x > max, max, ifelse(x < min, min, x))
+trunc_num <- function(x, min, max, toNA = FALSE) {
+  if (!is.numeric(x)) { stop("'x' must be numeric.")}
+  if (!is.logical(toNA)) { stop("'toNA' must be logic.")}
+  if (toNA) {
+    ifelse(x > max, NA, ifelse(x < min, NA, x))
+  } else {
+      ifelse(x > max, max, ifelse(x < min, min, x))
+  }
 }
 
 #' @rdname miscellaneous
