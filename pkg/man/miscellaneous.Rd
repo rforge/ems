@@ -21,7 +21,8 @@ tab2tex(x, nc = ncol(x))
 trunc_num(x, min, max, toNA = FALSE)
 
 dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
-  colnames.add = "Dummy.")
+  colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE,
+  warn = FALSE)
 }
 \arguments{
 \item{num.var}{A character, or factor variable to be formated as numeric.}
@@ -48,7 +49,13 @@ dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
 
 \item{sep}{A character of legth one that systematically split the factors in the original columns. It wil be passed to the \code{sep} argument in the \code{\link[base]{scan}} function.}
 
-\item{colnames.add}{= "Dummy_"}
+\item{colnames.add}{The default is '= "Dummy_"'. This is a character vector of length one to stick in the \code{colnames} of the dummy variables. For example, if the orginal column has A;B;C factor levels, the new dummy variables \code{colnames} would be "Dummy_A", "Dummy_B", and "Dummy_C"}
+
+\item{min.events}{Either \code{NULL} (default), or a numeric scalar. If any of the new variables have less events then specified in \code{min.events}, they will be deleted before returning the output data.}
+
+\item{rm.oc}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will delete the original column before returnig the final \code{data.frame}.}
+
+\item{warn}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.}
 }
 \description{
 Collections of functions for data editing usually used as lower levels for other functions.
@@ -61,7 +68,7 @@ Collections of functions for data editing usually used as lower levels for other
 
 \code{tab2tex} removes the empty rows, and also tunrs the rownames of a table epiDisplay::tableStack into the first column, to make it easier to paste the table into a rtf or latex document without empty rows or rownames conflicts.
 
-\code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively. See example.
+\code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively or optionall to NA. See example.
 
 \code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below.
 }
@@ -98,6 +105,9 @@ class(x)
 
 # Truncating numeric vectors
 trunc_num(1:12, min = 3, max = 10)
+
+# Truncating numeric vectors but returning NAs instead
+trunc_num(1:12, min = 3, max = 10, toNA = TRUE)
 
 # Simulating a dataset for dummy.columns example
 
