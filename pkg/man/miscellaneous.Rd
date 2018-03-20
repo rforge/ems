@@ -6,6 +6,7 @@
 \alias{f.num}
 \alias{miscellaneous}
 \alias{remove.na}
+\alias{rm.dummy.columns}
 \alias{tab2tex}
 \alias{trunc_num}
 \title{Miscellaneous functions for data editing}
@@ -23,6 +24,8 @@ trunc_num(x, min, max, toNA = FALSE)
 dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
   colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE,
   warn = FALSE)
+
+rm.dummy.columns(data, colnames, min.events = 50, warn = FALSE)
 }
 \arguments{
 \item{num.var}{A character, or factor variable to be formated as numeric.}
@@ -56,6 +59,8 @@ dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
 \item{rm.oc}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will delete the original column before returnig the final \code{data.frame}.}
 
 \item{warn}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.}
+
+\item{colnames}{For \code{rm.dummy.columns} this is the names of the columns to be tested and deleted inside \code{dummy.columns}.}
 }
 \description{
 Collections of functions for data editing usually used as lower levels for other functions.
@@ -70,7 +75,7 @@ Collections of functions for data editing usually used as lower levels for other
 
 \code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively or optionall to NA. See example.
 
-\code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below.
+\code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below. \code{rm.dummy.columns} is an internal function of \code{dummy.columns} that deletes the new dummy columns which have less then a specified minimum events.
 }
 \examples{
 # Formating character or factor variable that should be numeric variables

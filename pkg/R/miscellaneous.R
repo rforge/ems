@@ -14,7 +14,7 @@
 #'
 #' \code{trunc_num} truncates a numeric vector by replacing the values below the min value or above the max values by the min and max values respectively or optionall to NA. See example.
 #'
-#' \code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below.
+#' \code{dummy.columns} takes a \code{data.frame} with one column with concatatenated levels of a factor (or character) variable and return a \code{data.frame} with additional columns with zeros and ones (dummy values), which names are the factor levels of the original column. See example below. \code{rm.dummy.columns} is an internal function of \code{dummy.columns} that deletes the new dummy columns which have less then a specified minimum events.
 #'
 #' @param num.var A character, or factor variable to be formated as numeric.
 #'
@@ -47,6 +47,8 @@
 #' @param warn Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.
 #'
 #' @param rm.oc Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will delete the original column before returnig the final \code{data.frame}.
+#'
+#' @param colnames For \code{rm.dummy.columns} this is the names of the columns to be tested and deleted inside \code{dummy.columns}.
 #'
 #' @author Lunna Borges & Pedro Brasil
 #'
@@ -268,6 +270,7 @@ dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep =
 # data = dados
 # colnames.add = character que se repete em colnames (identifica as colunas que serão consideradas para remocao. Ver dummy.columns)
 # min.events - numero minimo de eventos necessarios para reter a coluna nos dados
+#' @rdname miscellaneous
 #' @export
 rm.dummy.columns <- function (data, colnames, min.events = 50, warn = FALSE) {
   col.index <- grep(colnames, colnames(data))
