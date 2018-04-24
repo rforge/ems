@@ -2,8 +2,8 @@
 % Please edit documentation in R/funnel.R
 \name{funnel}
 \alias{funnel}
-\alias{plot.funnel}
 \alias{print.funnel}
+\alias{plot.funnel}
 \title{Funnel plot for benchmarking health units}
 \usage{
 funnel(unit, y, n, n1, n2, o, o1, o2, e, e1, e2, lambda1 = sum(o1)/sum(n1),
@@ -246,4 +246,3 @@ Spiegelhalter, David J. "Funnel plots for comparing institutional performance." 
 \seealso{
 \code{\link{SMR}}, \code{\link{SRU}}, \code{\link{reclass}}
 }
-

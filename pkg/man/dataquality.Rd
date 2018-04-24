@@ -2,13 +2,13 @@
 % Please edit documentation in R/dataquality.R
 \name{dataquality}
 \alias{dataquality}
-\alias{date.table}
-\alias{factor.table}
-\alias{num.table}
-\alias{rm.unwanted}
-\alias{t_date}
 \alias{t_factor}
+\alias{factor.table}
 \alias{t_num}
+\alias{num.table}
+\alias{t_date}
+\alias{date.table}
+\alias{rm.unwanted}
 \title{Collection of functions to check data quality in a dataset, and remove not valid or extreme values.}
 \usage{
 t_factor(data, variable, legal, var.labels = attr(data,
@@ -156,10 +156,9 @@ date.table(data = icu, date.limits = d.lim, format.date = "")
 rm(icu, d.lim)
 
 }
-\author{
-Lunna Borges & Pedro Brasil
-}
 \seealso{
 \code{\link{miscellaneous}}
 }
-
+\author{
+Lunna Borges & Pedro Brasil
+}

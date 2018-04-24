@@ -364,7 +364,7 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
     }
     if (any(!(num.limits$num.var %in% names(data)))) {
       warning(paste0("The following variables are not in the dataset, and will ignored: ", toString(num.limits$num.var[-which(num.limits$num.var %in% names(data))])))
-      # removendo de num.limits as variáveis que não estão nos dados
+      # Removendo de num.limits variavies inexistentes nos dados
       num.limits <- subset(num.limits, subset = num.limits$num.var %in% names(data))
     }
   }
@@ -376,14 +376,12 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
     # var[3] <- "Var9"
     if ( any(!(var %in% names(data))) ) {
       warning(paste0("The following variables are not in the dataset, and will ignored: ", toString(var[-which(var %in% names(data))])))
-      # removendo de limits as variáveis que não estão nos dados
       nu <- sapply(seq_along(limits), function(i) limits[[i]][[1]]) %in%  names(data)
       # nu[3] <- FALSE
       limits[!nu] <- list(NULL)
     }
   }
 
-  # Removendo os nives não informativos das variáveis fatores
   if ( !is.null(limits) ) {
     for (i in seq_along(limits)) {
       # i = 2
@@ -395,44 +393,35 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
         if ( try.keep ) {
           DataLevels <- levels( data[ , CurrentVar ] )
           nValidLevels <-  DataLevels[!(DataLevels %in% CurrentLimits)]
-          # Se houver pelo menos um nivel inválido
           if ( length(nValidLevels) > 0 ) {
             WhichnValidLevels <- which(tolower(trimws(nValidLevels)) %in% tolower(CurrentLimits))
-            # Se houver pelo menos uma coincidência entre niveis inválidos e válidos
             if ( length(WhichnValidLevels) >= 1 ) {
               levels(data[, CurrentVar ])[sapply(nValidLevels[WhichnValidLevels], grep, x = DataLevels)] <- sapply(WhichnValidLevels, function(j) CurrentLimits[ tolower(CurrentLimits) == tolower(trimws(nValidLevels[j])) ])
             }
           }
         }
-        # Removendo os demais níveis inesperados
         levels(data[, CurrentVar ]) <- ifelse(!(levels(data[, CurrentVar ]) %in% CurrentLimits), NA, levels(data[, CurrentVar ]))
-        # Destransformando de fator para character
         data[, CurrentVar ] <- as.character(data[, CurrentVar ])
       }
       if ( is.factor(data[, CurrentVar ]) ) {
-        # Tentando recuperar os níves que possuem caixas e espaços diferentes
         if ( try.keep ) {
           DataLevels <- levels( data[ , CurrentVar ] )
           nValidLevels <-  DataLevels[!(DataLevels %in% CurrentLimits)]
-          # Se houver pelo menos um nivel inválido
           if ( length(nValidLevels) > 0 ) {
             WhichnValidLevels <- which(tolower(trimws(nValidLevels)) %in% tolower(CurrentLimits))
-            # Se houver pelo menos uma coincidência entre niveis inválidos e válidos
             if ( length(WhichnValidLevels) >= 1 ) {
               levels(data[, CurrentVar ])[sapply(nValidLevels[WhichnValidLevels], grep, x = DataLevels)] <- sapply(WhichnValidLevels, function(j) CurrentLimits[ tolower(CurrentLimits) == tolower(trimws(nValidLevels[j])) ])
             }
           }
         }
-        # Removendo os demais níveis inesperados
         levels(data[, CurrentVar ]) <- ifelse(!(levels(data[, CurrentVar ]) %in% CurrentLimits), NA, levels(data[, CurrentVar ]))
       }
     }
   }
 
-  # Removendo os valores não informativos das variáveis numéricas
   if ( !is.null(num.limits) ) {
     num.limits$num.var <- as.character(num.limits$num.var)
-    for (i in seq_along(num.limits)) {
+    for (i in 1:nrow(num.limits)) {
       # i = 2
       # i = grep("BUN", names(data))
       if ( !is.numeric(data[, num.limits[i, 1]]) ) {
