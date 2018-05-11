@@ -8,6 +8,7 @@
 \alias{tab2tex}
 \alias{trunc_num}
 \alias{dummy.columns}
+\alias{rm.dummy.columns}
 \title{Miscellaneous functions for data editing}
 \usage{
 f.num(num.var)
@@ -22,6 +23,9 @@ trunc_num(x, min, max, toNA = FALSE)
 
 dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
   colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE,
+  warn = FALSE)
+
+rm.dummy.columns(data, colnames, event = "1", min.events = 50,
   warn = FALSE)
 }
 \arguments{
@@ -58,6 +62,8 @@ dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
 \item{warn}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.}
 
 \item{colnames}{For \code{rm.dummy.columns} this is the names of the columns to be tested and deleted inside \code{dummy.columns}.}
+
+\item{event}{A character string to be detected as a event. In \code{rm.dummy.columns}, if the columns are coded as '0' and '1', the event is '1', if it is coded as logical, the events is 'TRUE'.}
 }
 \description{
 Collections of functions for data editing usually used as lower levels for other functions.

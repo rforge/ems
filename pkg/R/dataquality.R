@@ -10,7 +10,7 @@
 #'
 #' \code{t_date} will try to get a date variable (even if it is currently formated as character or factor) and check how much of its content are expected (match a desired range), unexpected, non-date values and missing vlaues. \code{date.table} does the same thing, but with two or more variables at once.
 #'
-#' \code{rm.unwanted} will chek in data the variables specified in the limits objects according to the limits specified for each variable. If there are levels considered not valid in a factor variable, these levels are deleted. For example, if Sex is expected to be "M" and "F", and there is also a "I" level in data, all "I" are replaced by \code{NA}. Similarly, misspelled levels will be understood as non-valid levels and coercerd to \code{NA}, with the exception of leading or trailing empty spaces and lower and upper cases diferences if \code{try.keep = TRUE}. If there is a continuous numeric variable and it is expected to have values ranging from 30 to 700, the values outside this range, i.e. higher then 700 or lower then 30, are replaced by \code{NA}. Non-numeric elements, i.e. non-valid elements that should be numeric, will also be coerced to \code{NA}. If a varible is specified in \code{num.limits}, then it will be returned as numeric variable, even if it was formated as factor or character. The arguments \code{limits} and \code{num.limits} may be \code{NULL}, meaning that the factor-character varibles or the numeric variables , respectively, will not be edited.
+#' \code{rm.unwanted} will chek in data the variables specified in the limits objects according to the limits specified for each variable. If there are levels considered not valid in a factor variable, these levels are deleted. For example, if Sex is expected to be "M" and "F", and there is also a "I" level in data, all "I" are replaced by \code{NA}. Similarly, misspelled levels will be understood as non-valid levels and coercerd to \code{NA}, with the exception of leading or trailing empty spaces and lower and upper cases diferences if \code{try.keep = TRUE}. If there is a continuous numeric variable and it is expected to have values ranging from 30 to 700, the values outside this range, i.e. higher then 700 or lower then 30, are replaced by \code{NA}. Non-numeric elements, i.e. non-valid elements that should be numeric, will also be coerced to \code{NA}. If a variable is specified in \code{num.limits}, then it will be returned as numeric variable, even if it was formated as factor or character. If a variable is specified in limits, the returnig format will depend on the \code{stringAsFactors} argument, unless it is formated as logical. In this case it is skipped. The arguments \code{limits} and \code{num.limits} may be \code{NULL}, meaning that the factor-character varibles or the numeric variables , respectively, will not be edited.
 #'
 #' @param data A data.frame where variables will be tested.
 #'
@@ -18,7 +18,7 @@
 #'
 #' @param legal A character vector representeing the expected levels of the tested variable.
 #'
-#' @param limits a list of two or more lists, each containing the arguments variable name and legal levels (in this order), to check the factor variables. See examples.
+#' @param limits a list of two or more lists, each containing the arguments variable name and legal levels (in this order), to check the factor variables. In the case of \code{rm.unwanted}, if left NULL, it means no numeric variable will be checked. See examples.
 #'
 #' @param var.labels Variables labels to nice output. Must be iformed in the same order as variable argument. By default, it captures the labels stored in attr(data, "var.labels"), if any. If not infomred, the function returns the variables names.
 #'
@@ -26,7 +26,7 @@
 #'
 #' @param num.max,num.min The maximal and minimal limits of acceptable range of a numeric variable.
 #'
-#' @param num.limits A data.frame with the following variables: num.var, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. See example.
+#' @param num.limits A data.frame with the following variables: num.var, num.max and num.min, representing the numeric variables names, maximal and minimal expected valid values. In the case of \code{rm.unwanted}, if left NULL, it means no numeric variable will be checked. See example.
 #'
 #' @param digits Decimal for rounding.
 #'
@@ -39,6 +39,8 @@
 #' @param date.limits A \code{data.frame} with the following variables: date.var, date.max, date.min, and (optionaly) format.date. These represent values of the arguments above. See example.
 #'
 #' @param try.keep Default is \code{TRUE}. If \code{TRUE}, \code{remove.unwanted} will first trim all empty spaces and transform all levels to lower characters before comparing the found levels to expected levels of a character/factor variables. Therefore, found levels such as "yes  " will be considered identical to the expected level "Yes", and will not be coerced to \code{NA}.
+#'
+#' @param stringAsFactors In \code{rm.unwanted}, if set to \code{TRUE}, the default value, variables in the limits argument that are character and numeric variables in data will be returned as factors. Logical variables are skipped. However, a variable will be returned as logical if it is originally a factor but its final levels are \code{TRUE} and \code{FALSE} and \code{stringAsFactors = FALSE}.
 #'
 #' @author Lunna Borges & Pedro Brasil
 #'
@@ -178,6 +180,8 @@ factor.table <- function(data, limits, var.labels = attr(data, "var.labels")[mat
   if (any(!(var %in% names(data)))) {
     stop(paste0("The following variables are not in the dataset: ", toString(var[-which(var %in% names(data))])))
   }
+  if (any(duplicated(var))) { stop(paste0("The following variables in limits are not unique: ", var[duplicated(var)]), collapse = TRUE) }
+
   # cat("Factor variables analysed: \n")
   # cat(var, fill = length(var),"\n")
   output <- as.data.frame(t(sapply(seq_along(limits), function(i) t_factor(data, var[i], unlist(limits[[i]][2]), digits = digits, var.labels = var.labels[i]))))
@@ -242,11 +246,14 @@ num.table <- function(data, num.limits, var.labels = attr(data, "var.labels")[ma
   }
   if (any(!(num.limits$num.var %in% names(data)))) {
     stop(paste0("The following variables are not in the dataset: ", toString(num.limits$num.var[-which(num.limits$num.var %in% names(data))])))
-    }
+  }
   if (any(num.limits$num.max < num.limits$num.min)) {
     stop(paste0("num.max is lower than num.min in ", num.limits$num.var[which(num.limits$num.max < num.limits$num.min)], collapse = ", "))
   }
   num.limits$num.var <- as.character(num.limits$num.var)
+  if (any(duplicated(num.limits$num.var))) {
+    stop(paste0("The following variables in num.limits are not unique: ", num.limits$num.var[duplicated(num.limits$num.var)]), collapse = TRUE)
+  }
   output <- as.data.frame(t(sapply(1:nrow(num.limits), function(i) t_num(data = data, num.var = num.limits$num.var[i], num.max = num.limits$num.max[i], num.min = num.limits$num.min[i], digits = digits, var.labels = var.labels[i]))))
   output
 }
@@ -323,6 +330,9 @@ date.table <- function(data, date.limits, format.date = "auto", digits = 3, var.
     stop(paste0("date.max is lower than date.min in ", date.limits$date.var[which(date.limits$date.max < date.limits$date.min)], collapse = " ,"))
   }
   date.limits$date.var <- as.character(date.limits$date.var)
+  if (any(duplicated(date.limits$date.var))) {
+    stop(paste0("The following variables in num.limits are not unique: ", date.limits$date.var[duplicated(date.limits$date.var)]), collapse = TRUE)
+  }
   if ( format.date == "auto") {
     output <- as.data.frame(t(sapply(1:nrow(date.limits), function(i) t_date(data = data, date.var = date.limits$date.var[i], date.max = date.limits$date.max[i], date.min = date.limits$date.min[i], digits = digits, var.labels = var.labels[i]))))
   }
@@ -339,7 +349,7 @@ date.table <- function(data, date.limits, format.date = "auto", digits = 3, var.
 
 #' @rdname dataquality
 #' @export
-rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
+rm.unwanted <- function(data, limits = NULL, num.limits = TRUE, try.keep = TRUE, stringAsFactors = TRUE) {
   if (!is.data.frame(data)) {
     stop("Argument 'data' is not a data.frame.")
   }
@@ -351,21 +361,26 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
       stop("Argument 'num.limits' is not a data.frame.")
     }
     if (!all(c("num.var","num.min","num.min") %in% names(num.limits))) {
-      stop("'num.limits' must be a data.frame with the following columns: 'num.var', 'num.min' and 'num.min'.")
+      stop("'num.limits' must be a data.frame with the following columns: 'num.var', 'num.max' and 'num.min'.")
     }
-    if (!is.character(num.limits$num.var) && !is.factor(num.limits$num.var)) {
+    if (any(!is.character(num.limits$num.var)) && any(!is.factor(num.limits$num.var))) {
       stop("'num.limits$num.var' must be a character or factor variable.")
     }
-    if (!is.numeric(num.limits$num.min) || !is.numeric(num.limits$num.max)) {
+    if (any(!is.numeric(num.limits$num.min)) || any(!is.numeric(num.limits$num.max))) {
       stop("'num.limits$num.min' and 'num.limits$num.max' must be numeric vectors.")
     }
     if (any(num.limits$num.max < num.limits$num.min)) {
       stop(paste0("num.max is lower than num.min in ", num.limits$num.var[which(num.limits$num.max < num.limits$num.min)], collapse = ", "))
     }
     if (any(!(num.limits$num.var %in% names(data)))) {
-      warning(paste0("The following variables are not in the dataset, and will ignored: ", toString(num.limits$num.var[-which(num.limits$num.var %in% names(data))])))
+      warning(paste0("The following variables are not in the dataset, and will be ignored: ", toString(num.limits$num.var[-which(num.limits$num.var %in% names(data))])))
       # Removendo de num.limits variavies inexistentes nos dados
       num.limits <- subset(num.limits, subset = num.limits$num.var %in% names(data))
+    }
+    if (any(duplicated(num.limits$num.var))) {
+      warning(paste0("The following variables are duplicated in num.limits, and will be ignored: ", toString(num.limits$num.var[duplicated(num.limits$num.var)])))
+      # Removendo de num.limits variavies inexistentes nos dados
+      num.limits <- subset(num.limits, subset = !duplicated(num.limits$num.var))
     }
   }
   if ( !is.null(limits) ) {
@@ -373,18 +388,23 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
       stop("Argument 'limits' is not a list.")
     }
     var <- unlist(sapply(seq_along(limits), function(i) limits[[i]][1]))
-    # var[3] <- "Var9"
+    # var[4] <- "Var8"
     if ( any(!(var %in% names(data))) ) {
-      warning(paste0("The following variables are not in the dataset, and will ignored: ", toString(var[-which(var %in% names(data))])))
+      warning(paste0("The following variables are not in the dataset, and will be ignored: ", toString(var[-which(var %in% names(data))])))
       nu <- sapply(seq_along(limits), function(i) limits[[i]][[1]]) %in%  names(data)
       # nu[3] <- FALSE
       limits[!nu] <- list(NULL)
+    }
+    if ( any(duplicated(var)) ) {
+      warning(paste0("The following variables are duplicated in 'limits', and will be ignored: ", toString(var[duplicated(var)])))
+      limits[duplicated(var)] <- list(NULL)
     }
   }
 
   if ( !is.null(limits) ) {
     for (i in seq_along(limits)) {
       # i = 2
+      # i = 1
       CurrentVar <- limits[[i]][[1]]
       CurrentLimits <- limits[[i]][[2]]
       if ( is.character(data[, CurrentVar ]) ) {
@@ -401,7 +421,9 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
           }
         }
         levels(data[, CurrentVar ]) <- ifelse(!(levels(data[, CurrentVar ]) %in% CurrentLimits), NA, levels(data[, CurrentVar ]))
-        data[, CurrentVar ] <- as.character(data[, CurrentVar ])
+        if ( !stringAsFactors ) {
+          data[, CurrentVar ] <- as.character(data[, CurrentVar ])
+        }
       }
       if ( is.factor(data[, CurrentVar ]) ) {
         if ( try.keep ) {
@@ -415,10 +437,32 @@ rm.unwanted <- function(data, limits, num.limits, try.keep = TRUE) {
           }
         }
         levels(data[, CurrentVar ]) <- ifelse(!(levels(data[, CurrentVar ]) %in% CurrentLimits), NA, levels(data[, CurrentVar ]))
+        if (!stringAsFactors) {
+          if (all(levels(data[, CurrentVar ]) %in% c("FALSE","TRUE"))) {
+            data[, CurrentVar ] <- as.logical(data[, CurrentVar ])
+          }
+        }
       }
-    }
+      if ( is.numeric(data[, CurrentVar ]) ) {
+        # Tranformando para factor para facilitar
+        data[, CurrentVar ] <- as.factor(data[, CurrentVar ])
+        if ( try.keep ) {
+          DataLevels <- levels( data[ , CurrentVar ] )
+          nValidLevels <-  DataLevels[!(DataLevels %in% CurrentLimits)]
+          if ( length(nValidLevels) > 0 ) {
+            WhichnValidLevels <- which(tolower(trimws(nValidLevels)) %in% tolower(CurrentLimits))
+            if ( length(WhichnValidLevels) >= 1 ) {
+              levels(data[, CurrentVar ])[sapply(nValidLevels[WhichnValidLevels], grep, x = DataLevels)] <- sapply(WhichnValidLevels, function(j) CurrentLimits[ tolower(CurrentLimits) == tolower(trimws(nValidLevels[j])) ])
+            }
+          }
+        }
+        levels(data[, CurrentVar ]) <- ifelse(!(levels(data[, CurrentVar ]) %in% CurrentLimits), NA, levels(data[, CurrentVar ]))
+        if ( !stringAsFactors ) {
+          data[, CurrentVar ] <- as.numeric(as.character(data[, CurrentVar ]))
+        }
+      }
+    } # Termina o seq limits
   }
-
   if ( !is.null(num.limits) ) {
     num.limits$num.var <- as.character(num.limits$num.var)
     for (i in 1:nrow(num.limits)) {

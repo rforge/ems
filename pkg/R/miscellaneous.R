@@ -42,6 +42,8 @@
 #'
 #' @param colnames.add The default is '= "Dummy_"'. This is a character vector of length one to stick in the \code{colnames} of the dummy variables. For example, if the orginal column has A;B;C factor levels, the new dummy variables \code{colnames} would be "Dummy_A", "Dummy_B", and "Dummy_C"
 #'
+#' @param event A character string to be detected as a event. In \code{rm.dummy.columns}, if the columns are coded as '0' and '1', the event is '1', if it is coded as logical, the events is 'TRUE'.
+#'
 #' @param min.events Either \code{NULL} (default), or a numeric scalar. If any of the new variables have less events then specified in \code{min.events}, they will be deleted before returning the output data.
 #'
 #' @param warn Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.
@@ -264,23 +266,16 @@ dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep =
   output
 }
 
-# Remove do banco de dados as colunas que não possuem um numero minimo de eventos
-# Esse código está dentro da dummy columns tambem
-# Pensar inserir no ems como uma função que não exporta
-# data = dados
-# colnames.add = character que se repete em colnames (identifica as colunas que serão consideradas para remocao. Ver dummy.columns)
-# min.events - numero minimo de eventos necessarios para reter a coluna nos dados
 #' @rdname miscellaneous
 #' @export
-rm.dummy.columns <- function (data, colnames, min.events = 50, warn = FALSE) {
+rm.dummy.columns <- function (data, colnames, event = "1", min.events = 50, warn = FALSE) {
   col.index <- grep(colnames, colnames(data))
   event.table <- lapply(data[, col.index], table)
-  cond.table <- sapply(seq_along(event.table), function(i) event.table[[i]]["1"] < min.events)
+  cond.table <- sapply(seq_along(event.table), function(i) event.table[[i]][event] < min.events)
   cond.table[is.na(cond.table)] <- TRUE
   if (warn) {
     warning(paste("The following columns were deleted:", toString(colnames(data)[col.index[cond.table]])))
   }
-  # names(data[, col.index[cond.table]])
   data[, col.index[cond.table]] <- list(NULL)
   data
 }
