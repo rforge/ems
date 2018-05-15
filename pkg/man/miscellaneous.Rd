@@ -23,7 +23,7 @@ trunc_num(x, min, max, toNA = FALSE)
 
 dummy.columns(data, original.column, factors, scan.oc = FALSE, sep = ",",
   colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE,
-  warn = FALSE)
+  warn = FALSE, return.factor = TRUE)
 
 rm.dummy.columns(data, colnames, event = "1", min.events = 50,
   warn = FALSE)
@@ -60,6 +60,8 @@ rm.dummy.columns(data, colnames, event = "1", min.events = 50,
 \item{rm.oc}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will delete the original column before returnig the final \code{data.frame}.}
 
 \item{warn}{Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will print at the console the deleted columns names.}
+
+\item{return.factor}{Default is \code{TRUE}. If \code{TRUE}, \code{dummy.columns} return factor columns with "0" and "1" levels, or numeric otherwise.}
 
 \item{colnames}{For \code{rm.dummy.columns} this is the names of the columns to be tested and deleted inside \code{dummy.columns}.}
 

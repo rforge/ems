@@ -50,6 +50,8 @@
 #'
 #' @param rm.oc Default is \code{FALSE}. If \code{TRUE}, \code{dummy.columns} will delete the original column before returnig the final \code{data.frame}.
 #'
+#' @param return.factor Default is \code{TRUE}. If \code{TRUE}, \code{dummy.columns} return factor columns with "0" and "1" levels, or numeric otherwise.
+#'
 #' @param colnames For \code{rm.dummy.columns} this is the names of the columns to be tested and deleted inside \code{dummy.columns}.
 #'
 #' @author Lunna Borges & Pedro Brasil
@@ -215,7 +217,7 @@ trunc_num <- function(x, min, max, toNA = FALSE) {
 
 #' @rdname miscellaneous
 #' @export
-dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep = ",", colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE, warn = FALSE) {
+dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep = ",", colnames.add = "Dummy.", min.events = NULL, rm.oc = FALSE, warn = FALSE, return.factor = TRUE) {
   if (!is.data.frame(data)) {
     stop("'data' must be a data.frame.")
   }
@@ -238,7 +240,7 @@ dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep =
     stop("'scan.oc' must be logical.")
   }
   if (scan.oc) {
-    factors <- as.character(sort(unique(trimws(scan(text = as.character(data[, original.column]), sep = sep, what = "character",quiet = TRUE)))))
+    factors <- as.character(sort(unique(trimws(scan(text = as.character(data[, original.column]), sep = sep, what = "character", quiet = TRUE)))))
   }
   if (!is.character(factors)) {
     stop("'factors' must be a character vector.")
@@ -247,13 +249,25 @@ dummy.columns <- function(data, original.column, factors, scan.oc = FALSE, sep =
     if (length(min.events) != 1 || !is.numeric(min.events) || min.events < 1)
     stop("'min.events' must be either null or a positive number.")
   }
+  if (!is.logical(return.factor)) {
+    stop("'return.factor' must be logical.")
+  }
+
   nr <- nrow(data)
   lf <- length(factors)
   b <- as.data.frame(matrix(NA, nrow = nr, ncol = lf))
   colnames(b) <- paste0(colnames.add, factors)
-  for (i in 1:lf) {
-    b[, i] <- ifelse(grepl(factors[i], data[, original.column]), 1, 0)
+  if ( return.factor ){
+    for (i in 1:lf) {
+      b[, i] <- as.factor(ifelse(grepl(factors[i], data[, original.column]), 1, 0))
+    }
+  } else {
+      for (i in 1:lf) {
+        b[, i] <- ifelse(grepl(factors[i], data[, original.column]), 1, 0)
+      }
   }
+
+
   output <- cbind(data, b)
   # Remover as colunas que possuem poucos eventos
   if ( !is.null(min.events) ) {
