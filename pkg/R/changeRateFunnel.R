@@ -36,7 +36,9 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
   if (any(e2 == 0)){e2 <- e2 + .5}
 
   y <- (o2/e2)/(o1/e1)
-  theta <- lambda2/lambda1
+  lambda1 <<- lambda1 #apagar
+  lambda2 <<- lambda2 #apagar
+  theta <<- lambda2/lambda1
   upperCI <- list()
   lowerCI <- list()
   ylowCI <- list()
@@ -62,7 +64,8 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1 = sum(o1)/sum
     }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(1, max(change.table$rho)+5)
-    lambda <- theta*expectedRange
+    # lambda <<- theta*expectedRange
+    lambda <<- theta
 
     for (i  in 1:(length(change.table$rho)-1)){ # do not allow repeted values in xCI
       if (ceiling(change.table$rho)[i] == ceiling(change.table$rho)[i+1]){

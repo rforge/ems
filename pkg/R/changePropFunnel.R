@@ -3,7 +3,7 @@
 #' @import graphics
 
 
-changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), method = c("diff","ratio"), ..., printUnits = FALSE, xlab = "Sample size per period", auto.ylab = TRUE, ylab = c("Proportions difference","Proportions ratio log"), ylim = c(max(lowerCI[[which(p == max(p))]]) - 6*theta, min(upperCI[[which(p == max(p))]]) + 6*theta), xlim = c(0,max(rho)), myunits = NULL, digits = 5, overdispersion){
+changePropFunnel <- function(unit, o1, o2, n1, n2, p = c(.95,.998), pi1 = sum(o1)/sum(n1), pi2 = sum(o2)/sum(n2), method = c("diff","ratio"), ..., printUnits = FALSE, xlab = "Sample size per period", auto.ylab = TRUE, ylab = c("Proportions difference","Proportions ratio log"), ylim = c(max(lowerCI[[which(p == max(p))]]) - 6*theta, min(upperCI[[which(p == max(p))]]) + 6*theta), xlim = c(0,max(rho)), myunits = rep(0, length(unit)), digits = 5, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
   if(!is.numeric(n1)){stop("n1 must be numeric.")}

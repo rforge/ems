@@ -71,7 +71,8 @@ rateFunnel <- function(unit, y, n, o, e, y.type = c("SMR","SRU"), p = c(.95,.998
 
     # Exact formula using binomial approximation
     if (method[1] == "exact"){
-      prob <- observedRange/admissionsRange
+      # prob <<- observedRange/admissionsRange
+      prob <- max(observed)/max(admissions)
       for (i in 1:length(p)){
         rp <- qbinom(p[i], size = admissionsRange, prob)
         alpha <- (pbinom(rp, size = admissionsRange, prob) - p[i]) / ((pbinom(rp, size = admissionsRange, prob)) - pbinom(rp - 1, size = admissionsRange, prob))
