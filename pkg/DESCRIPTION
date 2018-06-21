@@ -1,12 +1,16 @@
 Package: ems
 Title: Epimed Solutions Collection for Data Editing, Analysis, and Benchmarking
     of Health Units
-Version: 1.1.6
-Date: 2018-06-14
-Authors@R: c(person("Lunna", "Borges", role = c("aut"),
+Version: 1.2.0
+Date: 2018-06-21
+Authors@R: c(person("Lunna", "Borges", role = c("aut","cre"),
 	             email = "lunna.borges@epimedsolutions.com"),
-             person("Pedro", "Brasil", role = c("aut", "cre"),
-                    email = "pedro.brasil@epimedsolutions.com"))
+             person("Pedro", "Brasil", role = c("aut"),
+                    email = "pedro.brasil@epimedsolutions.com"),
+             person("Camila", "Cardoso", role = c("aut"),
+                    email = "camila.cardoso@epimedsolutions.com"),
+             person("Caio", "Ferreira", role = c("aut"),
+                    email = "caio.ferreira@epimedsolutions.com"))
 Description: Collection of functions for data analysis and
     editing of clinical and epidemiological data.
     Most of them are related to benchmarking with prediction models.
