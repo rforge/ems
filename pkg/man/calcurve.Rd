@@ -2,12 +2,11 @@
 % Please edit documentation in R/calcurve.R
 \name{calcurve}
 \alias{calcurve}
-\alias{calibration_curve}
 \alias{print.calcurve}
 \alias{plot.calcurve}
 \title{Calibration Curve}
 \usage{
-calibration_curve(deaths, pred, score = NULL, name_score = "Saps3",
+calcurve(deaths, pred, score = NULL, name_score = "Saps3",
   other_score = NULL, name_other_score = NULL,
   categories_option = c("predicted", "score"), table = FALSE, plot = TRUE,
   title_label = "Calibration Curve", y1axis_label = "Patients (n)",
@@ -45,9 +44,9 @@ calibration_curve(deaths, pred, score = NULL, name_score = "Saps3",
 
 \item{score_color}{a vector with the colors to be used in the score traces for \code{calcurve}.}
 
-\item{bar_color}{color of the bars for \code{curve}.}
+\item{bar_color}{color of the bars for \code{calcurve}.}
 
-\item{points}{a vector with markers types of the scores for \code{curve}.}
+\item{points}{a vector with markers types of the scores for \code{calcurve}.}
 
 \item{x}{an object of class 'calcurve'.}
 
@@ -64,7 +63,12 @@ calibration_curve(deaths, pred, score = NULL, name_score = "Saps3",
 \item{pch}{a vector with markers types of the scores for \code{plot.curve}.}
 }
 \description{
-\code{calibration_curve} function returns a data.frame containing the number of patients, the observed mortality rate and the predicted mortality rate for each category of the predicted moratlity rate. If any other score is given, the function will also return the mortality rate predicted by this score for each category.
+\code{calcurve} function returns a data.frame containing the number of patients, the observed mortality rate and the predicted mortality rate for each category of the predicted mortality rate. If any other acute physiology score is given, the function will also return the mortality rate predicted by this score for each category.
+}
+\details{
+\itemize{
+\item If \code{categories_option = 'score'}, the categories will refer to the deciles of the main score punctuation. If \code{categories_option = 'predicted'}, the categories will refer to fixed intervals of the predicted mortality rate.
+}
 }
 \examples{
 
@@ -73,7 +77,7 @@ calibration_curve(deaths, pred, score = NULL, name_score = "Saps3",
 data(icu)
 
 # Calibration Curve Plot
-a <- calibration_curve(deaths = icu$UnitDischargeName, pred = icu$Saps3DeathProbabilityStandardEquation, score = icu$Saps3Points, name_score = 'Saps3', categories_option = 'score', table = FALSE, plot = TRUE)
+a <- calcurve(deaths = icu$UnitDischargeName, pred = icu$Saps3DeathProbabilityStandardEquation, score = icu$Saps3Points, name_score = 'Saps3', categories_option = 'score', table = FALSE, plot = TRUE)
 
 
 }

@@ -2,7 +2,7 @@
 #'
 #' @name calcurve
 #'
-#' @description \code{calibration_curve} function returns a data.frame containing the number of patients, the observed mortality rate and the predicted mortality rate for each category of the predicted moratlity rate. If any other score is given, the function will also return the mortality rate predicted by this score for each category.
+#' @description \code{calcurve} function returns a data.frame containing the number of patients, the observed mortality rate and the predicted mortality rate for each category of the predicted mortality rate. If any other acute physiology score is given, the function will also return the mortality rate predicted by this score for each category.
 #'
 #' @param deaths a numerical vector that only contains 0 and 1, indicating whether the patient was alive or dead, respectively.
 #'
@@ -28,9 +28,9 @@
 #'
 #' @param score_color a vector with the colors to be used in the score traces for \code{calcurve}.
 #'
-#' @param bar_color color of the bars for \code{curve}.
+#' @param bar_color color of the bars for \code{calcurve}.
 #'
-#' @param points a vector with markers types of the scores for \code{curve}.
+#' @param points a vector with markers types of the scores for \code{calcurve}.
 #'
 #' @param x an object of class 'calcurve'.
 #'
@@ -46,6 +46,12 @@
 #'
 #' @param ... further arguments passed to \code{\link[graphics]{plot}}.
 #'
+#' @details
+#' \itemize{
+#' \item If \code{categories_option = 'score'}, the categories will refer to the deciles of the main score punctuation. If \code{categories_option = 'predicted'}, the categories will refer to fixed intervals of the predicted mortality rate.
+#' }
+#'
+#'
 #'
 #' @author Camila Cardoso
 #'
@@ -56,24 +62,24 @@
 #' data(icu)
 #'
 #' # Calibration Curve Plot
-#' a <- calibration_curve(deaths = icu$UnitDischargeName, pred = icu$Saps3DeathProbabilityStandardEquation, score = icu$Saps3Points, name_score = 'Saps3', categories_option = 'score', table = FALSE, plot = TRUE)
+#' a <- calcurve(deaths = icu$UnitDischargeName, pred = icu$Saps3DeathProbabilityStandardEquation, score = icu$Saps3Points, name_score = 'Saps3', categories_option = 'score', table = FALSE, plot = TRUE)
 #'
 #'
 #' @export
 
-calibration_curve <- function(deaths, pred,
-                              score = NULL, name_score = 'Saps3',
-                              other_score = NULL, name_other_score = NULL,
-                              categories_option = c('predicted', 'score'),
-                              table = FALSE, plot = TRUE,
-                              title_label = 'Calibration Curve',
-                              y1axis_label = 'Patients (n)',
-                              y2axis_label = 'Mortality Rate (%)',
-                              score_color = c('#cac7cc', '#ffc341',
-                                              '#33cca3'),
-                              bar_color = '#1f77b4',
-                              points = c(19, 18, 17)
-                              ){
+calcurve <- function(deaths, pred,
+                     score = NULL, name_score = 'Saps3',
+                     other_score = NULL, name_other_score = NULL,
+                     categories_option = c('predicted', 'score'),
+                     table = FALSE, plot = TRUE,
+                     title_label = 'Calibration Curve',
+                     y1axis_label = 'Patients (n)',
+                     y2axis_label = 'Mortality Rate (%)',
+                     score_color = c('#cac7cc', '#ffc341',
+                                     '#33cca3'),
+                     bar_color = '#1f77b4',
+                     points = c(19, 18, 17)
+                     ){
 
 
 
