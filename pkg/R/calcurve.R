@@ -62,7 +62,10 @@
 #' data(icu)
 #'
 #' # Calibration Curve Plot
-#' a <- calcurve(deaths = icu$UnitDischargeName, pred = icu$Saps3DeathProbabilityStandardEquation, score = icu$Saps3Points, name_score = 'Saps3', categories_option = 'score', table = FALSE, plot = TRUE)
+#' a <- calcurve(deaths = icu$UnitDischargeName,
+#' pred = icu$Saps3DeathProbabilityStandardEquation,
+#' score = icu$Saps3Points, name_score = 'Saps3',
+#' categories_option = 'score', table = FALSE, plot = TRUE)
 #'
 #'
 #' @export
