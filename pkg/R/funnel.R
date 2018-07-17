@@ -85,6 +85,8 @@
 #'
 #' @param overdispersion Logical (default = FALSE); If TRUE, introduces an multiplicative over-dispersion factor phi that will inflate the CI null variance. See details.
 #'
+#' @param auto.xlab,auto.ylab Logical. If \code{TRUE}, one is not able to change x and y axis labels, respectively.
+#'
 #' @details
 #' \itemize{
 #' \item For every possible value of \code{option}, if \code{overdispersion = TRUE}, the CI can be inflated by a overdispersion parameter phi. There is a test for overdispersion which inflates the funnel if it's necessary. An "Winsorized" over-dispersion parameter is estimated and is used to inflate the funnel limits if it is significantly greater than 1. The parameter phi is returned as an funnel object.
@@ -137,6 +139,7 @@
 #' @references Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
 #'
 #' @examples
+#' \dontrun{
 #' # Loading data
 #'data(icu)
 #'
@@ -212,6 +215,7 @@
 #'plot(f6, main = "Ratio of proportions of death for two periods")
 #'
 #'rm(icu, x, z, w, dt1, dt2, unit, f1, f2, f3, f4, f5, f6)
+#'}
 #'
 #' @import stats
 #' @import graphics
@@ -320,7 +324,8 @@ plot.funnel <- function(x, ...,col = c("darkblue","paleturquoise3","gray26"), lw
 #' @import stats
 #' @import graphics
 
-
+#' @rdname funnel
+#' @export
 rateFunnel <- function(unit, y, n, o, e, y.type, p, theta = 1, method = c("exact","normal"), direct, ..., printUnits, auto.xlab = TRUE, xlab = c("Volume of cases","Expected values"), ylab = y.type[1], xlim = c(0, max(rho)), ylim = c(min(lowerCI[[which(p == max(p))]]), max(upperCI[[which(p == max(p))]])), myunits, digits, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
@@ -592,7 +597,8 @@ rateFunnel <- function(unit, y, n, o, e, y.type, p, theta = 1, method = c("exact
 #' @import stats
 #' @import graphics
 
-
+#' @rdname funnel
+#' @export
 changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, ..., printUnits, auto.xlab = TRUE, xlab = c("Average observed count","Expectation per period"), auto.ylab = TRUE, ylab = c(paste0(y.type[1],"'s Ratio"),paste0("Log(", y.type[1],"'s Ratio)")), ylim = c(max(lowerCI[[which(p == max(p))]]) - 1.5*theta, min(upperCI[[which(p == max(p))]]) + 1.5*theta), xlim = c(0,max(rho)), myunits, digits, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
@@ -797,7 +803,8 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
 #' @import graphics
 
 
-
+#' @rdname funnel
+#' @export
 propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., printUnits, ylab = "%", xlab = "Volume", ylim = c(0, min(upperCI[[which(p == max(p))]]) + 2.5*theta), xlim = c(0, max(n)), myunits, digits, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
@@ -961,7 +968,8 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
 #' @import stats
 #' @import graphics
 
-
+#' @rdname funnel
+#' @export
 changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff","ratio"), ..., printUnits, xlab = "Sample size per period", auto.ylab = TRUE, ylab = c("Proportions difference","Proportions ratio log"), ylim = c(max(lowerCI[[which(p == max(p))]]) - 6*theta, min(upperCI[[which(p == max(p))]]) + 6*theta), xlim = c(0,max(rho)), myunits, digits, overdispersion){
 
   if(!is.factor(unit)){stop("Unit must be a factor.")}
