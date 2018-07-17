@@ -47,7 +47,7 @@ reclass(x, y, same = TRUE, plot = FALSE, digits = 2, compare = c("SRU",
 
 \item{complete.rank}{Logical. If \code{TRUE} (default), returns all ICUs ranked. If \code{FALSE}, returns only ICUs whose efficiency classification ranked changed.}
 
-\item{...}{Arguments to be passed to methods, such as \code{\link[graphics]{graphical parameters}} (see \code{\link[graphics]{par}}).}
+\item{...}{Arguments to be passed to methods (see \code{\link[graphics]{par}}).}
 
 \item{xlim_x, ylim_x}{Limits for x and y axis for 1st stage plot for \code{plot.reclass}.}
 
