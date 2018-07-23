@@ -1,8 +1,8 @@
 Package: ems
-Title: Epimed Solutions Collection for Data Editing, Analysis, and Benchmarking
+Title: Epimed Solutions Collection for Data Editing, Analysis, and Benchmark
     of Health Units
 Version: 1.2.0
-Date: 2018-07-17
+Date: 2018-07-23
 Authors@R: c(person("Lunna", "Borges", role = c("aut","cre"),
 	             email = "lunna.borges@epimedsolutions.com"),
              person("Pedro", "Brasil", role = c("aut"),
@@ -13,7 +13,7 @@ Authors@R: c(person("Lunna", "Borges", role = c("aut","cre"),
                     email = "caio.ferreira@epimedsolutions.com"))
 Description: Collection of functions for data analysis and
     editing of clinical and epidemiological data.
-    Most of them are related to benchmarking with prediction models.
+    Most of them are related to benchmark with prediction models.
 Depends:
     R (>= 3.2.2)
 License: GPL (>= 2)

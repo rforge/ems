@@ -314,20 +314,15 @@ rm.dummy.columns <- function (data, colnames, event = "1", min.events = 50, warn
 funnelEstimate <- function(y, range, u, totalAdmissions, totalObserved, p = .95, theta = 1, overdispersion = TRUE, dist = c("binomial","normal","poisson"), rho, gdetheta){
 
   if (!is.numeric(y)){stop("y must be numeric.")}
-  # if (!is.numeric(n)){stop("n must be numeric.")}
   if (!is.numeric(u)){stop("u must be numeric.")}
   if (!is.numeric(range)){stop("range must be numeric.")}
   if (!is.numeric(p)){stop("p must be numeric.")}
   if (!is.numeric(theta)){stop("theta must be numeric.")}
-  # if (!is.logical(normalApprox)){stop("normalApprox must be TRUE or FALSE.")}
   if (!is.logical(overdispersion)){stop("overdispersion must be TRUE or FALSE.")}
   if (dist[1] != "binomial" && dist[1] != "normal" && dist[1] != "poisson"){stop("dist must be either 'binomial', 'normal' or 'poisson'.")}
 
   #MISSING VERIFICATION FOR RHO AND GDETHETA
 
-
-  #### no caso do funil de taxas indiretas o parametro de precisao (rho) eh n.
-  # rho <- n
 
   # Calculate the z-score
   z_score <- (y - theta) * sqrt( rho / gdetheta)
@@ -336,23 +331,14 @@ funnelEstimate <- function(y, range, u, totalAdmissions, totalObserved, p = .95,
   # Used when overdispersion of the indicator
   phi <- winsorising(z_score, u = u)
 
-  # print(phi) #apagar
 
-  # if(!normalApprox){
   if(dist[1] == "binomial"){
     warning("It is being used exact (binomial) distribuition to draw the funnel plot.")
 
     if (!is.numeric(totalAdmissions)){stop("totalAdmissions must be numeric.")}
     if (!is.numeric(totalObserved)){stop("totalObserved must be numeric.")}
 
-    # # Calculate the z-score
-    # z_score <- (y - theta) * sqrt( rho / (theta * (1 - theta)))
-    #
-    # # Calculate the Winsorised estimate
-    # # Used when overdispersion of the indicator
-    # phi <- winsorising(z_score, n = n, u = u)
-
-    # estimativa da probabilidade de ocorrer um evento da binomial
+   # estimativa da probabilidade de ocorrer um evento da binomial
     prob <- totalObserved/totalAdmissions
     # creating binomial quantiles
     rp <- qbinom(p, size = range, prob)
@@ -371,16 +357,8 @@ funnelEstimate <- function(y, range, u, totalAdmissions, totalObserved, p = .95,
     }
   }
 
-  # if(normalApprox){
   if(dist[1] == 'normal'){
     warning("It is being used normal approximation to draw the funnel plot.")
-
-    # # Calculate the z-score
-    # z_score <- (y - theta) * sqrt( rho / theta)
-    #
-    # # Calculate the Winsorised estimate
-    # # Used when overdispersion of the indicator
-    # phi <- winsorising(z_score, n = n, u = u)
 
     zp <- qnorm(1 - (1 - p) / 2)
 
@@ -392,11 +370,8 @@ funnelEstimate <- function(y, range, u, totalAdmissions, totalObserved, p = .95,
 
     }
     else {
-      # for (i in 1:length(p)){
-        # zp <- qnorm(1 - (1 - p) / 2)
         upperCI <- theta + zp * sqrt(gdetheta / range)
         lowerCI <- theta - zp * sqrt(gdetheta / range)
-      # }
     }
   }
 
@@ -433,11 +408,10 @@ funnelEstimate <- function(y, range, u, totalAdmissions, totalObserved, p = .95,
 #' @export
 winsorising <- function(z_score, u){
   if (!is.numeric(z_score)){stop("z_score must be numeric.")}
-  # if (!is.numeric(n)){stop("n must be numeric.")}
   if (!is.numeric(u)){stop("u must be numeric.")}
   if (length(u) != 1){stop("u must be of length 1.")}
-  #### observa os decis para ver se ha NA no percentil 90
-  #### mecanismo para evitar problema no calculo de phi caso um z_score nao tenha quantil no percentil 90
+  #### observe deciles to see if there is NA in 90 percentile
+  #### it works to avoid problem to calculate phi if a z_score doesn't have 90 quantile
   deciles <- quantile(z_score, probs = seq(0,1,.1), na.rm = T)
   if (any(is.na(deciles[10]))){
     highestQuantile <- as.numeric((which(is.na(deciles))[1]-2)/10)

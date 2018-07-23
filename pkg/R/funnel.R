@@ -139,7 +139,6 @@
 #' @references Spiegelhalter, David J. "Funnel plots for comparing institutional performance." Statistics in medicine 24.8 (2005): 1185-1202.
 #'
 #' @examples
-#' \dontrun{
 #' # Loading data
 #'data(icu)
 #'
@@ -164,7 +163,7 @@
 #'# To analyze rates (SMR)
 #'f2 <- funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
 #'             theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
-#'             option = "rate", myunits = NULL, plot = FALSE)
+#'             option = "rate", plot = FALSE)
 #'f2
 #'plot(f2, main = "Cross-sectional rate (SMR)")
 #'
@@ -215,7 +214,6 @@
 #'plot(f6, main = "Ratio of proportions of death for two periods")
 #'
 #'rm(icu, x, z, w, dt1, dt2, unit, f1, f2, f3, f4, f5, f6)
-#'}
 #'
 #' @import stats
 #' @import graphics
@@ -282,20 +280,10 @@ plot.funnel <- function(x, ...,col = c("darkblue","paleturquoise3","gray26"), lw
 
     abline(h = x$theta, col = col[length(x$p)+1], lwd = lwd)
 
-    # if (length(x$myunits) > 0){
-    #   points(x$x[which(x$unitnames$Unit %in% x$myunits)], x$y[which(x$unitnames$Unit %in% x$myunits)], pch = pch, col = pt.col, bg = mypts.col, cex = pt.cex)
-    # }
     if (any(x$myunits == 1)){
       points(x$x[which(x$myunits == 1)], x$y[which(x$myunits == 1)], pch = pch, col = pt.col, bg = mypts.col, cex = pt.cex)
     }
     if (printUnits) {
-      # if (length(x$myunits) > 0 ){
-      #   par(font = 2)
-      #   text(x$x[-which(x$unitnames$Unit %in% x$myunits)], x$y[-which(x$unitnames$Unit %in% x$myunits)], labels = rownames(x$unitnames)[-which(x$unitnames$Unit %in% x$myunits)], cex = text.cex, pos = text.pos)
-      #
-      #   text(x$x[which(x$unitnames$Unit %in% x$myunits)], x$y[which(x$unitnames$Unit %in% x$myunits)], labels = rownames(x$unitnames)[which(x$unitnames$Unit %in% x$myunits)], cex = text.cex, pos = length(text.pos) + 1)
-      #   par(font = 1)
-      # }
 
       if (any(x$myunits == 1)){
         par(font = 2)
@@ -593,10 +581,6 @@ rateFunnel <- function(unit, y, n, o, e, y.type, p, theta = 1, method = c("exact
   output
 }
 
-
-#' @import stats
-#' @import graphics
-
 #' @rdname funnel
 #' @export
 changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.type, p, ..., printUnits, auto.xlab = TRUE, xlab = c("Average observed count","Expectation per period"), auto.ylab = TRUE, ylab = c(paste0(y.type[1],"'s Ratio"),paste0("Log(", y.type[1],"'s Ratio)")), ylim = c(max(lowerCI[[which(p == max(p))]]) - 1.5*theta, min(upperCI[[which(p == max(p))]]) + 1.5*theta), xlim = c(0,max(rho)), myunits, digits, overdispersion){
@@ -621,10 +605,7 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
     exc <- unit[which(n1 == 0 | n2 == 0)]
     warning(paste0("The following unit were excluded due to absence of observations: ", exc, "\n"))
   }
-  # if (any(! myunits %in% unit)){
-  #   warning(paste0("There is no unit called ", myunits[which(! myunits %in% unit)], "\n"))
-  #   myunits <- myunits[-which(! myunits %in% unit)]
-  # }
+
   if(any(myunits != 0 & myunits != 1)){stop("myunits must be coded as 0 and 1.")}
 
   if (any(o1 == 0)){o1 <- o1 + .5} #To don't generate NaN values.
@@ -652,19 +633,14 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
     # exact methods
     secondcolname <- "y"
     rho <- (o1 + o2)/2  # precision parameter: average observed count
-    # gdetheta <- (o1 + o2) / (theta * (1 - theta) * 2)
     gdetheta <- (((o1 + o2) ^ 2) * theta) / (2 * (1 + theta) ^ 2)
     change.table <- data.frame(unit,y,o1,e1,n1,o2,e2,n2,rho,myunits)
     change.table <- change.table[order(change.table$rho),]
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
-      # if (any(myunits %in% exc)){
-      #   myunits <- myunits[-which(myunits %in% exc)]
-      # }
     }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(1, max(change.table$rho)*1.2)
-    # lambda <- theta*expectedRange
     lambda <- theta
 
     for (i  in 1:(length(change.table$rho)-1)){ # do not allow repeted values in xCI
@@ -673,10 +649,6 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
       }
     }
     for (i in 1:length(p)){
-      # rp <- qpois(p[i], lambda) #### nao eh poisson aqui e sim binomial
-      # alpha <- (ppois(rp, lambda) - p[i]) / (ppois(rp, lambda) - ppois(rp - 1, lambda))
-      # upperCI[[i]] <- theta + (rp - alpha) / expectedRange
-      # lowerCI[[i]] <- theta - (rp - alpha) / expectedRange
 
       CI <- funnelEstimate(y = change.table$y, range = expectedRange, u = length(unique(change.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = theta, overdispersion = overdispersion, dist = "binomial", rho = rho, gdetheta = gdetheta)
       upperCI[[i]] <- CI$upperCI
@@ -709,65 +681,19 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
 
-      # if (any(myunits %in% exc)){
-      #   myunits <- myunits[-which(myunits %in% exc)]
-      # }
     }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(1, max(change.table$rho)+5)
 
-    # # Calculate the z-score
-    # z_score <- (y - theta) * sqrt(rho / gdetheta)
-    #
-    # # Calculate the 10% and 90% percentiles.
-    # q90 <- quantile(z_score,probs=c(0.9))
-    # q10 <- quantile(z_score,probs=c(0.1))
-    #
-    # # Set z-scores larger than the 90% percentile to the 90% percentile.
-    # z_score <- ifelse(z_score>q90,q90,z_score)
-    #
-    # # Set z-scores smaller than the 10% percentile to the 10% percentile.
-    # z_score <- ifelse(z_score<q10,q10,z_score)
-    #
-    # # Calculate the Winsorised estimate
-    # # Used when overdispersion of the indicator
-    # phi <- (1 / nrow(change.table)) * sum(z_score ^ 2)
-
-
-    for (i  in 1:(length(change.table$rho)-1)){ # do not allow repeted values in xCI
+   for (i  in 1:(length(change.table$rho)-1)){ # do not allow repeted values in xCI
       if (ceiling(change.table$rho)[i] == ceiling(change.table$rho)[i+1]){
         change.table$rho[i+1] <- change.table$rho[i+1] + 1
       }
     }
-    # if (overdispersion){
-    #
-    #   print(paste0("phi = ", phi))
-    #
-    #   if(phi > (1 + 2 * sqrt( 2 / nrow(change.table) ))){
-    #
-    #     warning("The funnel limits were inflated due overdispersion presence.")
 
-        # for (i in 1:length(p)){
-          # zp <- qnorm(1 - (1 - p[i]) / 2)
-          # upperCI[[i]] <- log(theta) + zp * sqrt(gdetheta * phi / expectedRange)
-          # lowerCI[[i]] <- log(theta) - zp * sqrt(gdetheta * phi / expectedRange)
-
-  #       ylowCI[[i]] <- lowerCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-    #       yuppCI[[i]] <- upperCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-    #       lowOUT[[i]] <- ifelse(change.table$y < ylowCI[[i]],TRUE, FALSE)
-    #       uppOUT[[i]]<- ifelse(change.table$y > yuppCI[[i]], TRUE, FALSE)
-    #       outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-    #       outcolname[i] <- paste0(p[i]*100,"%CI")
-    #       change.table <- cbind(change.table, outofcontrol[[i]])
-    #     }
-    #   # }
-    # } else{
       for (i in 1:length(p)){
-        # zp <- qnorm(1 - (1 - p[i]) / 2)
-        # upperCI[[i]] <- log(theta) + zp * sqrt(gdetheta / expectedRange)
-        # lowerCI[[i]] <- log(theta) - zp * sqrt(gdetheta / expectedRange)
 
-        CI <- funnelEstimate(y = change.table$y, range = expectedRange, u = length(unique(change.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = log(theta), overdispersion = overdispersion, dist = "normal", rho = change.table$rho, gdetheta = gdetheta)
+          CI <- funnelEstimate(y = change.table$y, range = expectedRange, u = length(unique(change.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = log(theta), overdispersion = overdispersion, dist = "normal", rho = change.table$rho, gdetheta = gdetheta)
         upperCI[[i]] <- CI$upperCI
         lowerCI[[i]] <- CI$lowerCI
 
@@ -780,10 +706,7 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
         change.table <- cbind(change.table, outofcontrol[[i]])
       }
 
-    # print(change.table$y) # apagar
-    # print(ylowCI[[i]]) # apagar
-    # print(ylowOUT[[i]]) # apagar
-    # # }
+
     if (auto.xlab){xlab = xlab[2]}
     if (auto.ylab){ylab = ylab[2]}
 
@@ -797,11 +720,6 @@ changeRateFunnel <- function(unit, n1, n2, o1, e1, o2, e2, lambda1, lambda2, y.t
   output$tab[,2:9] <- round(output$tab[,2:9], digits)
   output
 }
-
-
-#' @import stats
-#' @import graphics
-
 
 #' @rdname funnel
 #' @export
@@ -821,15 +739,9 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
     exc <- unit[which(n == 0)]
     warning(paste0("The following units were excluded due to absence of observations: ", exc, "\n"))
   }
-  # if (any(! myunits %in% unit)){
-  #   warning(paste0("There is no unit called ", myunits[which(! myunits %in% unit)], "\n"))
-  #   myunits <- myunits[-which(! myunits %in% unit)]
-  # }
+
   if(any(myunits != 0 & myunits != 1)){stop("myunits must be coded as 0 and 1.")}
 
-  # y <- (o / n) * 100
-  # theta <- theta * 100
-  # gdetheta <- theta * (100 - theta)
   rho <- n # precision parameter
 
   y <- (o / n)
@@ -848,33 +760,12 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
   prop.table <- data.frame(unit, y, o, n, myunits)
   prop.table <- prop.table[order(prop.table$n),]
 
-  # # Calculate the z-score
-  # z_score <- (y - theta) * sqrt( n / gdetheta)
-  #
-  # # Calculate the 10% and 90% percentiles.
-  # q90 <- quantile(z_score,probs=c(0.9))
-  # q10 <- quantile(z_score,probs=c(0.1))
-  #
-  # # Set z-scores larger than the 90% percentile to the 90% percentile.
-  # z_score <- ifelse(z_score>q90,q90,z_score)
-  #
-  # # Set z-scores smaller than the 10% percentile to the 10% percentile.
-  # z_score <- ifelse(z_score<q10,q10,z_score)
-  #
-  # # Calculate the Winsorised estimate
-  # # Used when overdispersion of the indicator
-  # phi <- (1 / nrow(prop.table)) * sum(z_score ^ 2)
-
   if (length(exc) > 0){
     prop.table <- prop.table[-which(prop.table$unit %in% exc),]
-    # if (any(myunits %in% exc)){
-    #   myunits <- myunits[-which(myunits %in% exc)]
-    # }
   }
   unitnames <- data.frame(Unit = prop.table$unit)
   admissionsRange <- seq(1,max(n))
   observedRange <- seq(1, max(o), length.out = length(admissionsRange))
-  # prob <- observedRange / admissionsRange
   prob <- max(o) / max(n)
 
   totalAdmissions <- sum(n)
@@ -883,12 +774,6 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
   # using exact binomial approximation
   if (method[1] == "exact"){
     for (i in 1:length(p)){
-      # rp <- qbinom(p[i], size = admissionsRange, prob)
-      # alpha <- (pbinom(rp, size = admissionsRange, prob) - p[i]) / ((pbinom(rp, size = admissionsRange, prob)) - pbinom(rp - 1, size = admissionsRange, prob))
-      # upperCI[[i]] <- theta + ((rp - alpha) / admissionsRange) * 100
-      # lowerCI[[i]] <- theta - ((rp - alpha) / admissionsRange) * 100
-      # upperCI[[i]] <- theta + ((rp - alpha) / admissionsRange)
-      # lowerCI[[i]] <- theta - ((rp - alpha) / admissionsRange)
 
       CI <- funnelEstimate(y = prop.table$y, range = admissionsRange, u = length(unique(prop.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = theta, overdispersion = overdispersion, dist = "binomial", rho = rho, gdetheta = gdetheta)
       upperCI[[i]] <- CI$upperCI
@@ -909,31 +794,9 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
 
   } else { # using normal approximation
 
-    # if (overdispersion){
-    #   if (phi > (1 + 2 * sqrt( 2 / nrow(prop.table) ))){ # overdispersion = TRUE
-    #     # phi <- (1/nrow(prop.table)) * sum(((y - theta) ^ 2 * (n/gdetheta)))
-    #     warning("The funnel limits were inflated due overdispersion presence.")
-    #
-    #     for (i in 1:length(p)){
-    #       zp <- qnorm(1 - (1 - p[i]) / 2)
-    #       upperCI[[i]] <- theta + zp * sqrt(gdetheta * phi / admissionsRange)
-    #       lowerCI[[i]] <- theta - zp * sqrt(gdetheta * phi / admissionsRange)
-    #       ylowCI[[i]] <- lowerCI[[i]][which(admissionsRange %in% prop.table$n == TRUE)]
-    #       yuppCI[[i]] <- upperCI[[i]][which(admissionsRange %in% prop.table$n == TRUE)]
-    #       lowOUT[[i]] <- ifelse(prop.table$y < ylowCI[[i]],TRUE,FALSE)
-    #       uppOUT[[i]]<- ifelse(prop.table$y > yuppCI[[i]], TRUE, FALSE)
-    #       outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-    #       outcolname[i] <- paste0(p[i]*100,"%CI")
-    #       prop.table <- cbind(prop.table, outofcontrol[[i]])
-    #     }
-    #   }
-    # } else {
-      for (i in 1:length(p)){
-        # zp <- qnorm(1 - (1 - p[i]) / 2)
-        # upperCI[[i]] <- theta + zp * sqrt(gdetheta / admissionsRange)
-        # lowerCI[[i]] <- theta - zp * sqrt(gdetheta / admissionsRange)
+    for (i in 1:length(p)){
 
-         CI <- funnelEstimate(y = prop.table$y, range = admissionsRange, u = length(unique(prop.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = theta, overdispersion = overdispersion, dist = "normal", rho = rho, gdetheta = gdetheta)
+        CI <- funnelEstimate(y = prop.table$y, range = admissionsRange, u = length(unique(prop.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = theta, overdispersion = overdispersion, dist = "normal", rho = rho, gdetheta = gdetheta)
         upperCI[[i]] <- CI$upperCI
         lowerCI[[i]] <- CI$lowerCI
 
@@ -948,10 +811,8 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
         upperCI[[i]] <- CI$upperCI * 100
         lowerCI[[i]] <- CI$lowerCI * 100
 
-
       }
     }
-  # }
 
   theta <- theta * 100
   prop.table$y <- prop.table$y * 100
@@ -964,9 +825,6 @@ propFunnel <- function(unit, o, n, theta, p, method = c("exact","normal"), ..., 
   output
 }
 
-
-#' @import stats
-#' @import graphics
 
 #' @rdname funnel
 #' @export
@@ -986,10 +844,7 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
     exc <- unit[which(n1 == 0 | n2 == 0)]
     warning(paste0("The following units were excluded due to absence of observations: ", exc, "\n"))
   }
-  # if (any(! myunits %in% unit)){
-  #   warning(paste0("There is no unit called ", myunits[which(! myunits %in% unit)], "\n"))
-  #   myunits <- myunits[-which(! myunits %in% unit)]
-  # }
+
   if(any(myunits != 0 & myunits != 1)){stop("myunits must be coded as 0 and 1.")}
 
   if (any(o1 == 0)){o1 <- o1 + .5} # To don't generate NaN values.
@@ -1006,6 +861,9 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
   outofcontrol <- list()
   outcolname <- c()
 
+  totalAdmissions <- sum(n1,n2)
+  totalObserved <- sum(o1,o2)
+
   if (method[1] == "diff"){
     secondcolname <- "y"
     y <- (o2/n2) - (o1/n1)
@@ -1017,29 +875,10 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
     change.table <- data.frame(unit,y,o1,n1,o2,n2,rho, myunits)
     change.table <- change.table[order(change.table$rho),]
 
-    # # Calculate the z-score
-    # z_score <- (y - theta) * sqrt( rho / gdetheta)
-    #
-    # # Calculate the 10% and 90% percentiles.
-    # q90 <- quantile(z_score,probs=c(0.9))
-    # q10 <- quantile(z_score,probs=c(0.1))
-    #
-    # # Set z-scores larger than the 90% percentile to the 90% percentile.
-    # z_score <- ifelse(z_score>q90,q90,z_score)
-    #
-    # # Set z-scores smaller than the 10% percentile to the 10% percentile.
-    # z_score <- ifelse(z_score<q10,q10,z_score)
-    #
-    # # Calculate the Winsorised estimate
-    # # Used when overdispersion of the indicator
-    # phi <- (1 / nrow(change.table)) * sum(z_score ^ 2)
 
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
-      # if (any(myunits %in% exc)){
-      #   myunits <- myunits[-which(myunits %in% exc)]
-      # }
-    }
+       }
     unitnames <- data.frame(Unit = change.table$unit)
     expectedRange <- seq(0, max(change.table$rho)+5)
 
@@ -1049,29 +888,7 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
       }
     }
 
-    # if (overdispersion){
-    #   if (phi > (1 + 2 * sqrt( 2 / nrow(change.table) ))) {
-    #
-    #     warning("The funnel limits were inflated due overdispersion presence.")
-    #
-    #     for (i in 1:length(p)){
-    #       zp <- qnorm(1 - (1 - p[i]) / 2)
-    #       upperCI[[i]] <- theta + zp * sqrt(gdetheta * phi / expectedRange)
-    #       lowerCI[[i]] <- theta - zp * sqrt(gdetheta * phi / expectedRange)
-    #       ylowCI[[i]] <- lowerCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-    #       yuppCI[[i]] <- upperCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-    #       lowOUT[[i]] <- ifelse(change.table$y < ylowCI[[i]],TRUE, FALSE)
-    #       uppOUT[[i]] <- ifelse(change.table$y > yuppCI[[i]], TRUE, FALSE)
-    #       outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-    #       outcolname[i] <- paste0(p[i]*100,"%CI")
-    #       change.table <- cbind(change.table, outofcontrol[[i]])
-    #     }
-    #   }
-    # } else {
-      for (i in 1:length(p)){
-        # zp <- qnorm(1 - (1 - p[i]) / 2)
-        # upperCI[[i]] <- theta + zp * sqrt(gdetheta / expectedRange)
-        # lowerCI[[i]] <- theta - zp * sqrt(gdetheta / expectedRange)
+    for (i in 1:length(p)){
 
         CI <- funnelEstimate(y = change.table$y, range = expectedRange, u = length(unique(change.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = theta, overdispersion = overdispersion, dist = "normal", rho = rho, gdetheta = gdetheta)
         upperCI[[i]] <- CI$upperCI
@@ -1085,7 +902,6 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
         outcolname[i] <- paste0(p[i]*100,"%CI")
         change.table <- cbind(change.table, outofcontrol[[i]])
       }
-    # }
     if (auto.ylab){ylab = ylab[1]}
   } else {
     # logarithmic scale!!
@@ -1099,22 +915,6 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
     change.table <- data.frame(unit,"y" = log(y),o1,n1,o2,n2,rho, myunits)
     change.table <- change.table[order(change.table$rho),]
 
-    # # Calculate the z-score
-    # z_score <- (y - theta) * sqrt( rho / gdetheta)
-    #
-    # # Calculate the 10% and 90% percentiles.
-    # q90 <- quantile(z_score,probs=c(0.9))
-    # q10 <- quantile(z_score,probs=c(0.1))
-    #
-    # # Set z-scores larger than the 90% percentile to the 90% percentile.
-    # z_score <- ifelse(z_score>q90,q90,z_score)
-    #
-    # # Set z-scores smaller than the 10% percentile to the 10% percentile.
-    # z_score <- ifelse(z_score<q10,q10,z_score)
-    #
-    # # Calculate the Winsorised estimate
-    # # Used when overdispersion of the indicator
-    # phi <- (1 / nrow(change.table)) * sum(z_score ^ 2)
 
     if (length(exc) > 0){
       change.table <- change.table[-which(change.table$unit %in% exc),]
@@ -1136,35 +936,7 @@ changePropFunnel <- function(unit, o1, o2, n1, n2, p, pi1, pi2, method = c("diff
         change.table$rho[i+1] <- change.table$rho[i+1] + 1
       }
     }
-#
-#     if (overdispersion){
-#
-#       if (phi > (1 + 2 * sqrt( 2 / nrow(change.table) ))){
-#
-#         warning("The funnel limits were inflated due overdispersion presence.")
-#
-#         for (i in 1:length(p)){
-#           zp <- qnorm(1 - (1 - p[i]) / 2)
-#           upperCI[[i]] <- log(theta) + zp * sqrt(gdetheta * phi / expectedRange)
-#           lowerCI[[i]] <- log(theta) - zp * sqrt(gdetheta * phi / expectedRange)
-#           ylowCI[[i]] <- lowerCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-#           yuppCI[[i]] <- upperCI[[i]][which(expectedRange %in% ceiling(change.table$rho) == TRUE)]
-#           lowOUT[[i]] <- ifelse(change.table$y < ylowCI[[i]],TRUE, FALSE)
-#           uppOUT[[i]]<- ifelse(change.table$y > yuppCI[[i]], TRUE, FALSE)
-#           outofcontrol[[i]] <- ifelse(lowOUT[[i]] == TRUE | uppOUT[[i]] == TRUE, "OUT","-")
-#           outcolname[i] <- paste0(p[i]*100,"%CI")
-#           change.table <- cbind(change.table, outofcontrol[[i]])
-#         }
-#         if (auto.ylab){ylab = ylab[2]}
-#
-#         theta <- log(theta)
-#       }
-#
-#     } else {
       for (i in 1:length(p)){
-        # zp <- qnorm(1 - (1 - p[i]) / 2)
-        # upperCI[[i]] <- log(theta) + zp * sqrt(gdetheta / expectedRange)
-        # lowerCI[[i]] <- log(theta) - zp * sqrt(gdetheta / expectedRange)
 
         CI <- funnelEstimate(y = change.table$y, range = expectedRange, u = length(unique(change.table$unit)), totalAdmissions = totalAdmissions, totalObserved = totalObserved, p = p[i], theta = log(theta), overdispersion = overdispersion, dist = "normal", rho = rho, gdetheta = gdetheta)
         upperCI[[i]] <- CI$upperCI

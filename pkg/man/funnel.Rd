@@ -187,7 +187,6 @@ For these two parameter options, the precision parameter (plotted at horizontal 
 }
 }
 \examples{
-\dontrun{
 # Loading data
 data(icu)
 
@@ -212,7 +211,7 @@ plot(f1, main = "Cross-sectional proportions")
 # To analyze rates (SMR)
 f2 <- funnel(unit = x$Levels[-1], y = x[-1,]$SMR, method = "exact", direct = TRUE,
             theta = x$SMR[1], e = x[-1,]$Expected, n = x[-1,]$N, o = x[-1,]$Observed,
-            option = "rate", myunits = NULL, plot = FALSE)
+            option = "rate", plot = FALSE)
 f2
 plot(f2, main = "Cross-sectional rate (SMR)")
 
@@ -263,7 +262,6 @@ f6
 plot(f6, main = "Ratio of proportions of death for two periods")
 
 rm(icu, x, z, w, dt1, dt2, unit, f1, f2, f3, f4, f5, f6)
-}
 
 }
 \references{
