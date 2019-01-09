@@ -1,7 +1,14 @@
 ==============
+ems v1.2.02 (Release date: 2019-01-09)
+
+1- Function mortality_rate doens't need to receive monthOrder between 1 and 12 anymore.
+2- mortality_rate now can receive an periodName argument and returns months and quarters names for them.
+
+
+==============
 ems v1.2.01 (Release date: 2018-11-16)
 
-2- Fix in funnelEstimate for normal distribution when there is overdispersion.
+1- Fix in funnelEstimate for normal distribution when there is overdispersion.
 
 ==============
 ems v1.2.00 (Release date: 2018-07-23)
