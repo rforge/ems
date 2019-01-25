@@ -1,9 +1,9 @@
 Package: ems
 Title: Epimed Solutions Collection for Data Editing, Analysis, and Benchmark
     of Health Units
-Version: 1.2.2
-Date: 2019-01-09
-Authors: c(person("Lunna", "Borges", role = c("aut","cre"),
+Version: 1.2.3
+Date: 2019-01-25
+Authors@R: c(person("Lunna", "Borges", role = c("aut","cre"),
     email = "lunna.borges@epimedsolutions.com"),
     person("Pedro", "Brasil", role = c("aut"),
     email = "pedro.brasil@epimedsolutions.com"),

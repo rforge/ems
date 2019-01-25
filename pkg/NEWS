@@ -1,4 +1,11 @@
 ==============
+ems v1.2.03 (Release date: 2019-01-25)
+
+    Changes:
+
+1- Function mortality_rate now calculate annual mortality rate too.
+
+==============
 ems v1.2.02 (Release date: 2019-01-09)
 
 1- Function mortality_rate doens't need to receive monthOrder between 1 and 12 anymore.
