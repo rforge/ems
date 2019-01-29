@@ -239,12 +239,13 @@ drplvls = TRUE) # with drplvls
 
 rm(total.score, mean.score, a, data, bloodbank)
 }
-\references{
-'table', 'tab1', 'summ', 'alpha', 'unclassDataframe'
-}
 \author{
 Virasakdi Chongsuvivatwong <cvirasak@medicine.psu.ac.th>
 Caio Ferreira <caio.ferreira@epimedsolutions.com>
 Lunna Borges <caio.ferreira@epimedsolutions.com>
 Pedro Brasil <pedro.brasil@epimedsolutions.com>
 }
+\references{
+'table', 'tab1', 'summ', 'alpha', 'unclassDataframe'
+}
+
