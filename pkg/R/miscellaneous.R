@@ -201,7 +201,7 @@ remove.na <- function(data, replace = NA, console.output = TRUE){
     sf <- round( s / (length(na.sum) * nc[1]), 3)
     cat(paste0("Data has ", nc[2] , " columns."),"\n")
     cat(paste0("Data has ", length(na.sum) , " factor variables."),"\n")
-    cat(paste0("Data has ", s , " or " , sf, " of the factor fileds withouth data."),"\n")
+    cat(paste0("Data has ", s , " or " , sf, " of the factor fileds without data."),"\n")
   }
   data
 }

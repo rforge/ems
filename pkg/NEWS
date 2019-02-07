@@ -1,4 +1,12 @@
 ==============
+ems v1.2.05 (Release date: in development)
+
+    Changes:
+
+1- The  default approximation method for funnel is now 'normal' besides 'exact'.
+
+
+==============
 ems v1.2.04 (Release date: 2019-01-29)
 
     Changes:
