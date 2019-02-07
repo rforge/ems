@@ -110,12 +110,10 @@ mortality_rate <- function(deaths, period = NULL,
     ### Creating a new column of years only if there is more than 12 periods
 
     if(length(unique(period)) > 12){
-      print('entrou') ## apagar
       years <- rep(NA, length(period))
 
       n_intervals <- round(length(unique(period)) / 12)
       years <- cut(period, breaks = n_intervals, labels = seq(1,n_intervals))
-      print(quarters) ## apagar
       ### Annual mortality rate
       annual_rate <- tapply(X = deaths, INDEX = years, FUN = mean)
 
@@ -126,7 +124,6 @@ mortality_rate <- function(deaths, period = NULL,
       j <- 1
       for (i in 1:qtd_years){
         years_names[i] <- paste0(months_names[j],'-',months_names[j+11])
-        # print(months_names[1]) ## apagar
         if(is.na(months_names[j+11])){
           years_names[i] <- paste0(months_names[j])
         }
