@@ -2,8 +2,8 @@
 % Please edit documentation in R/calcurve.R
 \name{calcurve}
 \alias{calcurve}
-\alias{plot.calcurve}
 \alias{print.calcurve}
+\alias{plot.calcurve}
 \title{Calibration Curve}
 \usage{
 calcurve(deaths, pred, score = NULL, name_score = "Saps3",
@@ -87,4 +87,3 @@ categories_option = 'score', table = FALSE, plot = TRUE)
 \author{
 Camila Cardoso
 }
-

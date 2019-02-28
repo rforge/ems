@@ -40,4 +40,3 @@ mortality_rate(deaths = deaths, period = months, option = 'both')
 Camila Cardoso <camila.cardoso@epimedsolutions.com>
 Lunna Borges <lunna.borges@epimedsolutions.com>
 }
-
