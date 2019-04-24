@@ -1,4 +1,13 @@
 ==============
+ems v1.3.0 (Release date: 2019-04-22)
+
+    Changes:
+
+1- New functions: R2sh, R2pm and cal.slope.
+2- Now ems depend of packages boot, survival and rms.
+
+
+==============
 ems v1.2.07 (Release date: 2019-03-25)
 
     Changes:
