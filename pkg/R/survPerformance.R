@@ -66,6 +66,8 @@
 #' Kent, John T., and J. O. H. N. O'QUIGLEY. "Measures of dependence for censored survival data." Biometrika 75.3 (1988): 525-534.
 #'
 #' van Houwelingen, Hans C. "Validation, calibration, revision and combination of prognostic survival models." Statistics in medicine 19.24 (2000): 3401-3415.
+#'
+#' Rahman, M. Shafiqur, et al. "Review and evaluation of performance measures for survival prediction models in external validation settings." BMC medical research methodology 17.1 (2017): 60.
 
 #'
 #' @author Lunna Borges <lunna.borges@epimedsolutions.com>
