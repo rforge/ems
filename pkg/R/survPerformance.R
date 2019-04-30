@@ -10,7 +10,7 @@
 #' \code{R2pm} calculates a estimator of survival predictive accuracy proposed by Kent & O'Quigley and its bootstrap confidence interval.
 #'
 #'
-#' \code{cal.slope} returns the calibration slope of a survival model and its bootstrap confidence interval.
+#' \code{cal.Slope} returns the calibration slope of a survival model and its bootstrap confidence interval.
 #'
 #' @param time A vector of event times.
 #' @param status A indicator vector of event occurrence.
@@ -43,7 +43,7 @@
 #' \item \code{bootCI}: Boot confidence intervals resampling.
 #' }
 #'
-#' \code{cal.slope} returns a list with the following components:
+#' \code{cal.Slope} returns a list with the following components:
 #' \itemize{
 #' \item \code{slope}: The calibration slope measure of a survival model.
 #' \item \code{lower}: slope lower confidence limit.
