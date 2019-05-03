@@ -4,7 +4,7 @@
 #'
 #' @description Colection of functions for survival models performance analysis.
 #'
-#' \code{R2sh} estimates a distance-based estimator of survival predictive accuracy proposed by Schemper and Henderson. It was inspirated in \code{\link[survAUC]{schemper}} function, but receives the predicted values directly. Besides that, \code{R2sh} does bootstrap resampling and returns its confidence interval estimate.
+#' \code{R2sh} estimates a distance-based estimator of survival predictive accuracy proposed by Schemper and Henderson. It was inspirated in survAUC::schemper function, but receives the predicted values directly. Besides that, \code{R2sh} does bootstrap resampling and returns its confidence interval estimate.
 #'
 #'
 #' \code{R2pm} calculates a estimator of survival predictive accuracy proposed by Kent & O'Quigley and its bootstrap confidence interval.
